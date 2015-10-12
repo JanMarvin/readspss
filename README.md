@@ -7,11 +7,6 @@ Expect it to not work.
 
 master:
 ```R
-devtools::install_git("https://git.methoden.ruhr-uni-bochum.de/jmg/readspss.git")
+devtools::install_git("https://github.com/JanMarvin/readspss.git")
 ```
 
-testing:
-```R
-devtools::install_git("https://git.methoden.ruhr-uni-bochum.de/jmg/readspss.git",
-                      branch="testing")
-```
