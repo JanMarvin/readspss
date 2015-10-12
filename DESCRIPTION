@@ -1,0 +1,20 @@
+Package: readspss
+Type: Package
+Title: Import SPSS sav-files
+Version: 0.1.1
+Date: 2015-10-11
+Authors@R: c(
+    person("Jan Marvin", "Garbuszus",
+    email = "jan.garbuszus@ruhr-uni-bochum.de", role = c("aut", "cre")),
+    person("readstata13", role="cph"),
+    person("R Core Team", role="cph")
+    )
+Maintainer: Jan Marvin Garbuszus <jan.garbuszus@ruhr-uni-bochum.de>
+Description: Experimental function to read the SPSS file format.
+License: GPL-2
+LazyData: TRUE
+Imports:
+    Rcpp (>= 0.11.2)
+LinkingTo:
+    Rcpp
+ByteCompile: yes
