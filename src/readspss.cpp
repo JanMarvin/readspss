@@ -60,7 +60,7 @@ void debug(std::istream& sav, int size) {
 //' @import Rcpp
 //' @export
 // [[Rcpp::export]]
-List spss(const char * filePath)
+List spss(const char * filePath, const bool debug)
 {
 
   std::ifstream sav(filePath, std::ios::in | std::ios::binary);
@@ -84,13 +84,17 @@ List spss(const char * filePath)
     //  (Software) Version?
     std::string datalabel (56, '\0');
     readstring(datalabel, sav, datalabel.size());
-    // Rprintf("Datalabel: %s \n", datalabel);
+
+    if (debug)
+      Rprintf("Datalabel: %s \n", datalabel);
 
     int arch=0; // file format? should be 2
     arch = readbin(arch, sav, 0);
 
     k = readbin(k, sav, 0);
-    // Rprintf("K: %d \n", k);
+
+    if (debug)
+      Rprintf("K: %d \n", k);
 
     // nothing?
     // Number of base 30 digits
@@ -104,7 +108,9 @@ List spss(const char * filePath)
     cwvariables = readbin(cwvariables, sav, 0); // case weight variables
 
     n = readbin(n, sav, 0);
-    // Rprintf("N: %d \n", n);
+
+    if (debug)
+      Rprintf("N: %d \n", n);
 
     double bias = 0; // 100: compression bias
     bias = readbin(bias, sav, 0);
@@ -463,6 +469,9 @@ List spss(const char * filePath)
 
     // Data Part -------------------------------------------------------------//
 
+    if (debug)
+      Rprintf("-- Start: Data Part \n");
+
     // 1. Create Rcpp::List
     Rcpp::List df(k);
     for (uint16_t i=0; i<k; ++i)
@@ -694,6 +703,9 @@ List spss(const char * filePath)
 
     // debug(sav, 10);
 
+    if (debug)
+      Rprintf("-- End: Data Part \n");
+
 
 
 
@@ -710,7 +722,7 @@ List spss(const char * filePath)
     df.attr("missings") = missings;
     df.attr("label") = Labell_list;
     df.attr("EoHUnks") = EoHList;
-    // df.attr("data") = data;
+    df.attr("data") = data;
     df.attr("vartype") = vartype;
 
 

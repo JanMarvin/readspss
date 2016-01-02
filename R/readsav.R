@@ -63,10 +63,11 @@
 #'\code{\link{haven::read_sav}}.
 
 #' @useDynLib readspss
+#' @importFrom tools file_ext
 #' @export
 read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
                      encoding = NULL, fromEncoding = NULL, use.missings =
-                       FALSE) {
+                       FALSE, debug = FALSE, override = FALSE) {
 
   # Check if path is a url
   if (length(grep("^(http|ftp|https)://", file))) {
@@ -81,8 +82,15 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   if (!file.exists(filepath))
     return(message("File not found."))
 
+  file <- file_ext(basename(filepath))
 
-  data <- spss(filePath = filepath)
+  if (file != "sav" & !isTRUE(override) ){
+    warning ("Filending is not sav.
+             Use Override if this check should be ignored.")
+    return( NULL )
+  }
+
+  data <- spss(filePath = filepath, debug)
 
   names(data) <- trimws(names(data), "right")
 

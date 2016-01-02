@@ -6,13 +6,14 @@
 using namespace Rcpp;
 
 // spss
-List spss(const char * filePath);
-RcppExport SEXP readspss_spss(SEXP filePathSEXP) {
+List spss(const char * filePath, const bool debug);
+RcppExport SEXP readspss_spss(SEXP filePathSEXP, SEXP debugSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< const char * >::type filePath(filePathSEXP);
-    __result = Rcpp::wrap(spss(filePath));
+    Rcpp::traits::input_parameter< const bool >::type debug(debugSEXP);
+    __result = Rcpp::wrap(spss(filePath, debug));
     return __result;
 END_RCPP
 }

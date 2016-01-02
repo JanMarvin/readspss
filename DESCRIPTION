@@ -15,6 +15,6 @@ License: GPL-2
 LazyData: TRUE
 Imports:
     Rcpp (>= 0.11.2)
-LinkingTo:
-    Rcpp
+LinkingTo: Rcpp
 ByteCompile: yes
+RoxygenNote: 5.0.1

@@ -6,7 +6,7 @@
 #' @param filePath The full systempath to the dta file you want to import.
 #' @import Rcpp
 #' @export
-spss <- function(filePath) {
-    .Call('readspss_spss', PACKAGE = 'readspss', filePath)
+spss <- function(filePath, debug) {
+    .Call('readspss_spss', PACKAGE = 'readspss', filePath, debug)
 }
 
