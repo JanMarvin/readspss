@@ -84,7 +84,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   file <- file_ext(basename(filepath))
 
-  if (file != "sav" & !isTRUE(override) ){
+  if ((file != "sav" & file != "SAV") & !isTRUE(override) ){
     warning ("Filending is not sav.
              Use Override if this check should be ignored.")
     return( NULL )
@@ -206,6 +206,11 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
       labtable <- unlist(label[[i]])
       # print(vartypes)
 
+      # if(!is.null(labtable))
+      #   labtable <- trimws(labtable, "right")
+
+      names(labtable) <- trimws(names(labtable), "right")
+
       for (j in labname) {
         vartype <- vartypes[j]
 
@@ -217,7 +222,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
           # assign label if label set is complete
           if (all(varunique %in% labtable)) {
             data[, j] <- factor(data[, j], levels=labtable,
-                                labels=trimws(names(labtable), "right"))
+                                labels=labtable)
 
             # else generate labels from codes
           } else {
