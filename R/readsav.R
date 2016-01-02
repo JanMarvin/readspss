@@ -222,7 +222,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
           # assign label if label set is complete
           if (all(varunique %in% labtable)) {
             data[, j] <- factor(data[, j], levels=labtable,
-                                labels=labtable)
+                                labels=names(labtable))
 
             # else generate labels from codes
           } else {
