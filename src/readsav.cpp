@@ -24,35 +24,7 @@
 using namespace Rcpp;
 using namespace std;
 
-
-template <typename T>
-T readbin( T t , std::istream& sav, bool swapit)
-{
-  if (!sav.read ((char*)&t, sizeof(t)))
-    Rcpp::stop("readbin: a binary read error occurred");
-  if (swapit==0)
-    return(t);
-  else
-    return(t);
-}
-
-static void readstring(std::string &mystring, std::istream& sav, int nchar)
-{
-  if (!sav.read(&mystring[0], nchar))
-    Rcpp::warning("char: a binary read error occurred");
-  // Rcout << mystring << std::endl;
-}
-
-void debug(std::istream& sav, int size) {
-  char * memblock;
-
-  memblock = new char [size];
-  sav.read (memblock, size);
-
-  Rcpp::Rcout << memblock << std::endl;
-
-  delete[] memblock;
-}
+#include "spss.h"
 
 //' Reads the binary SPSS file
 //'
@@ -60,7 +32,7 @@ void debug(std::istream& sav, int size) {
 //' @import Rcpp
 //' @export
 // [[Rcpp::export]]
-List spss(const char * filePath, const bool debug)
+List sav(const char * filePath, const bool debug)
 {
 
   std::ifstream sav(filePath, std::ios::in | std::ios::binary);
@@ -135,8 +107,15 @@ List spss(const char * filePath, const bool debug)
     std::string nvarname (8, '\0');
 
     int8_t lablen = 0;
+    int32_t lablen32 = 0;
     int32_t nolab = 0;
     int32_t rtype = 0;
+    int32_t typeINT = 0;
+    int32_t has_var_label;
+    int32_t n_missing_values;
+    int32_t printINT;
+    int32_t writeINT;
+    std::string name (8, '\0');
 
     int32_t vtype=0, vlflag=0, nmiss=0, unk4=0, unk5 = 0;
 
@@ -278,6 +257,9 @@ List spss(const char * filePath, const bool debug)
       }
     }
 
+    if (debug)
+      Rcout << "end of header" << std::endl;
+
     // while loop above ends with 999
     // do not read another byte if 999 was already reached
     if (rtype!=999)
@@ -292,6 +274,48 @@ List spss(const char * filePath, const bool debug)
 
     while(rtype!=999)
     {
+      Rcpp::checkUserInterrupt();
+
+      while (rtype == 2) {
+
+        typeINT = readbin(typeINT, sav, 0);
+        has_var_label = readbin(has_var_label, sav, 0);
+
+        n_missing_values = readbin(n_missing_values, sav, 0);
+        printINT = readbin(printINT, sav, 0);
+        writeINT = readbin(writeINT, sav, 0);
+
+
+        Rprintf("1: %d \n", typeINT);
+        Rprintf("2: %d \n", has_var_label);
+        Rprintf("3: %d \n", n_missing_values);
+        Rprintf("4: %d \n", printINT);
+        Rprintf("5: %d \n", writeINT);
+
+        readstring(name, sav, name.size());
+
+        Rcout << "Name: " << name << std::endl;
+
+        if (has_var_label == 1){
+
+          lablen32 = readbin(lablen32, sav, 0);
+
+          std::string lab (lablen32, '\0');
+          readstring(lab, sav, 0);
+
+          Rprintf("lablen: %d \n", n);
+          Rcout << "Label: " << lab << std::endl;
+        }
+
+        if (n_missing_values != 0) {
+          double missing_values = 0;
+
+          missing_values = readbin(missing_values, sav, 0);
+        }
+
+        rtype = readbin(rtype, sav, 0);
+
+      }
 
       // 3 reading variable labels
       // first int: 3
@@ -302,6 +326,7 @@ List spss(const char * filePath, const bool debug)
       //
       // if second int >1 restart at double
       while (rtype == 3) {
+
         nolab = readbin(nolab, sav, 0);
         // Rprintf("Nolab: %d \n", nolab);
         Rcpp::CharacterVector label(nolab);
@@ -330,7 +355,7 @@ List spss(const char * filePath, const bool debug)
           label(i) = lab;
           code(i) = coden;
 
-          // Rcout << "Label: " << lab << std::endl;
+          Rcout << "Label: " << lab << std::endl;
         }
 
 
@@ -352,6 +377,8 @@ List spss(const char * filePath, const bool debug)
       int32_t nolabels = 0, unk2 = 0;
       while (rtype==4)
       {
+        Rcpp::checkUserInterrupt();
+
         nolabels = readbin(nolabels, sav, 0); // number of labels
 
         Rcpp::NumericVector EoHUnks(nolabels);
@@ -370,6 +397,8 @@ List spss(const char * filePath, const bool debug)
 
       while (rtype==6)
       {
+        Rcpp::checkUserInterrupt();
+
         int32_t nlines = 0; // number of lines
         Rcpp::CharacterVector Document(nlines);
         std::string document (80, '\0');
@@ -393,6 +422,7 @@ List spss(const char * filePath, const bool debug)
       // floating point info
       // vardispl paramenter
       while (rtype==7) {
+        Rcpp::checkUserInterrupt();
 
         // Rcout << "gelesen!" << endl;
 
@@ -406,6 +436,12 @@ List spss(const char * filePath, const bool debug)
         subtyp = readbin(subtyp, sav, 0);
         size = readbin(size, sav, 0);     // size always 4
         count = readbin(count, sav, 0);   // count always 8
+
+
+        // Rprintf("rtype: %d \n", rtype);
+        // Rprintf("subtyp: %d \n", subtyp);
+        // Rprintf("size: %d \n", size);
+        // Rprintf("count: %d \n", count);
 
         if (subtyp == 3) {
           // Rcout << "-- subtyp 3" << endl;
@@ -446,7 +482,7 @@ List spss(const char * filePath, const bool debug)
           std::string longvarname (count, '\0');
           readstring(longvarname, sav, count);
 
-          // Rcout << longvarname << std::endl;
+          Rcout << longvarname << std::endl;
 
         } else if (subtyp == 14) {
           // very long strings
@@ -454,10 +490,14 @@ List spss(const char * filePath, const bool debug)
           std::string longstring (count, '\0');
           readstring(longstring, sav, count);
 
+          Rcout << longstring << std::endl;
+
         } else {
           std::string data (size*count, '\0');
 
           readstring(data, sav, data.size());
+
+          Rcout << data << std::endl;
         }
 
 
@@ -465,9 +505,15 @@ List spss(const char * filePath, const bool debug)
 
       }
 
+      if (debug)
+        Rprintf("rtype: %d \n", rtype);
+
     }
 
     // Data Part -------------------------------------------------------------//
+
+    if(rtype != 999)
+      Rcpp::stop("Expected data part. Somethings wrong in this file.");
 
     if (debug)
       Rprintf("-- Start: Data Part \n");
@@ -511,71 +557,126 @@ List spss(const char * filePath, const bool debug)
 
 
 
-    int nn = 0;
-    int kk = 0;
+    int32_t nn = 0;
+    int32_t kk = 0;
     bool eof = 0;
 
-    while(!sav.eof() && !eof)
-    {
-      // data is stored rowwise-ish.
-      // for (int jj = 0; jj < k; ++jj) {
-      // for (int ii = 0; ii < n; ++ii) {
 
-      // chunk is 8 bit long. it gives the structure of the data. If it contains
-      // only uint8_t it stores 8 vals. If data contains doubles it stores a
-      // 253 and the next 8 byte will be the double.
+    int32_t iter = 0;
 
-      // Rcpp::Rcout << "read chunk" << endl;
-      chunk = readbin(val_d, sav, 0);
-
-      // therefor with respect to the required data structure (numerics and
-      // strings) the data has to be read.
-      // e.g. if there are 2 vals, in the first 8 bit may be 4 rows.
-
-      union {
-        double d;
-        uint8_t byte[8];
-      } u;
-
-      u.d = chunk;
-
-      uint8_t prev = 0;
-      for(int i=0; i<8; ++i)
+    if (cflag) {
+      while(!sav.eof() && !eof)
       {
-        prev = chunk;
-        val_b = u.byte[i];
+        iter++;
 
-        // Rprintf("val_b ist %d\n", val_b);
+        Rcpp::checkUserInterrupt();
 
-        // chunk verarbeiten
-        // 0 = Leer
-        // 1:251 = gut!
-        // jede 253 = es folgt ein double
-        // Steht eine 253 im code, dann folgt die an der Stelle erwartete Zahl
-        // im naechsten double block.
+        // data is stored rowwise-ish.
+
+        // chunk is 8 bit long. it gives the structure of the data. If it contains
+        // only uint8_t it stores 8 vals. If data contains doubles it stores a
+        // 253 and the next 8 byte will be the double.
+
+        // Rcpp::Rcout << "read chunk" << endl;
+
+        // if (kk == 0 && nn == 0)
 
 
-        if(val_b != 252 && val_b != 253 && val_b != 254 && val_b!=255)
+
+        chunk = readbin(val_d, sav, 0);
+
+        // therefor with respect to the required data structure (numerics and
+        // strings) the data has to be read.
+        // e.g. if there are 2 vals, in the first 8 bit may be 4 rows.
+
+        union {
+          double d;
+          uint8_t byte[8];
+        } u;
+
+        u.d = chunk;
+
+        for (int8_t i=0; i<8; ++i)
         {
 
-          int const type = vartype[kk];
-          switch(type)
+          val_b = u.byte[i];
+
+
+          // chunk verarbeiten
+          // 0 = Leer
+          // 1:251 = gut!
+          // jede 253 = es folgt ein double
+          // Steht eine 253 im code, dann folgt die an der Stelle erwartete Zahl
+          // im naechsten double block.
+
+          // Rprintf("val_b: %d \n", val_b);
+
+          // Rcpp::stop("break!");
+          //
+          int32_t len = 0;
+          int32_t const type = vartype[kk];
+          len = type;
+
+          // Rprintf("val_b: %d \n", val_b);
+          // Rprintf("type: %d \n", type);
+
+          switch (val_b)
           {
 
           case 0:
           {
+
+            val_d = chunk;
+
+            switch(type)
+            {
+
+            case 0:
+            {
+              Rcout << val_d << std::endl;
+              REAL(VECTOR_ELT(df,kk))[nn] = val_d;
+              break;
+            }
+
+            default:
+            {
+
+              if (len !=0 ) {
+              len = 8;
+
+              std::string val_s (len, '\0');
+              readstring(val_s, sav, val_s.size());
+
+              // Rcpp::Rcout << val_s << std::endl;
+              as<CharacterVector>(df[kk])[nn] = val_s;
+            }
+
+
+              break;
+            }
+            }
+
+            break;
+            // ignored
+          }
+
+          default: // (val_b >= 1 & val_b <= 251) {
+          {
+
+            switch(type)
+          {
+
+          case 0:
+          {
+            Rprintf("%f \n", val_b);
             REAL(VECTOR_ELT(df,kk))[nn] = val_b-100;
-            // Rprintf("%f \n", val_d);
             break;
           }
 
-
           default:
           {
-            int32_t len = 0;
-            len = vartype[kk];
 
-            if(len==-1 || (len !=0 && len !=8) )
+            if (len==-1 || (len !=0 && len !=8) )
               len = 8;
 
             std::string val_s (len, '\0');
@@ -583,17 +684,29 @@ List spss(const char * filePath, const bool debug)
             readstring(val_s, sav, val_s.size());
             // Rcpp::Rcout << val_s << std::endl;
             as<CharacterVector>(df[kk])[nn] = val_s;
+
             break;
           }
 
           }
 
-        } else if (val_b ==253) {
-          //           Rcpp::Rcout << "## Debug ... 253" << std::endl;
-          //           Rprintf("nn %d & kk %d \n", nn, kk);
+            break;
+          }
 
-          int const type = vartype[kk];
-          switch(type)
+          case 252:
+          {
+            // Rcpp::Rcout << "## Debug ... 252" << std::endl;
+            eof = true;
+            break;
+
+            break;
+          }
+
+          case  253:
+          {
+            //           Rcpp::Rcout << "## Debug ... 253" << std::endl;
+            //           Rprintf("nn %d & kk %d \n", nn, kk);
+            switch(type)
           {
 
           case 0:
@@ -606,8 +719,7 @@ List spss(const char * filePath, const bool debug)
 
           default:
           {
-            int32_t len = 0;
-            len = vartype[kk];
+            // Rprintf("len: %d \n", len);
 
             // spss length 1:251 indicate a string. the value is the string
             // size. obvious spss uses the size to determine the size of the
@@ -621,7 +733,7 @@ List spss(const char * filePath, const bool debug)
             // or not a field contains a numeric or character. Following fields
             // have len -1.
 
-            if(len==-1 || (len !=0 && len !=8) )
+            if (len==-1 || (len !=0 && len !=8) )
               len = 8;
 
             std::string val_s (len, '\0');
@@ -634,20 +746,25 @@ List spss(const char * filePath, const bool debug)
 
           }
 
+            break;
+          }
 
-        } else if (val_b ==254) {
-          // 254 indicates that string chunks read before should be interpreted
-          // as a single string. This is currently handled in R.
+          case 254:
+          {
+            // 254 indicates that string chunks read before should be interpreted
+            // as a single string. This is currently handled in R.
 
-          std::string val_s = "";
-          as<CharacterVector>(df[kk])[nn] = val_s;
+            std::string val_s = "";
+            as<CharacterVector>(df[kk])[nn] = val_s;
 
+            break;
+          }
 
-        } else if (val_b == 255) {
-          // 255 is a missing value in spss files.
-
-          int const type = vartype[kk];
-          switch(type)
+          case 255:
+          {
+            // 255 is a missing value in spss files.
+            //
+            switch(type)
           {
 
           case 0:
@@ -662,37 +779,98 @@ List spss(const char * filePath, const bool debug)
           }
           }
 
-        } else if (val_b ==252) {
-          // Rcpp::Rcout << "## Debug ... 252" << std::endl;
-          eof = true;
+
+          }
+          }
+
+          // Update kk iterator. If kk is k, update nn to start in next row.
+          kk++;
+          if (kk == k) {
+            nn++;
+
+            // some files are not ended with 252, ensure that no out of bounds
+            // error occures.
+            if (nn == n) {
+              eof = true;
+              break;
+            }
+
+            // reset k
+            kk = 0;
+          }
+
+
+          // Rprintf("i: %d \n", i);
+          // Rprintf("n: %d \n", nn);
+          // Rprintf("k: %d \n", kk);
+
+        }
+      }
+    } else {
+
+      Rcout << "yea!" << std::endl;
+
+      kk = 0;
+
+      for (int ii = 0; ii < n*k; ++ii) {
+
+        int32_t const type = vartype[kk];
+
+        switch(type)
+        {
+
+        case 0:
+        {
+          // Rcout << val_d << std::endl;
+
+          val_d = readbin(val_d, sav, 0);
+          REAL(VECTOR_ELT(df,kk))[nn] = val_d;
           break;
         }
 
-        // Update kk iterator. If kk is k, update nn to start in next row.
+        default:
+        {
+
+          int32_t len = 8;
+
+          std::string val_s (len, '\0');
+          readstring(val_s, sav, val_s.size());
+
+          // Rcpp::Rcout << val_s << std::endl;
+          as<CharacterVector>(df[kk])[nn] = val_s;
+
+          break;
+        }
+
+        }
+
+        // // Update kk iterator. If kk is k, update nn to start in next row.
+        // if (kk == k) {
+        //   nn++;
+        //
+        //   // some files are not ended with 252, ensure that no out of bounds
+        //   // error occures.
+        //   if (nn == n) {
+        //     eof = true;
+        //     break;
+        //   }
+        //
+        //   // reset k
+        //   kk = 0;
+        // }
+
         kk++;
+
         if (kk == k) {
           nn++;
-
-          // some files are not ended with 252, ensure that no out of bounds
-          // error occures.
-          if (nn == n) {
-            eof = true;
-            break;
-          }
-
-          // reset k
           kk = 0;
         }
 
-        // finish chunk, restart
-        if (i == 8)
-          break;
+        // Rprintf("ii: %d \n", ii);
+        Rprintf("kk: %d \n", kk);
 
       }
-
     }
-
-
 
 
     // 3. Create a data.frame
@@ -723,7 +901,6 @@ List spss(const char * filePath, const bool debug)
     df.attr("label") = Labell_list;
     df.attr("EoHUnks") = EoHList;
     df.attr("data") = data;
-    df.attr("vartype") = vartype;
 
 
     return(df);

@@ -90,7 +90,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     return( NULL )
   }
 
-  data <- spss(filePath = filepath, debug)
+  data <- sav(filePath = filepath, debug)
 
   names(data) <- trimws(names(data), "right")
 
@@ -305,7 +305,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   attr(data, "val.label") <- val.labels
   attr(data, "labnames") <- labnames
   attr(data, "missings") <- attribs$missings
-  attr(data, "vartype") <- attribs$vartype
+  attr(data, "vartype") <- attribs$vartypes
 
   return(data)
   }
