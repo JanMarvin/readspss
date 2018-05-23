@@ -518,11 +518,15 @@ List sav(const char * filePath, const bool debug)
     if (debug)
       Rprintf("-- Start: Data Part \n");
 
+    CharacterVector vnam = varnames[vartype >= 0];
+    IntegerVector vtyp = vartype[vartype >= 0];
+    int32_t kv = vnam.size();
+
     // 1. Create Rcpp::List
-    Rcpp::List df(k);
-    for (uint16_t i=0; i<k; ++i)
+    Rcpp::List df(kv);
+    for (uint16_t i=0; i<kv; ++i)
     {
-      int const type = vartype[i];
+      int const type = vtyp[i];
       switch(type)
       {
       case 0:
@@ -535,6 +539,11 @@ List sav(const char * filePath, const bool debug)
       }
     }
 
+    Rcout << vtyp << std::endl;
+    Rcout << vnam << std::endl;
+    Rprintf("kv: %d \n", kv);
+
+    // Rcpp::stop("stop");
 
     int32_t unk8=0;
     unk8 = readbin(unk8, sav, 0); // 0
@@ -625,37 +634,6 @@ List sav(const char * filePath, const bool debug)
 
           case 0:
           {
-
-            val_d = chunk;
-
-            switch(type)
-            {
-
-            case 0:
-            {
-              Rcout << val_d << std::endl;
-              REAL(VECTOR_ELT(df,kk))[nn] = val_d;
-              break;
-            }
-
-            default:
-            {
-
-              if (len !=0 ) {
-              len = 8;
-
-              std::string val_s (len, '\0');
-              readstring(val_s, sav, val_s.size());
-
-              // Rcpp::Rcout << val_s << std::endl;
-              as<CharacterVector>(df[kk])[nn] = val_s;
-            }
-
-
-              break;
-            }
-            }
-
             break;
             // ignored
           }
@@ -663,12 +641,12 @@ List sav(const char * filePath, const bool debug)
           default: // (val_b >= 1 & val_b <= 251) {
           {
 
-            switch(type)
+          switch(type)
           {
 
           case 0:
           {
-            Rprintf("%f \n", val_b);
+            // Rprintf("%f \n", val_b);
             REAL(VECTOR_ELT(df,kk))[nn] = val_b-100;
             break;
           }
@@ -812,9 +790,11 @@ List sav(const char * filePath, const bool debug)
 
       kk = 0;
 
-      for (int ii = 0; ii < n*k; ++ii) {
+      std::string val_s = "";
 
-        int32_t const type = vartype[kk];
+      for (int ii = 0; ii < n*kv; ++ii) {
+
+        int32_t const type = vtyp[kk];
 
         switch(type)
         {
@@ -823,6 +803,7 @@ List sav(const char * filePath, const bool debug)
         {
           // Rcout << val_d << std::endl;
 
+          val_d = NA_REAL;
           val_d = readbin(val_d, sav, 0);
           REAL(VECTOR_ELT(df,kk))[nn] = val_d;
           break;
@@ -831,9 +812,11 @@ List sav(const char * filePath, const bool debug)
         default:
         {
 
-          int32_t len = 8;
+          double len = type;
 
-          std::string val_s (len, '\0');
+          len = ceil(len/8) * 8;
+
+          std::string val_s ((int32_t)len, '\0');
           readstring(val_s, sav, val_s.size());
 
           // Rcpp::Rcout << val_s << std::endl;
@@ -844,30 +827,15 @@ List sav(const char * filePath, const bool debug)
 
         }
 
-        // // Update kk iterator. If kk is k, update nn to start in next row.
-        // if (kk == k) {
-        //   nn++;
-        //
-        //   // some files are not ended with 252, ensure that no out of bounds
-        //   // error occures.
-        //   if (nn == n) {
-        //     eof = true;
-        //     break;
-        //   }
-        //
-        //   // reset k
-        //   kk = 0;
-        // }
-
         kk++;
 
-        if (kk == k) {
+        if (kk == kv) {
           nn++;
           kk = 0;
         }
 
         // Rprintf("ii: %d \n", ii);
-        Rprintf("kk: %d \n", kk);
+        // Rprintf("kk: %d \n", kk);
 
       }
     }
@@ -876,7 +844,7 @@ List sav(const char * filePath, const bool debug)
     // 3. Create a data.frame
     R_xlen_t nrows = Rf_length(df[0]);
     df.attr("row.names") = IntegerVector::create(NA_INTEGER, nrows);
-    df.attr("names") = varnames;
+    df.attr("names") = vnam;
     df.attr("class") = "data.frame";
 
     // debug(sav, 10);
@@ -895,7 +863,7 @@ List sav(const char * filePath, const bool debug)
     df.attr("datestamp") = datestamp;
     df.attr("timestamp") = timestamp;
     df.attr("vallabels") = vallabels;
-    df.attr("vartypes") = vartype;
+    df.attr("vartypes") = vtyp;
     df.attr("unkmat") = unkmat;
     df.attr("missings") = missings;
     df.attr("label") = Labell_list;
