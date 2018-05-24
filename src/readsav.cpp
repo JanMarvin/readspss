@@ -763,7 +763,7 @@ List sav(const char * filePath, const bool debug)
 
           // Update kk iterator. If kk is k, update nn to start in next row.
           kk++;
-          if (kk == k) {
+          if (kk == kv) {
             nn++;
 
             // some files are not ended with 252, ensure that no out of bounds
