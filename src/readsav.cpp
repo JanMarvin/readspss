@@ -529,6 +529,18 @@ List sav(const char * filePath, const bool debug)
     IntegerVector vtyp = vartype[vartype >= 0];
     int32_t kv = vnam.size();
 
+    // wrangling around to get the length of the strings
+    NumericVector vtyp2 = wrap(vtyp);
+    NumericVector res = ceil( vtyp2 / 8);
+
+    Rcout << res << std::endl;
+
+    if (cflag) {
+      kv = k;
+      vtyp = vartype;
+      vnam = varnames;
+    }
+
     // 1. Create Rcpp::List
     Rcpp::List df(kv);
     for (uint16_t i=0; i<kv; ++i)
@@ -580,217 +592,252 @@ List sav(const char * filePath, const bool debug)
 
     int32_t iter = 0;
 
+
+
+
+    Rcpp::List chunklist = Rcpp::List();
+
     if (cflag) {
-      while(!sav.eof() && !eof)
-      {
-        iter++;
 
-        Rcpp::checkUserInterrupt();
+      for (int ii = 0; ii < res.size(); ++ii) {
 
-        // data is stored rowwise-ish.
+        int rr = res[ii];
+        std::string start = "";
 
-        // chunk is 8 bit long. it gives the structure of the data. If it contains
-        // only uint8_t it stores 8 vals. If data contains doubles it stores a
-        // 253 and the next 8 byte will be the double.
+        int jj = 0;
 
-        // Rcpp::Rcout << "read chunk" << endl;
+        while( jj < rr ) {
+          Rprintf("%d", jj);
 
-        // if (kk == 0 && nn == 0)
+          Rcpp::checkUserInterrupt();
 
+          // data is stored rowwise-ish.
 
+          // chunk is 8 bit long. it gives the structure of the data. If it contains
+          // only uint8_t it stores 8 vals. If data contains doubles it stores a
+          // 253 and the next 8 byte will be the double.
 
-        chunk = readbin(val_d, sav, 0);
+          // Rcpp::Rcout << "read chunk" << endl;
 
-        // therefor with respect to the required data structure (numerics and
-        // strings) the data has to be read.
-        // e.g. if there are 2 vals, in the first 8 bit may be 4 rows.
-
-        union {
-          double d;
-          uint8_t byte[8];
-        } u;
-
-        u.d = chunk;
-
-        for (int8_t i=0; i<8; ++i)
-        {
-
-          val_b = u.byte[i];
+          // if (kk == 0 && nn == 0)
 
 
-          // chunk verarbeiten
-          // 0 = Leer
-          // 1:251 = gut!
-          // jede 253 = es folgt ein double
-          // Steht eine 253 im code, dann folgt die an der Stelle erwartete Zahl
-          // im naechsten double block.
 
-          // Rprintf("val_b: %d \n", val_b);
 
-          // Rcpp::stop("break!");
-          //
-          int32_t len = 0;
-          int32_t const type = vartype[kk];
-          len = type;
+          chunk = readbin(val_d, sav, 0);
 
-          // Rprintf("val_b: %d \n", val_b);
-          // Rprintf("type: %d \n", type);
+          IntegerVector chunkvec(8);
 
-          switch (val_b)
+          // therefor with respect to the required data structure (numerics and
+          // strings) the data has to be read.
+          // e.g. if there are 2 vals, in the first 8 bit may be 4 rows.
+
+          union {
+            double d;
+            uint8_t byte[8];
+          } u;
+
+          u.d = chunk;
+
+          // combine strings
+          int16_t lastval = 0;
+
+
+          for (int8_t i=0; i<8; ++i)
           {
 
-          case 0:
-          {
-            break;
-            // ignored
-          }
+            val_b = u.byte[i];
 
-          default: // (val_b >= 1 & val_b <= 251) {
-          {
+            // chunk verarbeiten
+            // 0 = Leer
+            // 1:251 = gut!
+            // jede 253 = es folgt ein double
+            // Steht eine 253 im code, dann folgt die an der Stelle erwartete Zahl
+            // im naechsten double block.
 
-          switch(type)
-          {
+            // Rprintf("val_b: %d \n", val_b);
 
-          case 0:
-          {
-            // Rprintf("%f \n", val_b);
-            REAL(VECTOR_ELT(df,kk))[nn] = val_b-100;
-            break;
-          }
-
-          default:
-          {
-
-            if (len==-1 || (len !=0 && len !=8) )
-              len = 8;
-
-            std::string val_s (len, '\0');
-
-            readstring(val_s, sav, val_s.size());
-            // Rcpp::Rcout << val_s << std::endl;
-            as<CharacterVector>(df[kk])[nn] = val_s;
-
-            break;
-          }
-
-          }
-
-            break;
-          }
-
-          case 252:
-          {
-            // Rcpp::Rcout << "## Debug ... 252" << std::endl;
-            eof = true;
-            break;
-
-            break;
-          }
-
-          case  253:
-          {
-            //           Rcpp::Rcout << "## Debug ... 253" << std::endl;
-            //           Rprintf("nn %d & kk %d \n", nn, kk);
-            switch(type)
-          {
-
-          case 0:
-          {
-            val_d = readbin(val_d, sav, 0);
-            REAL(VECTOR_ELT(df,kk))[nn] = val_d;
-            // Rprintf("%f \n", val_d);
-            break;
-          }
-
-          default:
-          {
-            // Rprintf("len: %d \n", len);
-
-            // spss length 1:251 indicate a string. the value is the string
-            // size. obvious spss uses the size to determine the size of the
-            // string. there are two possible problems.
-            // 1. len can be 1:7 in this case we know the max string size of the
-            // variable is less than 8 bit long. still the field to read is 8 bit
-            // long.
-            // 2. the string is spread across different internal strings. in this
-            // case we know the max size, still have to read each 8bit field.
-            // maybe the max size can be used to have a second opinion wheather
-            // or not a field contains a numeric or character. Following fields
-            // have len -1.
-
-            if (len==-1 || (len !=0 && len !=8) )
-              len = 8;
-
-            std::string val_s (len, '\0');
-
-            readstring(val_s, sav, val_s.size());
-            // Rcpp::Rcout << val_s << std::endl;
-            as<CharacterVector>(df[kk])[nn] = val_s;
-            break;
-          }
-
-          }
-
-            break;
-          }
-
-          case 254:
-          {
-            // 254 indicates that string chunks read before should be interpreted
-            // as a single string. This is currently handled in R.
-
-            std::string val_s = "";
-            as<CharacterVector>(df[kk])[nn] = val_s;
-
-            break;
-          }
-
-          case 255:
-          {
-            // 255 is a missing value in spss files.
+            // Rcpp::stop("break!");
             //
-            switch(type)
-          {
+            int32_t len = 0;
+            int32_t const type = vartype[kk];
+            len = type;
 
-          case 0:
-          {
-            REAL(VECTOR_ELT(df,kk))[nn] = NA_REAL;
-            break;
-          }
-          default:
-          {
-            as<CharacterVector>(df[kk])[nn] = NA_STRING;
-            break;
-          }
-          }
+            // Rprintf("val_b: %d \n", val_b);
+            // Rprintf("type: %d \n", type);
 
+            switch (val_b)
+            {
 
-          }
-          }
+            case 0:
+            {
+              break;
+              // ignored
+            }
 
-          // Update kk iterator. If kk is k, update nn to start in next row.
-          kk++;
-          if (kk == kv) {
-            nn++;
+            default: // (val_b >= 1 & val_b <= 251) {
+            {
 
-            // some files are not ended with 252, ensure that no out of bounds
-            // error occures.
-            if (nn == n) {
-              eof = true;
+              switch(type)
+            {
+
+            case 0:
+            {
+              // Rprintf("%f \n", val_b);
+              REAL(VECTOR_ELT(df,kk))[nn] = val_b-100;
               break;
             }
 
-            // reset k
-            kk = 0;
+            default:
+            {
+
+              if (len==-1 || (len !=0 && len !=8) )
+                len = 8;
+
+              std::string val_s (len, '\0');
+
+              readstring(val_s, sav, val_s.size());
+
+              start.append( val_s );
+              jj++;
+
+              // Rcpp::Rcout << val_s << std::endl;
+              // as<CharacterVector>(df[kk])[nn] = val_s;
+
+              break;
+            }
+
+            }
+
+              break;
+            }
+
+            case 252:
+            {
+              // Rcpp::Rcout << "## Debug ... 252" << std::endl;
+              eof = true;
+              break;
+
+              break;
+            }
+
+            case  253:
+            {
+              //           Rcpp::Rcout << "## Debug ... 253" << std::endl;
+              //           Rprintf("nn %d & kk %d \n", nn, kk);
+              switch(type)
+            {
+
+            case 0:
+            {
+              val_d = readbin(val_d, sav, 0);
+              REAL(VECTOR_ELT(df,kk))[nn] = val_d;
+              // Rprintf("%f \n", val_d);
+              break;
+            }
+
+            default:
+            {
+              // Rprintf("len: %d \n", len);
+
+              // spss length 1:251 indicate a string. the value is the string
+              // size. obvious spss uses the size to determine the size of the
+              // string. there are two possible problems.
+              // 1. len can be 1:7 in this case we know the max string size of the
+              // variable is less than 8 bit long. still the field to read is 8 bit
+              // long.
+              // 2. the string is spread across different internal strings. in this
+              // case we know the max size, still have to read each 8bit field.
+              // maybe the max size can be used to have a second opinion wheather
+              // or not a field contains a numeric or character. Following fields
+              // have len -1.
+
+              if (len==-1 || (len !=0 && len !=8) )
+                len = 8;
+
+              std::string val_s (len, '\0');
+
+              readstring(val_s, sav, val_s.size());
+              // Rcpp::Rcout << val_s << std::endl;
+              // as<CharacterVector>(df[kk])[nn] = val_s;
+
+              start.append( val_s );
+              jj++;
+
+
+              break;
+            }
+
+            }
+
+              break;
+            }
+
+            case 254:
+            {
+              // 254 indicates that string chunks read before should be interpreted
+              // as a single string. This is currently handled in R.
+
+              // std::string val_s = "";
+              //
+              // as<CharacterVector>(df[kk])[nn] = val_s;
+
+              Rcout << "test";
+
+              break;
+            }
+
+            case 255:
+            {
+              // 255 is a missing value in spss files.
+              //
+              switch(type)
+            {
+
+            case 0:
+            {
+              REAL(VECTOR_ELT(df,kk))[nn] = NA_REAL;
+              break;
+            }
+            default:
+            {
+              // as<CharacterVector>(df[kk])[nn] = NA_STRING;
+              break;
+            }
+            }
+
+
+            }
+            }
+
+            // Update kk iterator. If kk is k, update nn to start in next row.
+            kk++;
+            if (kk == kv) {
+              nn++;
+
+              // some files are not ended with 252, ensure that no out of bounds
+              // error occures.
+              if (nn == n) {
+                eof = true;
+                break;
+              }
+
+              // reset k
+              kk = 0;
+            }
+
+
+            // Rprintf("i: %d \n", i);
+            // Rprintf("n: %d \n", nn);
+            // Rprintf("k: %d \n", kk);
+
           }
-
-
-          // Rprintf("i: %d \n", i);
-          // Rprintf("n: %d \n", nn);
-          // Rprintf("k: %d \n", kk);
-
         }
+
+        Rcout << start << std::endl;
+
       }
+
     } else {
 
       kk = 0;
@@ -823,6 +870,13 @@ List sav(const char * filePath, const bool debug)
 
           std::string val_s ((int32_t)len, '\0');
           readstring(val_s, sav, val_s.size());
+
+          // shorten the string to the actual size reported by SPSS
+          val_s.erase(type, std::string::npos);
+          // trim additional whitespaces on the right
+          val_s.erase(std::remove(
+              std::begin(val_s), std::end(val_s), ' '), std::end(val_s)
+          );
 
           // Rcpp::Rcout << val_s << std::endl;
           as<CharacterVector>(df[kk])[nn] = val_s;
@@ -876,6 +930,8 @@ List sav(const char * filePath, const bool debug)
     df.attr("data") = data;
     df.attr("longstring") = lstring;
     df.attr("longvarname") = lvarname;
+    df.attr("cflag") = cflag;
+    df.attr("chunklist") = chunklist;
 
 
     return(df);
