@@ -47,7 +47,7 @@ List sav(const char * filePath, const bool debug)
     readstring(spss, sav, spss.size());
     // Rprintf("%s \n", spss);
 
-    // @(#)
+    // @(#) // todo add this as a check if not: bail out
     sav.seekg(4, std::ios::cur);
 
     // Textfield 1
@@ -270,6 +270,8 @@ List sav(const char * filePath, const bool debug)
     // how to determine length?
 
     Rcpp::List EoHList = Rcpp::List();
+    Rcpp::List lvarname;
+    Rcpp::List lstring;
 
 
     while(rtype!=999)
@@ -286,15 +288,15 @@ List sav(const char * filePath, const bool debug)
         writeINT = readbin(writeINT, sav, 0);
 
 
-        Rprintf("1: %d \n", typeINT);
-        Rprintf("2: %d \n", has_var_label);
-        Rprintf("3: %d \n", n_missing_values);
-        Rprintf("4: %d \n", printINT);
-        Rprintf("5: %d \n", writeINT);
+        // Rprintf("1: %d \n", typeINT);
+        // Rprintf("2: %d \n", has_var_label);
+        // Rprintf("3: %d \n", n_missing_values);
+        // Rprintf("4: %d \n", printINT);
+        // Rprintf("5: %d \n", writeINT);
 
         readstring(name, sav, name.size());
 
-        Rcout << "Name: " << name << std::endl;
+        // Rcout << "Name: " << name << std::endl;
 
         if (has_var_label == 1){
 
@@ -303,8 +305,8 @@ List sav(const char * filePath, const bool debug)
           std::string lab (lablen32, '\0');
           readstring(lab, sav, 0);
 
-          Rprintf("lablen: %d \n", n);
-          Rcout << "Label: " << lab << std::endl;
+          // Rprintf("lablen: %d \n", n);
+          // Rcout << "Label: " << lab << std::endl;
         }
 
         if (n_missing_values != 0) {
@@ -355,7 +357,7 @@ List sav(const char * filePath, const bool debug)
           label(i) = lab;
           code(i) = coden;
 
-          Rcout << "Label: " << lab << std::endl;
+          // Rcout << "Label: " << lab << std::endl;
         }
 
 
@@ -479,10 +481,13 @@ List sav(const char * filePath, const bool debug)
         } else if (subtyp == 13) {
           // very long varnames
           // Rcout << "-- subtyp 13" << endl;
+          //
           std::string longvarname (count, '\0');
           readstring(longvarname, sav, count);
 
-          Rcout << longvarname << std::endl;
+          lvarname.push_back( longvarname );
+
+          // Rcout << longvarname << std::endl;
 
         } else if (subtyp == 14) {
           // very long strings
@@ -490,14 +495,16 @@ List sav(const char * filePath, const bool debug)
           std::string longstring (count, '\0');
           readstring(longstring, sav, count);
 
-          Rcout << longstring << std::endl;
+          lstring.push_back( longstring );
+
+          // Rcout << longstring << std::endl;
 
         } else {
           std::string data (size*count, '\0');
 
           readstring(data, sav, data.size());
 
-          Rcout << data << std::endl;
+          // Rcout << data << std::endl;
         }
 
 
@@ -539,9 +546,9 @@ List sav(const char * filePath, const bool debug)
       }
     }
 
-    Rcout << vtyp << std::endl;
-    Rcout << vnam << std::endl;
-    Rprintf("kv: %d \n", kv);
+    // Rcout << vtyp << std::endl;
+    // Rcout << vnam << std::endl;
+    // Rprintf("kv: %d \n", kv);
 
     // Rcpp::stop("stop");
 
@@ -786,8 +793,6 @@ List sav(const char * filePath, const bool debug)
       }
     } else {
 
-      Rcout << "yea!" << std::endl;
-
       kk = 0;
 
       std::string val_s = "";
@@ -869,6 +874,8 @@ List sav(const char * filePath, const bool debug)
     df.attr("label") = Labell_list;
     df.attr("EoHUnks") = EoHList;
     df.attr("data") = data;
+    df.attr("longstring") = lstring;
+    df.attr("longvarname") = lvarname;
 
 
     return(df);
