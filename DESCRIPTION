@@ -13,6 +13,7 @@ Maintainer: Jan Marvin Garbuszus <jan.garbuszus@ruhr-uni-bochum.de>
 Description: Experimental function to read the SPSS file format.
 License: GPL-2
 LazyData: TRUE
+Depends: magrittr
 Imports:
     Rcpp (>= 0.11.2)
 LinkingTo: Rcpp
