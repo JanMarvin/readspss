@@ -599,15 +599,19 @@ List sav(const char * filePath, const bool debug)
 
     if (cflag) {
 
-      for (int ii = 0; ii < res.size(); ++ii) {
+      // for (int ii = 0; ii < res.size(); ++ii) {
 
-        int rr = res[ii];
-        std::string start = "";
+        // int rr = res[ii];
+        // std::string start = "";
+        //
+        // Rprintf("ii: %d \n", rr);
+        //
+        // int jj = 0;
+        int chunkdone = 0;
 
-        int jj = 0;
+        while(!eof /* jj < rr && !eof */ && !chunkdone) {
+          // Rprintf("%d - %d\n", rr, jj);
 
-        while( jj < rr ) {
-          Rprintf("%d", jj);
 
           Rcpp::checkUserInterrupt();
 
@@ -618,10 +622,6 @@ List sav(const char * filePath, const bool debug)
           // 253 and the next 8 byte will be the double.
 
           // Rcpp::Rcout << "read chunk" << endl;
-
-          // if (kk == 0 && nn == 0)
-
-
 
 
           chunk = readbin(val_d, sav, 0);
@@ -642,6 +642,7 @@ List sav(const char * filePath, const bool debug)
           // combine strings
           int16_t lastval = 0;
 
+          // Rcout << "kk: " << kk << std::endl;
 
           for (int8_t i=0; i<8; ++i)
           {
@@ -698,11 +699,11 @@ List sav(const char * filePath, const bool debug)
 
               readstring(val_s, sav, val_s.size());
 
-              start.append( val_s );
-              jj++;
+              // start.append( val_s );
+              // jj++;
 
               // Rcpp::Rcout << val_s << std::endl;
-              // as<CharacterVector>(df[kk])[nn] = val_s;
+              as<CharacterVector>(df[kk])[nn] = val_s;
 
               break;
             }
@@ -759,10 +760,10 @@ List sav(const char * filePath, const bool debug)
 
               readstring(val_s, sav, val_s.size());
               // Rcpp::Rcout << val_s << std::endl;
-              // as<CharacterVector>(df[kk])[nn] = val_s;
+              as<CharacterVector>(df[kk])[nn] = val_s;
 
-              start.append( val_s );
-              jj++;
+              // start.append( val_s );
+              // jj++;
 
 
               break;
@@ -778,11 +779,11 @@ List sav(const char * filePath, const bool debug)
               // 254 indicates that string chunks read before should be interpreted
               // as a single string. This is currently handled in R.
 
-              // std::string val_s = "";
-              //
-              // as<CharacterVector>(df[kk])[nn] = val_s;
+              std::string val_s = "";
 
-              Rcout << "test";
+              as<CharacterVector>(df[kk])[nn] = val_s;
+
+              // Rcout << "test";
 
               break;
             }
@@ -808,6 +809,10 @@ List sav(const char * filePath, const bool debug)
 
 
             }
+
+              if (i == 7) {
+                chunkdone = 1;
+              }
             }
 
             // Update kk iterator. If kk is k, update nn to start in next row.
@@ -831,10 +836,17 @@ List sav(const char * filePath, const bool debug)
             // Rprintf("n: %d \n", nn);
             // Rprintf("k: %d \n", kk);
 
-          }
-        }
+            // if (jj == rr) {
+            //   Rcout << start << std::endl;
+            //   start = "";
+            //
+            //   // reset jj
+            //   jj = 0;
+            // }
 
-        Rcout << start << std::endl;
+          }
+        // }
+
 
       }
 
