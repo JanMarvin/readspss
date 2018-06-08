@@ -255,6 +255,8 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     nams[grep(pattern=x[[1]], nams)]
   })
 
+  print(replvec)
+
   # vtyp <- attr(data, "vartype")
   #
   # vtyp <- vtyp[vtyp>0]
@@ -264,47 +266,55 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   if (cflag == 0) {
     # data.frame(dd)
-    for (i in seq_along(replvec)) {
+    for (i in length(replvec):1) {
+
       pat <- replvec[[i]]
 
+
+      # print(pat)
+      # print(data)
+
       if (length(pat) > 1) {
-        sel <- data[pat]
+        sel <- data[,names(data) %in% pat]
 
         if (all(sapply(sel, is.character))) {
+          print("yeah")
           pp <- pat[-1]; p1 <- pat[1]
 
-          data[pp] <- NULL
+          # remove columns pat[2:n]
+          data <- data[,!names(data) %in% pp]
+
           data[p1] <- do.call(paste0, sel)
         }
       }
     }
   }
 
-  # #### ToDo: For additional speed this could/should have been done during the
-  # #### Rcpp loop.
-  # # if unkmat > 0 it is a string.
-  # # trim strings of size < 8
-  #
-  # dfstr <- which(attribs$unkmat[,1] > 0 & attribs$unkmat[,1] < 8)
-  #
-  # # print(dfstr)
-  #
-  # if (any(dfstr)) {
-  #   for (j in 1:length(dfstr)) {
-  #     var <- dfstr[j]
-  #     data[var] <- trimws(c(data[, var]), "right")
-  #   }
-  # }
-  #
-  # # Identify strings longer than 8. divide the
-  # # size to see how many cells need to be merged.
-  # spssstr <- attribs$unkmat[,1]
-  # longstr <- which(spssstr > 8)
-  # spssstr <- ceiling(spssstr[longstr] / 8)
-  #
-  # #   print(spssstr)
-  # #   print(longstr)
-  #
+  #### ToDo: For additional speed this could/should have been done during the
+  #### Rcpp loop.
+  # if unkmat > 0 it is a string.
+  # trim strings of size < 8
+
+  dfstr <- which(attribs$unkmat[,1] > 0 & attribs$unkmat[,1] < 8)
+
+  # print(dfstr)
+
+  if (any(dfstr)) {
+    for (j in 1:length(dfstr)) {
+      var <- dfstr[j]
+      data[var] <- trimws(c(data[, var]), "right")
+    }
+  }
+
+  # Identify strings longer than 8. divide the
+  # size to see how many cells need to be merged.
+  spssstr <- attribs$unkmat[,1]
+  longstr <- which(spssstr > 8)
+  spssstr <- ceiling(spssstr[longstr] / 8)
+
+  #   print(spssstr)
+  #   print(longstr)
+
   # # strings that are longer than 8 bit. works only for
   # if (any(longstr)) {
   #   for (j in length(longstr):1) {
