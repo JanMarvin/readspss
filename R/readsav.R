@@ -92,13 +92,9 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   data <- sav(filePath = filepath, debug)
 
-  names(data) <- trimws(names(data), "right")
-
   label <- attr(data, "label")
   val.labels <- attr(data, "vallabels")
   vartypes <- attr(data, "vartype")
-
-  # print(label)
 
   attribs <- attributes(data)
 

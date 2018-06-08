@@ -104,7 +104,6 @@ List sav(const char * filePath, const bool debug)
     Rcpp::CharacterVector varnames(k);
     Rcpp::CharacterVector vallabels(k);
     Rcpp::IntegerVector vartype(k);
-    std::string nvarname (8, '\0');
 
     int8_t lablen = 0;
     int32_t lablen32 = 0;
@@ -151,8 +150,16 @@ List sav(const char * filePath, const bool debug)
 
         vartype(i) = vtype;
 
+
+        std::string nvarname (8, '\0');
         // read variable name 8 bytes long upercase letters
         readstring(nvarname, sav, nvarname.size());
+
+        // trim additional whitespaces on the right
+        nvarname.erase(std::remove(
+            std::begin(nvarname), std::end(nvarname), ' '), std::end(nvarname)
+        );
+
         varnames(i) = nvarname;
         // Rprintf("Varname: %s \n", nvarname);
 
