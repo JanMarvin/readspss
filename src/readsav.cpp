@@ -272,6 +272,12 @@ List sav(const char * filePath, const bool debug)
       }
     }
 
+
+
+    if (debug){
+      Rcout << varnames << std::endl;
+    }
+
     if (debug)
       Rcout << "end of header" << std::endl;
 
@@ -321,7 +327,7 @@ List sav(const char * filePath, const bool debug)
           readstring(lab, sav, 0);
 
           // Rprintf("lablen: %d \n", n);
-          // Rcout << "Label: " << lab << std::endl;
+          Rcout << "Label: " << lab << std::endl;
         }
 
         if (n_missing_values != 0) {
@@ -453,8 +459,8 @@ List sav(const char * filePath, const bool debug)
 
         // subtype integer: 3 / floating: 4 / varsyst: 11
         subtyp = readbin(subtyp, sav, 0);
-        size = readbin(size, sav, 0);     // size always 4
-        count = readbin(count, sav, 0);   // count always 8
+        size = readbin(size, sav, 0);
+        count = readbin(count, sav, 0);
 
 
         // Rprintf("rtype: %d \n", rtype);
@@ -545,9 +551,6 @@ List sav(const char * filePath, const bool debug)
     if(rtype != 999)
       Rcpp::stop("Expected data part. Somethings wrong in this file.");
 
-    if (debug)
-      Rprintf("-- Start: Data Part \n");
-
     CharacterVector vnam = varnames[vartype >= 0];
     IntegerVector vtyp = vartype[vartype >= 0];
     int32_t kv = vnam.size();
@@ -556,9 +559,14 @@ List sav(const char * filePath, const bool debug)
     NumericVector vtyp2 = wrap(vtyp);
     NumericVector res = ceil( vtyp2 / 8);
 
-    Rcout << res << std::endl;
+    if (debug) {
+      Rcout << res << std::endl;
+      Rcout << vtyp << std::endl;
+      Rcout << vartype << std::endl;
+    }
 
-    Rcout << vtyp << std::endl;
+    if (debug)
+      Rprintf("-- Start: Data Part \n");
 
     // if (cflag) {
     //   kv = k;
@@ -618,6 +626,9 @@ List sav(const char * filePath, const bool debug)
     int32_t iter = 0;
 
 
+    if (debug) {
+      Rprintf("cflag: %d\n", cflag);
+    }
 
 
     Rcpp::List chunklist = Rcpp::List();
@@ -675,8 +686,8 @@ List sav(const char * filePath, const bool debug)
 
           // Rcout << "kk: " << kk << std::endl;
 
-          Rprintf("res: %d\n", res_kk);
-          Rprintf("res_i: %d\n", res_i);
+          // Rprintf("res: %d\n", res_kk);
+          // Rprintf("res_i: %d\n", res_i);
 
           for (int8_t i=0; i<8; ++i)
           {
@@ -697,6 +708,10 @@ List sav(const char * filePath, const bool debug)
             int32_t len = 0;
             int32_t const type = vartype[kk_i];
             len = type;
+
+            if (debug) {
+              Rprintf("val_b: %d - type: %d\n", val_b, type);
+            }
 
             // Rprintf("kk_i: %d \n", kk_i);
             // Rprintf("k: %d \n", k);
