@@ -542,11 +542,13 @@ List sav(const char * filePath, const bool debug)
 
     Rcout << res << std::endl;
 
-    if (cflag) {
-      kv = k;
-      vtyp = vartype;
-      vnam = varnames;
-    }
+    Rcout << vtyp << std::endl;
+
+    // if (cflag) {
+    //   kv = k;
+    //   vtyp = vartype;
+    //   vnam = varnames;
+    // }
 
     // 1. Create Rcpp::List
     Rcpp::List df(kv);
@@ -609,16 +611,22 @@ List sav(const char * filePath, const bool debug)
       // for (int ii = 0; ii < res.size(); ++ii) {
 
         // int rr = res[ii];
-        // std::string start = "";
+        std::string start = "";
         //
         // Rprintf("ii: %d \n", rr);
         //
         // int jj = 0;
+
+
+
         int chunkdone = 0;
 
-        while(!eof /* jj < rr && !eof */ && !chunkdone) {
-          // Rprintf("%d - %d\n", rr, jj);
+        int res_i = 0;
+        int kk_i = 0;
+        int32_t res_kk = res[kk];
 
+        while (!eof /* jj < rr && !eof */ && !chunkdone) {
+          // Rprintf("%d - %d\n", rr, jj);
 
           Rcpp::checkUserInterrupt();
 
@@ -651,6 +659,9 @@ List sav(const char * filePath, const bool debug)
 
           // Rcout << "kk: " << kk << std::endl;
 
+          Rprintf("res: %d\n", res_kk);
+          Rprintf("res_i: %d\n", res_i);
+
           for (int8_t i=0; i<8; ++i)
           {
 
@@ -668,8 +679,16 @@ List sav(const char * filePath, const bool debug)
             // Rcpp::stop("break!");
             //
             int32_t len = 0;
-            int32_t const type = vartype[kk];
+            int32_t const type = vartype[kk_i];
             len = type;
+
+            // Rprintf("kk_i: %d \n", kk_i);
+            // Rprintf("k: %d \n", k);
+
+            if (kk_i == vartype.size()-1)
+              kk_i = 0;
+            else
+              kk_i++;
 
             // Rprintf("val_b: %d \n", val_b);
             // Rprintf("type: %d \n", type);
@@ -706,11 +725,20 @@ List sav(const char * filePath, const bool debug)
 
               readstring(val_s, sav, val_s.size());
 
-              // start.append( val_s );
-              // jj++;
+              start.append( val_s );
 
-              // Rcpp::Rcout << val_s << std::endl;
-              as<CharacterVector>(df[kk])[nn] = val_s;
+              if ((res_i >= res_kk-1) || (res_i+1 == res_kk)) {
+                Rcpp::Rcout << start << std::endl;
+                as<CharacterVector>(df[kk])[nn] = start;
+
+                // reset start
+                start = "";
+                kk++;
+                res_kk = res[kk];
+                res_i = 0;
+              } else {
+                res_i++;
+              }
 
               break;
             }
@@ -766,8 +794,21 @@ List sav(const char * filePath, const bool debug)
               std::string val_s (len, '\0');
 
               readstring(val_s, sav, val_s.size());
-              // Rcpp::Rcout << val_s << std::endl;
-              as<CharacterVector>(df[kk])[nn] = val_s;
+              start.append( val_s );
+
+              if ((res_i >= res_kk-1)) {
+                Rprintf("kk: %d; nn: %d; res_i %d\n", kk, nn, res_i);
+                Rcpp::Rcout << start << std::endl;
+                as<CharacterVector>(df[kk])[nn] = start;
+
+                // reset start
+                start = "";
+                kk++;
+                res_kk = res[kk];
+                res_i = 0;
+              } else {
+                res_i++;
+              }
 
               // start.append( val_s );
               // jj++;
@@ -786,9 +827,23 @@ List sav(const char * filePath, const bool debug)
               // 254 indicates that string chunks read before should be interpreted
               // as a single string. This is currently handled in R.
 
-              std::string val_s = "";
+              // std::string val_s = "";
+              //
+              // as<CharacterVector>(df[kk])[nn] = val_s;
 
-              as<CharacterVector>(df[kk])[nn] = val_s;
+              if (res_i > 0) {
+                Rprintf("kk: %d; nn: %d; res_i %d\n", kk, nn, res_i);
+                Rcpp::Rcout << start << std::endl;
+                as<CharacterVector>(df[kk])[nn] = start;
+
+                // reset start
+                start = "";
+                kk++;
+                res_kk = res[kk];
+                res_i = 0;
+              }
+
+              // res_i = 0;
 
               // Rcout << "test";
 
@@ -822,8 +877,13 @@ List sav(const char * filePath, const bool debug)
               }
             }
 
+            // Rprintf("kk: %d", kk);
+            // Rprintf(" type: %d\n", type);
+
+            if (type == 0)
+              kk++;
+
             // Update kk iterator. If kk is k, update nn to start in next row.
-            kk++;
             if (kk == kv) {
               nn++;
 
@@ -838,22 +898,7 @@ List sav(const char * filePath, const bool debug)
               kk = 0;
             }
 
-
-            // Rprintf("i: %d \n", i);
-            // Rprintf("n: %d \n", nn);
-            // Rprintf("k: %d \n", kk);
-
-            // if (jj == rr) {
-            //   Rcout << start << std::endl;
-            //   start = "";
-            //
-            //   // reset jj
-            //   jj = 0;
-            // }
-
           }
-        // }
-
 
       }
 
@@ -951,6 +996,7 @@ List sav(const char * filePath, const bool debug)
     df.attr("longvarname") = lvarname;
     df.attr("cflag") = cflag;
     df.attr("chunklist") = chunklist;
+    df.attr("res") = res;
 
 
     return(df);
