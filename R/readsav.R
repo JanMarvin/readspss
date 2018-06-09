@@ -275,7 +275,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
       pat <- replvec[[i]]
 
       # any variables to combine?
-      if (length(pat) > 1) {
+      if (length(pat) > 1 & grepl("001", pat[2])) {
         sel <- data[,names(data) %in% pat]
 
         if (all(sapply(sel, is.character))) {

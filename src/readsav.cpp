@@ -106,9 +106,9 @@ List sav(const char * filePath, const bool debug)
     std::string filelabel (67, '\0');
     readstring(filelabel, sav, filelabel.size());
 
-    Rcpp::CharacterVector varnames(k);
-    Rcpp::CharacterVector vallabels(k);
-    Rcpp::IntegerVector vartype(k);
+    std::vector<string> varnames;
+    std::vector<string> vallabels;
+    std::vector<int> vartype;
 
     int8_t lablen = 0;
     int32_t lablen32 = 0;
@@ -123,15 +123,16 @@ List sav(const char * filePath, const bool debug)
 
     int32_t vtype=0, vlflag=0, nmiss=0, unk4=0, unk5 = 0;
 
-    Rcpp::NumericMatrix unkmat(k,5);
 
     Rcpp::List missings = Rcpp::List();
+    Rcpp::List unklist = Rcpp::List();
 
-    // rtype = readbin(rtype, sav, 0);
-    for(int32_t i=0; i < k; ++i) {
 
-      rtype = readbin(rtype, sav, 0);
-      // Rprintf("Zahl in durchgang %d: %d \n", i,rtype);
+    rtype = readbin(rtype, sav, 0);
+    // Rprintf("Zahl in durchgang %d: %d \n", i,rtype);
+
+    int32_t i = 0;
+    while (rtype == 2) {
 
       if (rtype == 2)
       {
@@ -144,16 +145,21 @@ List sav(const char * filePath, const bool debug)
         // oder sind es int8_ts? aber 2 8 5 0 macht so viel Sinn wie 329730
         unk5 = readbin(unk5, sav, 0);        // 4 and 5 are equal.
 
+
+        Rcpp::NumericMatrix unkmat(0,5);
+
         // Store unks in matrix export as attr unkmat
-        unkmat(i,0) = vtype;
-        unkmat(i,1) = vlflag;
-        unkmat(i,2) = nmiss; // 1, 2, 3 or -1, -2, -3 (range)
-        unkmat(i,3) = unk4; // print format?
-        unkmat(i,4) = unk5; // write format?
+        unkmat(0,0) = vtype;
+        unkmat(0,1) = vlflag;
+        unkmat(0,2) = nmiss; // 1, 2, 3 or -1, -2, -3 (range)
+        unkmat(0,3) = unk4; // print format?
+        unkmat(0,4) = unk5; // write format?
+
+        unklist.push_back(unkmat);
 
         // Rcpp::Rcout << vtype <<"; "<< vlflag <<"; " << nmiss <<"; " << unk4 << "; "<< unk5 << endl;
 
-        vartype(i) = vtype;
+        vartype.push_back(vtype);
 
 
         std::string nvarname (8, '\0');
@@ -164,8 +170,8 @@ List sav(const char * filePath, const bool debug)
         nvarname = std::regex_replace(nvarname,
                                       std::regex("^ +| +$|( ) +"), "$1");
 
-        varnames(i) = nvarname;
-        // Rprintf("Varname: %s \n", nvarname);
+        varnames.push_back(nvarname);
+        // Rcout << nvarname << std::endl;
 
         if(vlflag==1)
         {
@@ -192,8 +198,8 @@ List sav(const char * filePath, const bool debug)
 
           // trim additional whitespaces on the right
           vallabel = std::regex_replace(vallabel,
-                                         std::regex("^ +| +$|( ) +"), "$1");
-          vallabels(i) = vallabel;
+                                        std::regex("^ +| +$|( ) +"), "$1");
+          vallabels.push_back(vallabel);
 
           rtype = origlen;
 
@@ -270,21 +276,16 @@ List sav(const char * filePath, const bool debug)
           }
         }
       }
-    }
 
+      // while loop above ends with 999
+      // do not read another byte if 999 was already reached
+      if (rtype!=999)
+        rtype = readbin(rtype, sav, 0);
 
-
-    if (debug){
-      Rcout << varnames << std::endl;
     }
 
     if (debug)
-      Rcout << "end of header" << std::endl;
-
-    // while loop above ends with 999
-    // do not read another byte if 999 was already reached
-    if (rtype!=999)
-      rtype = readbin(rtype, sav, 0);
+      Rcout << "-- end of header" << std::endl;
 
 
     Rcpp::List Labell_list = Rcpp::List();
@@ -294,51 +295,50 @@ List sav(const char * filePath, const bool debug)
     Rcpp::List lvarname;
     Rcpp::List lstring;
 
-
-    while(rtype!=999)
+    while(rtype!=999 & rtype != 2)
     {
       Rcpp::checkUserInterrupt();
 
-      while (rtype == 2) {
-
-        typeINT = readbin(typeINT, sav, 0);
-        has_var_label = readbin(has_var_label, sav, 0);
-
-        n_missing_values = readbin(n_missing_values, sav, 0);
-        printINT = readbin(printINT, sav, 0);
-        writeINT = readbin(writeINT, sav, 0);
-
-
-        // Rprintf("1: %d \n", typeINT);
-        // Rprintf("2: %d \n", has_var_label);
-        // Rprintf("3: %d \n", n_missing_values);
-        // Rprintf("4: %d \n", printINT);
-        // Rprintf("5: %d \n", writeINT);
-
-        readstring(name, sav, name.size());
-
-        // Rcout << "Name: " << name << std::endl;
-
-        if (has_var_label == 1){
-
-          lablen32 = readbin(lablen32, sav, 0);
-
-          std::string lab (lablen32, '\0');
-          readstring(lab, sav, 0);
-
-          // Rprintf("lablen: %d \n", n);
-          Rcout << "Label: " << lab << std::endl;
-        }
-
-        if (n_missing_values != 0) {
-          double missing_values = 0;
-
-          missing_values = readbin(missing_values, sav, 0);
-        }
-
-        rtype = readbin(rtype, sav, 0);
-
-      }
+      // while (rtype == 2) {
+      //
+      //   typeINT = readbin(typeINT, sav, 0);
+      //   has_var_label = readbin(has_var_label, sav, 0);
+      //
+      //   n_missing_values = readbin(n_missing_values, sav, 0);
+      //   printINT = readbin(printINT, sav, 0);
+      //   writeINT = readbin(writeINT, sav, 0);
+      //
+      //
+      //   // Rprintf("1: %d \n", typeINT);
+      //   // Rprintf("2: %d \n", has_var_label);
+      //   // Rprintf("3: %d \n", n_missing_values);
+      //   // Rprintf("4: %d \n", printINT);
+      //   // Rprintf("5: %d \n", writeINT);
+      //
+      //   readstring(name, sav, name.size());
+      //
+      //   // Rcout << "Name: " << name << std::endl;
+      //
+      //   if (has_var_label == 1){
+      //
+      //     lablen32 = readbin(lablen32, sav, 0);
+      //
+      //     std::string lab (lablen32, '\0');
+      //     readstring(lab, sav, 0);
+      //
+      //     // Rprintf("lablen: %d \n", n);
+      //     Rcout << "Label: " << lab << std::endl;
+      //   }
+      //
+      //   if (n_missing_values != 0) {
+      //     double missing_values = 0;
+      //
+      //     missing_values = readbin(missing_values, sav, 0);
+      //   }
+      //
+      //   rtype = readbin(rtype, sav, 0);
+      //
+      // }
 
       // 3 reading variable labels
       // first int: 3
@@ -551,18 +551,26 @@ List sav(const char * filePath, const bool debug)
     if(rtype != 999)
       Rcpp::stop("Expected data part. Somethings wrong in this file.");
 
-    CharacterVector vnam = varnames[vartype >= 0];
-    IntegerVector vtyp = vartype[vartype >= 0];
+    // c++ vector to Rcpp Vector
+    IntegerVector Vartype = wrap(vartype);
+    CharacterVector Varnames = wrap(varnames);
+
+
+    CharacterVector vnam = Varnames[Vartype >= 0];
+    IntegerVector vtyp = Vartype[Vartype >= 0];
     int32_t kv = vnam.size();
+
 
     // wrangling around to get the length of the strings
     NumericVector vtyp2 = wrap(vtyp);
     NumericVector res = ceil( vtyp2 / 8);
 
     if (debug) {
+      Rcout << vnam << std::endl;
+      Rcout << vtyp << std::endl;
       Rcout << res << std::endl;
       Rcout << vtyp << std::endl;
-      Rcout << vartype << std::endl;
+      Rcout << Vartype << std::endl;
     }
 
     if (debug)
@@ -637,103 +645,103 @@ List sav(const char * filePath, const bool debug)
 
       // for (int ii = 0; ii < res.size(); ++ii) {
 
-        // int rr = res[ii];
-        std::string start = "";
-        //
-        // Rprintf("ii: %d \n", rr);
-        //
-        // int jj = 0;
+      // int rr = res[ii];
+      std::string start = "";
+      //
+      // Rprintf("ii: %d \n", rr);
+      //
+      // int jj = 0;
 
 
 
-        int chunkdone = 0;
+      int chunkdone = 0;
 
-        int res_i = 0;
-        int kk_i = 0;
-        int32_t res_kk = 0;
+      int res_i = 0;
+      int kk_i = 0;
+      int32_t res_kk = 0;
 
-        while (!eof /* jj < rr && !eof && !chunkdone*/ ) {
-          // Rprintf("%d - %d\n", rr, jj);
+      while (!eof /* jj < rr && !eof && !chunkdone*/ ) {
+        // Rprintf("%d - %d\n", rr, jj);
 
-          Rcpp::checkUserInterrupt();
+        Rcpp::checkUserInterrupt();
 
-          // data is stored rowwise-ish.
+        // data is stored rowwise-ish.
 
-          // chunk is 8 bit long. it gives the structure of the data. If it contains
-          // only uint8_t it stores 8 vals. If data contains doubles it stores a
-          // 253 and the next 8 byte will be the double.
+        // chunk is 8 bit long. it gives the structure of the data. If it contains
+        // only uint8_t it stores 8 vals. If data contains doubles it stores a
+        // 253 and the next 8 byte will be the double.
 
-          // Rcpp::Rcout << "read chunk" << endl;
+        // Rcpp::Rcout << "read chunk" << endl;
 
 
-          chunk = readbin(val_d, sav, 0);
+        chunk = readbin(val_d, sav, 0);
 
-          IntegerVector chunkvec(8);
+        IntegerVector chunkvec(8);
 
-          // therefor with respect to the required data structure (numerics and
-          // strings) the data has to be read.
-          // e.g. if there are 2 vals, in the first 8 bit may be 4 rows.
+        // therefor with respect to the required data structure (numerics and
+        // strings) the data has to be read.
+        // e.g. if there are 2 vals, in the first 8 bit may be 4 rows.
 
-          union {
-            double d;
-            uint8_t byte[8];
-          } u;
+        union {
+          double d;
+          uint8_t byte[8];
+        } u;
 
-          u.d = chunk;
+        u.d = chunk;
 
-          // combine strings
-          int16_t lastval = 0;
+        // combine strings
+        int16_t lastval = 0;
 
-          // Rcout << "kk: " << kk << std::endl;
+        // Rcout << "kk: " << kk << std::endl;
 
-          // Rprintf("res: %d\n", res_kk);
-          // Rprintf("res_i: %d\n", res_i);
+        // Rprintf("res: %d\n", res_kk);
+        // Rprintf("res_i: %d\n", res_i);
 
-          for (int8_t i=0; i<8; ++i)
+        for (int8_t i=0; i<8; ++i)
+        {
+
+          val_b = u.byte[i];
+
+          // chunk verarbeiten
+          // 0 = Leer
+          // 1:251 = gut!
+          // jede 253 = es folgt ein double
+          // Steht eine 253 im code, dann folgt die an der Stelle erwartete Zahl
+          // im naechsten double block.
+
+          // Rprintf("val_b: %d \n", val_b);
+
+          // Rcpp::stop("break!");
+          //
+          int32_t len = 0;
+          int32_t const type = vartype[kk_i];
+          len = type;
+
+          // if (debug) {
+          //   Rprintf("val_b: %d - type: %d - kk: %d\n", val_b, type, kk);
+          // }
+          //
+          // Rprintf("kk: %d \n", kk);
+          // Rprintf("nn: %d \n", nn);
+
+          if (kk_i == vartype.size()-1)
+            kk_i = 0;
+          else
+            kk_i++;
+
+          // Rprintf("val_b: %d \n", val_b);
+          // Rprintf("type: %d \n", type);
+
+          switch (val_b)
           {
 
-            val_b = u.byte[i];
-
-            // chunk verarbeiten
-            // 0 = Leer
-            // 1:251 = gut!
-            // jede 253 = es folgt ein double
-            // Steht eine 253 im code, dann folgt die an der Stelle erwartete Zahl
-            // im naechsten double block.
-
-            // Rprintf("val_b: %d \n", val_b);
-
-            // Rcpp::stop("break!");
-            //
-            int32_t len = 0;
-            int32_t const type = vartype[kk_i];
-            len = type;
-
-            // if (debug) {
-            //   Rprintf("val_b: %d - type: %d\n", val_b, type);
-            // }
-
-            // Rprintf("kk_i: %d \n", kk_i);
-            // Rprintf("k: %d \n", k);
-
-            if (kk_i == vartype.size()-1)
-              kk_i = 0;
-            else
-              kk_i++;
-
-            // Rprintf("val_b: %d \n", val_b);
-            // Rprintf("type: %d \n", type);
-
-            switch (val_b)
-            {
-
-            case 0:
+          case 0:
             {
               break;
               // ignored
             }
 
-            default: // (val_b >= 1 & val_b <= 251) {
+          default: // (val_b >= 1 & val_b <= 251) {
             {
 
               switch(type)
@@ -741,7 +749,7 @@ List sav(const char * filePath, const bool debug)
 
             case 0:
             {
-              // Rprintf("%f \n", val_b);
+              // Rprintf("- %d \n", val_b-100);
               REAL(VECTOR_ELT(df,kk))[nn] = val_b-100;
               break;
             }
@@ -769,7 +777,6 @@ List sav(const char * filePath, const bool debug)
                 // reset start
                 start = "";
                 kk++;
-                res_kk = res[kk];
                 res_i = 0;
               } else {
                 res_i++;
@@ -783,7 +790,7 @@ List sav(const char * filePath, const bool debug)
               break;
             }
 
-            case 252:
+          case 252:
             {
               // Rcpp::Rcout << "## Debug ... 252" << std::endl;
               eof = true;
@@ -792,7 +799,7 @@ List sav(const char * filePath, const bool debug)
               break;
             }
 
-            case  253:
+          case  253:
             {
               //           Rcpp::Rcout << "## Debug ... 253" << std::endl;
               //           Rprintf("nn %d & kk %d \n", nn, kk);
@@ -809,7 +816,6 @@ List sav(const char * filePath, const bool debug)
 
             default:
             {
-              // Rprintf("len: %d \n", len);
 
               // spss length 1:251 indicate a string. the value is the string
               // size. obvious spss uses the size to determine the size of the
@@ -846,7 +852,6 @@ List sav(const char * filePath, const bool debug)
                 // reset start
                 start = "";
                 kk++;
-                res_kk = res[kk];
                 res_i = 0;
               } else {
                 res_i++;
@@ -864,7 +869,7 @@ List sav(const char * filePath, const bool debug)
               break;
             }
 
-            case 254:
+          case 254:
             {
               // 254 indicates that string chunks read before should be interpreted
               // as a single string. This is currently handled in R.
@@ -874,26 +879,27 @@ List sav(const char * filePath, const bool debug)
               // as<CharacterVector>(df[kk])[nn] = val_s;
 
               if (res_i > 0) {
-                // Rprintf("kk: %d; nn: %d; res_i %d\n", kk, nn, res_i);
-                // Rcpp::Rcout << start << std::endl;
+              // Rprintf("kk: %d; nn: %d; res_i %d\n", kk, nn, res_i);
+              // Rcpp::Rcout << start << std::endl;
 
-                // trim additional whitespaces
-                start = std::regex_replace(start,
-                                           std::regex("^ +| +$|( ) +"), "$1");
+              // trim additional whitespaces
+              start = std::regex_replace(start,
+                                         std::regex("^ +| +$|( ) +"), "$1");
 
-                as<CharacterVector>(df[kk])[nn] = start;
+              as<CharacterVector>(df[kk])[nn] = start;
 
-                // reset start
-                start = "";
-                kk++;
-                res_kk = res[kk];
-                res_i = 0;
-              }
-
-              break;
+              // reset start
+              start = "";
+              kk++;
+              res_i = 0;
+            } else if (type >= 0) {
+              kk++;
             }
 
-            case 255:
+            break;
+            }
+
+          case 255:
             {
               // 255 is a missing value in spss files.
               //
@@ -902,7 +908,9 @@ List sav(const char * filePath, const bool debug)
 
             case 0:
             {
+              // Rcout << NA_REAL << std::endl;
               REAL(VECTOR_ELT(df,kk))[nn] = NA_REAL;
+              // kk++;
               break;
             }
             default:
@@ -911,44 +919,45 @@ List sav(const char * filePath, const bool debug)
               kk++;
               break;
             }
+              break;
             }
 
 
             }
 
-              // if (i == 7) {
-              //   chunkdone = 1;
-              //
-              //   Rcout << "stop: chunkdone" << std::endl;
-              // }
-            }
-
-            // Rprintf("kk: %d", kk);
-            // Rprintf(" type: %d\n", type);
-
-            if (type == 0)
-              kk++;
-
-            // Update kk iterator. If kk is k, update nn to start in next row.
-            if (kk == kv) {
-              nn++;
-
-              // some files are not ended with 252, ensure that no out of bounds
-              // error occures.
-              if (nn == n) {
-                eof = true;
-
-                if (debug)
-                  Rcout << "stop: eof" << std::endl;
-
-                break;
-              }
-
-              // reset k
-              kk = 0;
-            }
-
+            // if (i == 7) {
+            //   chunkdone = 1;
+            //
+            //   Rcout << "stop: chunkdone" << std::endl;
+            // }
           }
+
+          // Rprintf(" type: %d\n", type);
+
+          if (type == 0)
+            kk++;
+
+          // Update kk iterator. If kk is k, update nn to start in next row.
+          if (kk == kv) {
+            nn++;
+
+            // Rprintf("nn: %d", nn);
+            // some files are not ended with 252, ensure that no out of bounds
+            // error occures.
+            if (nn == n) {
+              eof = true;
+
+              if (debug)
+                Rcout << "stop: eof" << std::endl;
+
+              break;
+            }
+
+            // reset k
+            kk = 0;
+          }
+
+        }
 
       }
 
@@ -1036,10 +1045,10 @@ List sav(const char * filePath, const bool debug)
     df.attr("datestamp") = datestamp;
     df.attr("timestamp") = timestamp;
     df.attr("vallabels") = vallabels;
-    df.attr("varnames") = varnames;
-    df.attr("vartypes") = vartype;
+    df.attr("varnames") = Varnames;
+    df.attr("vartypes") = Vartype;
     df.attr("vtype") = vtyp;
-    df.attr("unkmat") = unkmat;
+    df.attr("unkmat") = unklist;
     df.attr("missings") = missings;
     df.attr("label") = Labell_list;
     df.attr("haslabel") = EoHList;
