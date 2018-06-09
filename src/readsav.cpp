@@ -652,7 +652,7 @@ List sav(const char * filePath, const bool debug)
         int kk_i = 0;
         int32_t res_kk = 0;
 
-        while (!eof /* jj < rr && !eof */ && !chunkdone) {
+        while (!eof /* jj < rr && !eof && !chunkdone*/ ) {
           // Rprintf("%d - %d\n", rr, jj);
 
           Rcpp::checkUserInterrupt();
@@ -907,7 +907,8 @@ List sav(const char * filePath, const bool debug)
             }
             default:
             {
-              // as<CharacterVector>(df[kk])[nn] = NA_STRING;
+              as<CharacterVector>(df[kk])[nn] = NA_STRING;
+              kk++;
               break;
             }
             }
@@ -915,9 +916,11 @@ List sav(const char * filePath, const bool debug)
 
             }
 
-              if (i == 7) {
-                chunkdone = 1;
-              }
+              // if (i == 7) {
+              //   chunkdone = 1;
+              //
+              //   Rcout << "stop: chunkdone" << std::endl;
+              // }
             }
 
             // Rprintf("kk: %d", kk);
@@ -934,6 +937,10 @@ List sav(const char * filePath, const bool debug)
               // error occures.
               if (nn == n) {
                 eof = true;
+
+                if (debug)
+                  Rcout << "stop: eof" << std::endl;
+
                 break;
               }
 
