@@ -1,15 +1,20 @@
 # Readspss
 
 Experimental R package using Rcpp to parse a sav-file into a data.frame().
-It may work. Testing is welcome though the package is still at a experimental
-stage and the package can crash. The current package imports numerics and 
-strings into a data frame. Long strings are currently not implemented.
+It works. Testing is welcome though the package is still at a experimental
+stage and the package can crash. The current package imports everything into
+a data frame. Including long strings and labels.
 
-Because of the R code wrapped around the Rcpp-Function the package is way slower
-than havens read_sav, but it is still a bit faster than foreigns read.spss 
-(tested with a minimal example).
-In contrast to the other packages readspss ships some additional informations 
-like the datalabel, date- and timestamp.
+Because of the R code wrapped Rcpp-Function the package is pretty fast. Though
+since SPSS files can not be trustet (!) some tasks need to be handled in while()
+loops and vectors need to be increased on the fly (generally not the best idea).
+The R code for factor conversion slows things down a bit, changing encoding even
+more.
+In comparisson to `haven:read_sav` and `foreign:read.spss` this package reads a
+few more files and reads them correctly, but it is still in early stages and 
+only(tested with minimal examples).
+In addition readspss ships some additional informations like the datalabel,
+date- and timestamp.
 
 ## Installation
 
@@ -28,16 +33,12 @@ dat <- read.sav(file)
 
 ## Test
 
-Currently readspss does not convert internal NAs to R NAs. Meaning, if a value
-label is defined as NA (e.g. 9 is missing), it will be returned as number, not
-as <NA>. This explaines some differences. readspss will have more factor levels
-than foreign because of this. Missings are parsed form the sav file, but the
-implementation is missing. Pull requests are welcome.
-
 Another difference, some characters are returend as factors in foreign. 
 Currently I have no clue why. Nevertheless this appears to affect only variables
 with identical values (e.g. a variable containing the dataset name "Data" can be
-a factor in foreign and a character in readspss). 
+a factor in foreign and a character in readspss).
+As of today, I have no clue what this is supposed to mean, but I leave this here
+as a reminder.
 
 
 ```R
