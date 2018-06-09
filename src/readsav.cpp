@@ -759,7 +759,7 @@ List sav(const char * filePath, const bool debug)
               start.append( val_s );
 
               if ((res_i >= res_kk-1) || (res_i+1 == res_kk)) {
-                Rcpp::Rcout << start << std::endl;
+                // Rcpp::Rcout << start << std::endl;
 
                 // trim additional whitespaces
                 start = std::regex_replace(start,
@@ -834,9 +834,9 @@ List sav(const char * filePath, const bool debug)
               res_kk = res[kk];
 
               if ((res_i >= res_kk-1)) {
-                Rprintf("kk: %d; nn: %d; res_i %d; res_kk %d\n",
-                        kk, nn, res_i, res_kk);
-                Rcpp::Rcout << start << std::endl;
+                // Rprintf("kk: %d; nn: %d; res_i %d; res_kk %d\n",
+                //         kk, nn, res_i, res_kk);
+                // Rcpp::Rcout << start << std::endl;
 
                 // trim additional whitespaces
                 start = std::regex_replace(start,
