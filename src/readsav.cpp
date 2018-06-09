@@ -20,6 +20,7 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
+#include <regex>
 
 using namespace Rcpp;
 using namespace std;
@@ -56,6 +57,10 @@ List sav(const char * filePath, const bool debug)
     //  (Software) Version?
     std::string datalabel (56, '\0');
     readstring(datalabel, sav, datalabel.size());
+
+    // trim additional whitespaces
+    datalabel = std::regex_replace(datalabel,
+                                   std::regex("^ +| +$|( ) +"), "$1");
 
     if (debug)
       Rprintf("Datalabel: %s \n", datalabel);
@@ -155,14 +160,12 @@ List sav(const char * filePath, const bool debug)
         // read variable name 8 bytes long upercase letters
         readstring(nvarname, sav, nvarname.size());
 
-        // trim additional whitespaces on the right
-        nvarname.erase(std::remove(
-            std::begin(nvarname), std::end(nvarname), ' '), std::end(nvarname)
-        );
+        // trim additional whitespaces
+        nvarname = std::regex_replace(nvarname,
+                                      std::regex("^ +| +$|( ) +"), "$1");
 
         varnames(i) = nvarname;
         // Rprintf("Varname: %s \n", nvarname);
-
 
         if(vlflag==1)
         {
@@ -185,6 +188,11 @@ List sav(const char * filePath, const bool debug)
           // Rprintf("%d \n", rtype);
           std::string vallabel (rtype, '\0');
           readstring(vallabel, sav, vallabel.size());
+
+
+          // trim additional whitespaces on the right
+          vallabel = std::regex_replace(vallabel,
+                                         std::regex("^ +| +$|( ) +"), "$1");
           vallabels(i) = vallabel;
 
           rtype = origlen;
@@ -361,6 +369,8 @@ List sav(const char * filePath, const bool debug)
           std::string lab (lablen, '\0');
           readstring(lab, sav, lab.size());
 
+          lab = std::regex_replace(lab, std::regex("^ +| +$|( ) +"), "$1");
+
           label(i) = lab;
           code(i) = coden;
 
@@ -502,9 +512,15 @@ List sav(const char * filePath, const bool debug)
           std::string longstring (count, '\0');
           readstring(longstring, sav, count);
 
+          // remove null termination from string
+          longstring.erase(std::remove(longstring.begin(),
+                                       longstring.end(),
+                                       '\0'),
+                                       longstring.end());
+
           lstring.push_back( longstring );
 
-          // Rcout << longstring << std::endl;
+          // std::cout << longstring << std::endl;
 
         } else {
           std::string data (size*count, '\0');
@@ -729,6 +745,10 @@ List sav(const char * filePath, const bool debug)
 
               if ((res_i >= res_kk-1) || (res_i+1 == res_kk)) {
                 Rcpp::Rcout << start << std::endl;
+
+                // trim additional whitespaces
+                start = std::regex_replace(start,
+                                           std::regex("^ +| +$|( ) +"), "$1");
                 as<CharacterVector>(df[kk])[nn] = start;
 
                 // reset start
@@ -797,8 +817,12 @@ List sav(const char * filePath, const bool debug)
               start.append( val_s );
 
               if ((res_i >= res_kk-1)) {
-                Rprintf("kk: %d; nn: %d; res_i %d\n", kk, nn, res_i);
-                Rcpp::Rcout << start << std::endl;
+                // Rprintf("kk: %d; nn: %d; res_i %d\n", kk, nn, res_i);
+                // Rcpp::Rcout << start << std::endl;
+
+                // trim additional whitespaces
+                start = std::regex_replace(start,
+                                           std::regex("^ +| +$|( ) +"), "$1");
                 as<CharacterVector>(df[kk])[nn] = start;
 
                 // reset start
@@ -832,8 +856,13 @@ List sav(const char * filePath, const bool debug)
               // as<CharacterVector>(df[kk])[nn] = val_s;
 
               if (res_i > 0) {
-                Rprintf("kk: %d; nn: %d; res_i %d\n", kk, nn, res_i);
-                Rcpp::Rcout << start << std::endl;
+                // Rprintf("kk: %d; nn: %d; res_i %d\n", kk, nn, res_i);
+                // Rcpp::Rcout << start << std::endl;
+
+                // trim additional whitespaces
+                start = std::regex_replace(start,
+                                           std::regex("^ +| +$|( ) +"), "$1");
+
                 as<CharacterVector>(df[kk])[nn] = start;
 
                 // reset start
@@ -842,10 +871,6 @@ List sav(const char * filePath, const bool debug)
                 res_kk = res[kk];
                 res_i = 0;
               }
-
-              // res_i = 0;
-
-              // Rcout << "test";
 
               break;
             }
@@ -937,10 +962,10 @@ List sav(const char * filePath, const bool debug)
 
           // shorten the string to the actual size reported by SPSS
           val_s.erase(type, std::string::npos);
-          // trim additional whitespaces on the right
-          val_s.erase(std::remove(
-              std::begin(val_s), std::end(val_s), ' '), std::end(val_s)
-          );
+
+          // trim additional whitespaces
+          val_s = std::regex_replace(val_s,
+                                     std::regex("^ +| +$|( ) +"), "$1");
 
           // Rcpp::Rcout << val_s << std::endl;
           as<CharacterVector>(df[kk])[nn] = val_s;

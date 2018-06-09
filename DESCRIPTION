@@ -17,5 +17,6 @@ Depends: magrittr
 Imports:
     Rcpp (>= 0.11.2)
 LinkingTo: Rcpp
+SystemRequirements: C++11
 ByteCompile: yes
 RoxygenNote: 5.0.1

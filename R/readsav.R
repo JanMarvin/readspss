@@ -90,19 +90,22 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     return( NULL )
   }
 
+
+  # import data using an rcpp routine
   data <- sav(filePath = filepath, debug)
 
-  label <- attr(data, "label")
-  val.labels <- attr(data, "vallabels")
-  vartypes <- attr(data, "vartype")
-
   attribs <- attributes(data)
+
+  label      <- attribs$label
+  val.labels <- attribs$vallabels
+  vartypes   <- attribs$vartypes
+
 
   # convert NAs by missing information provided by SPSS.
   # these are just different missing values in Stata and NA in R.
   if (use.missings) {
-    mvtab <- attr(data, "missings")
-    varmat <- attr(data, "unkmat")
+    mvtab <- attribs$missings
+    varmat <- attribs$unkmat
     missinfo <- varmat[,3]
     missinfo <- which(missinfo %in% missinfo[missinfo != 0])
 
@@ -188,10 +191,6 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   labnames <- attr(data, "EoHUnks")
 
-  vallabels <<- val.labels
-  label <<- label
-  labnames <<- labnames
-
   if (convert.factors) {
     # vnames <- names(data)
     for (i in seq_along(label)) {
@@ -200,12 +199,6 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
       # print(labname)
       # vartype <- types[i]
       labtable <- unlist(label[[i]])
-      # print(vartypes)
-
-      # if(!is.null(labtable))
-      #   labtable <- trimws(labtable, "right")
-
-      names(labtable) <- trimws(names(labtable), "right")
 
       for (j in labname) {
         vartype <- vartypes[j]
@@ -243,42 +236,48 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
       }
     }
 
+  # some SPSS files contain long varnames.
+  # longvarname is created as empty list
+  longvarname <- attr(data, "longvarname")
 
-  nams <- names(data)
+  if (!identical(longvarname, list())) {
 
-  lnams <- sapply(nams, nchar)
-
-  longname <- attr(data, "longvarname") %>% unlist %>%
-    strsplit("\t") %>% unlist %>% strsplit("=")
-
-  replvec <- lapply(longname, function(x){
-    nams[grep(pattern=x[[1]], nams)]
-  })
-
-  print(replvec)
-
-  # vtyp <- attr(data, "vartype")
-  #
-  # vtyp <- vtyp[vtyp>0]
+    longname <- longvarname %>% unlist %>%
+      strsplit("\t") %>% unlist %>% strsplit("=")
 
 
-  cflag <- attr(data, "cflag")
+    # If the imported data contains strings longer than nchar(255) the data is
+    # scrambled at this point. SPSS separates longer strings in different pieces
+    # of size 255. The rcpp import already sorted the data in variables. These
+    # variables are now combined. Variable names are split after a few letters
+    # used for identification. Since SPSS can use variable names of 8 characters
+    # they trim the name down to max of 5. They add three digits identifying the
+    # order of the long strings. E.g. "Var1, Var1001, Var1002".
+    # Unsure if 999 is the limit.
 
-  if (cflag == 0) {
-    # data.frame(dd)
+    nams <- names(data)
+
+    replvec <- lapply(
+      longname,
+      function(x){
+        # grep for identical variable names (not sure if SPSS considers the
+        # possiblilty of similar cases. are Value1 and Value2 the same?)
+        nams[
+          grep(pattern = strtrim(x[[1]], 5), nams)
+          ]
+      })
+
+    # print(replvec)
+
     for (i in length(replvec):1) {
 
       pat <- replvec[[i]]
 
-
-      # print(pat)
-      # print(data)
-
+      # any variables to combine?
       if (length(pat) > 1) {
         sel <- data[,names(data) %in% pat]
 
         if (all(sapply(sel, is.character))) {
-          print("yeah")
           pp <- pat[-1]; p1 <- pat[1]
 
           # remove columns pat[2:n]
@@ -288,65 +287,34 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
         }
       }
     }
+
+    # assign names stored in spss
+    # Previously the dataset used some different internal names usefull for
+    # combining different long strings. Now everything is cleaned up and we
+    # can apply the correct variable names
+    new_nams <- lapply(longname, function(x){ x[[2]]  })
+
+    # check that data and new_names length match
+    if (length(new_nams) == NCOL(data))
+      names(data) <- new_nams
+
   }
 
-  #### ToDo: For additional speed this could/should have been done during the
-  #### Rcpp loop.
-  # if unkmat > 0 it is a string.
-  # trim strings of size < 8
 
-  dfstr <- which(attribs$unkmat[,1] > 0 & attribs$unkmat[,1] < 8)
-
-  # print(dfstr)
-
-  if (any(dfstr)) {
-    for (j in 1:length(dfstr)) {
-      var <- dfstr[j]
-      data[var] <- trimws(c(data[, var]), "right")
-    }
-  }
-
-  # Identify strings longer than 8. divide the
-  # size to see how many cells need to be merged.
-  spssstr <- attribs$unkmat[,1]
-  longstr <- which(spssstr > 8)
-  spssstr <- ceiling(spssstr[longstr] / 8)
-
-  #   print(spssstr)
-  #   print(longstr)
-
-  # # strings that are longer than 8 bit. works only for
-  # if (any(longstr)) {
-  #   for (j in length(longstr):1) {
-  #     var <- longstr[j]
-  #     varrange <- var:(var + spssstr[j] - 1)
-  #
-  #     paststr <- c(do.call(paste0, data[varrange]))
-  #
-  #     if (!is.null(encoding))
-  #       paststr <- read.encoding(paststr, fromEncoding, encoding)
-  #
-  #     data[var] <- trimws(paststr, "right")
-  #     data <- data[-varrange[-1]]
-  #   }
-  #   attr(data, "val.label") <- val.labels
-  #
-  # }
-
-
-  # longstrnam <- names(data[longstr])[1]
-  # print(longstr)
-
-
+  # prepare for return
   attr(data, "datalabel") <- attribs$datalabel
   attr(data, "datestamp") <- attribs$datestamp
   attr(data, "timestamp") <- attribs$timestamp
 
   attr(data, "varmatrix") <- attribs$unkmat
   attr(data, "val.label") <- val.labels
-  attr(data, "labnames") <- labnames
-  attr(data, "missings") <- attribs$missings
-  attr(data, "vartype") <- attribs$vartypes
+  attr(data, "labnames")  <- labnames
+  attr(data, "missings")  <- attribs$missings
+  attr(data, "vartype")   <- attribs$vartypes
+  attr(data, "lstring")   <- attribs$longstring
+  attr(data, "lvarname")  <- attribs$longvarname
 
+  # return
   return(data)
+
   }
