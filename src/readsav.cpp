@@ -86,6 +86,9 @@ List sav(const char * filePath, const bool debug)
 
     n = readbin(n, sav, 0);
 
+    if (n <= 0)
+      stop("Get out! File does not know how many observations there are.");
+
     if (debug)
       Rprintf("N: %d \n", n);
 
@@ -146,7 +149,7 @@ List sav(const char * filePath, const bool debug)
         unk5 = readbin(unk5, sav, 0);        // 4 and 5 are equal.
 
 
-        Rcpp::NumericMatrix unkmat(0,5);
+        Rcpp::NumericMatrix unkmat(1,5);
 
         // Store unks in matrix export as attr unkmat
         unkmat(0,0) = vtype;

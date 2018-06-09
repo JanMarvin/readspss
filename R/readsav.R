@@ -307,7 +307,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   attr(data, "datestamp") <- attribs$datestamp
   attr(data, "timestamp") <- attribs$timestamp
 
-  attr(data, "varmatrix") <- attribs$unkmat
+  attr(data, "varmatrix") <- do.call("rbind", attribs$unkmat)
   attr(data, "val.label") <- val.labels
   attr(data, "labnames")  <- labnames
   attr(data, "missings")  <- attribs$missings
