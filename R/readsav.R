@@ -175,14 +175,14 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     }
 
     # varnames
-    names(data) <-
-      read.encoding(names(data), fromEncoding, encoding)
+    names(data) <- read.encoding(names(data), fromEncoding, encoding)
+
 
     # label
     for (i in seq_along(label))
-      names(label[i]) <- read.encoding(names(label[[i]]),
-                                       fromEncoding = fromEncoding, encoding =
-                                         encoding)
+      names(label[[i]][[1]]) <- read.encoding(names(label[[i]][[1]]),
+                                       fromEncoding = fromEncoding,
+                                       encoding = encoding)
 
     # var.labels
     val.labels <- read.encoding(val.labels, fromEncoding, encoding)
@@ -190,6 +190,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   }
 
   labnames <- attr(data, "haslabel")
+  varnames <- attr(data, "varnames")
 
   if (convert.factors) {
     # vnames <- names(data)
@@ -201,15 +202,16 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
       for (j in labname) {
         vartype <- vartypes[j]
+        varname <- varnames[j]
 
         if (vartype == 0) {
           # get unique values / omit NA)
-          varunique <- na.omit(unique(data[, j]))
+          varunique <- na.omit(unique(data[,varname]))
           # print(varunique)
 
           # assign label if label set is complete
           if (all(varunique %in% labtable)) {
-            data[, j] <- factor(data[, j], levels=labtable,
+            data[, varname] <- factor(data[, varname], levels=labtable,
                                 labels=names(labtable))
 
             # else generate labels from codes
@@ -219,7 +221,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
               gen.lab  <-
                 sort(c(varunique[!varunique %in% labtable], labtable))
 
-              data[, j] <- factor(data[, j], levels = gen.lab,
+              data[, varname] <- factor(data[, varname], levels = gen.lab,
                                   labels = names(gen.lab))
             } else {
               warning(
@@ -309,7 +311,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   attr(data, "val.label") <- val.labels
   attr(data, "labnames")  <- labnames
   attr(data, "missings")  <- attribs$missings
-  attr(data, "vartype")   <- attribs$vartypes
+  attr(data, "vartype")   <- attribs$vtype
   attr(data, "lstring")   <- attribs$longstring
   attr(data, "lvarname")  <- attribs$longvarname
 

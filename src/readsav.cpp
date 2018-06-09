@@ -1036,6 +1036,7 @@ List sav(const char * filePath, const bool debug)
     df.attr("datestamp") = datestamp;
     df.attr("timestamp") = timestamp;
     df.attr("vallabels") = vallabels;
+    df.attr("varnames") = varnames;
     df.attr("vartypes") = vartype;
     df.attr("vtype") = vtyp;
     df.attr("unkmat") = unkmat;
