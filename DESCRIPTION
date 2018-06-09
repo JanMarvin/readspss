@@ -19,4 +19,4 @@ Imports:
 LinkingTo: Rcpp
 SystemRequirements: C++11
 ByteCompile: yes
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

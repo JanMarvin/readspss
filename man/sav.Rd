@@ -12,4 +12,3 @@ sav(filePath, debug)
 \description{
 Reads the binary SPSS file
 }
-

@@ -58,13 +58,12 @@ information to decrypt the sav-format was provided by tda
 \url{http://www.stat.ruhr-uni-bochum.de/tda.html} and pspp
  \url{http://www.gnu.org/software/pspp/}
 }
+\seealso{
+\code{\link{foreign::read.sav}}, \code{memisc} and
+\code{\link{haven::read_sav}}.
+}
 \author{
 Jan Marvin Garbuszus \email{jan.garbuszus@ruhr-uni-bochum.de}
 
 Sebastian Jeworutzki \email{sebastian.jeworutzki@ruhr-uni-bochum.de}
 }
-\seealso{
-\code{\link{foreign::read.sav}}, \code{memisc} and
-\code{\link{haven::read_sav}}.
-}
-
