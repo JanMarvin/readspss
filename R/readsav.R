@@ -189,14 +189,13 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     # print(val.labels)
   }
 
-  labnames <- attr(data, "EoHUnks")
+  labnames <- attr(data, "haslabel")
 
   if (convert.factors) {
     # vnames <- names(data)
     for (i in seq_along(label)) {
       # print(seq_along(val.labels))
       labname <- unlist(labnames[[i]])
-      # print(labname)
       # vartype <- types[i]
       labtable <- unlist(label[[i]])
 

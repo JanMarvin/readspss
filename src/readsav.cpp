@@ -709,9 +709,9 @@ List sav(const char * filePath, const bool debug)
             int32_t const type = vartype[kk_i];
             len = type;
 
-            if (debug) {
-              Rprintf("val_b: %d - type: %d\n", val_b, type);
-            }
+            // if (debug) {
+            //   Rprintf("val_b: %d - type: %d\n", val_b, type);
+            // }
 
             // Rprintf("kk_i: %d \n", kk_i);
             // Rprintf("k: %d \n", k);
@@ -1036,11 +1036,12 @@ List sav(const char * filePath, const bool debug)
     df.attr("datestamp") = datestamp;
     df.attr("timestamp") = timestamp;
     df.attr("vallabels") = vallabels;
-    df.attr("vartypes") = vtyp;
+    df.attr("vartypes") = vartype;
+    df.attr("vtype") = vtyp;
     df.attr("unkmat") = unkmat;
     df.attr("missings") = missings;
     df.attr("label") = Labell_list;
-    df.attr("EoHUnks") = EoHList;
+    df.attr("haslabel") = EoHList;
     df.attr("data") = data;
     df.attr("longstring") = lstring;
     df.attr("longvarname") = lvarname;
