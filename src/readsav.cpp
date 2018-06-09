@@ -639,7 +639,7 @@ List sav(const char * filePath, const bool debug)
 
         int res_i = 0;
         int kk_i = 0;
-        int32_t res_kk = res[kk];
+        int32_t res_kk = 0;
 
         while (!eof /* jj < rr && !eof */ && !chunkdone) {
           // Rprintf("%d - %d\n", rr, jj);
@@ -816,9 +816,12 @@ List sav(const char * filePath, const bool debug)
               readstring(val_s, sav, val_s.size());
               start.append( val_s );
 
+              res_kk = res[kk];
+
               if ((res_i >= res_kk-1)) {
-                // Rprintf("kk: %d; nn: %d; res_i %d\n", kk, nn, res_i);
-                // Rcpp::Rcout << start << std::endl;
+                Rprintf("kk: %d; nn: %d; res_i %d; res_kk %d\n",
+                        kk, nn, res_i, res_kk);
+                Rcpp::Rcout << start << std::endl;
 
                 // trim additional whitespaces
                 start = std::regex_replace(start,
