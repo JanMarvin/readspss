@@ -67,7 +67,7 @@
 #' @export
 read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
                      encoding = NULL, fromEncoding = NULL, use.missings =
-                       FALSE, debug = FALSE, override = FALSE) {
+                       TRUE, debug = FALSE, override = FALSE) {
 
   # Check if path is a url
   if (length(grep("^(http|ftp|https)://", file))) {
@@ -99,13 +99,15 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   label      <- attribs$label
   val.labels <- attribs$vallabels
   vartypes   <- attribs$vartypes
+  unkmat     <- do.call("rbind", attribs$unkmat)
 
 
   # convert NAs by missing information provided by SPSS.
   # these are just different missing values in Stata and NA in R.
   if (use.missings) {
     mvtab <- attribs$missings
-    varmat <- attribs$unkmat
+    varmat <- unkmat
+    varmat <- varmat[varmat[,1]>=0,]
     missinfo <- varmat[,3]
     missinfo <- which(missinfo %in% missinfo[missinfo != 0])
 
@@ -293,11 +295,15 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     # Previously the dataset used some different internal names usefull for
     # combining different long strings. Now everything is cleaned up and we
     # can apply the correct variable names
-    new_nams <- lapply(longname, function(x){ x[[2]]  })
+    nams <- names(data)
 
-    # check that data and new_names length match
-    if (length(new_nams) == NCOL(data))
-      names(data) <- new_nams
+    new_nams <- do.call(rbind, longname)
+
+    for (i in 1:NROW(new_nams)) {
+      nams[nams == new_nams[i,1] ] <- new_nams[i,2]
+    }
+
+    names(data) <- nams
 
   }
 
@@ -307,7 +313,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   attr(data, "datestamp") <- attribs$datestamp
   attr(data, "timestamp") <- attribs$timestamp
 
-  attr(data, "varmatrix") <- do.call("rbind", attribs$unkmat)
+  attr(data, "varmatrix") <- unkmat
   attr(data, "val.label") <- val.labels
   attr(data, "labnames")  <- labnames
   attr(data, "missings")  <- attribs$missings
