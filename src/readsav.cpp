@@ -302,47 +302,6 @@ List sav(const char * filePath, const bool debug)
     {
       Rcpp::checkUserInterrupt();
 
-      // while (rtype == 2) {
-      //
-      //   typeINT = readbin(typeINT, sav, 0);
-      //   has_var_label = readbin(has_var_label, sav, 0);
-      //
-      //   n_missing_values = readbin(n_missing_values, sav, 0);
-      //   printINT = readbin(printINT, sav, 0);
-      //   writeINT = readbin(writeINT, sav, 0);
-      //
-      //
-      //   // Rprintf("1: %d \n", typeINT);
-      //   // Rprintf("2: %d \n", has_var_label);
-      //   // Rprintf("3: %d \n", n_missing_values);
-      //   // Rprintf("4: %d \n", printINT);
-      //   // Rprintf("5: %d \n", writeINT);
-      //
-      //   readstring(name, sav, name.size());
-      //
-      //   // Rcout << "Name: " << name << std::endl;
-      //
-      //   if (has_var_label == 1){
-      //
-      //     lablen32 = readbin(lablen32, sav, 0);
-      //
-      //     std::string lab (lablen32, '\0');
-      //     readstring(lab, sav, 0);
-      //
-      //     // Rprintf("lablen: %d \n", n);
-      //     Rcout << "Label: " << lab << std::endl;
-      //   }
-      //
-      //   if (n_missing_values != 0) {
-      //     double missing_values = 0;
-      //
-      //     missing_values = readbin(missing_values, sav, 0);
-      //   }
-      //
-      //   rtype = readbin(rtype, sav, 0);
-      //
-      // }
-
       // 3 reading variable labels
       // first int: 3
       // second int: number of labels
@@ -351,18 +310,42 @@ List sav(const char * filePath, const bool debug)
       // first char: labeltext
       //
       // if second int >1 restart at double
+
+      bool noNum = 0;
+
       while (rtype == 3) {
 
         nolab = readbin(nolab, sav, 0);
         // Rprintf("Nolab: %d \n", nolab);
         Rcpp::CharacterVector label(nolab);
         Rcpp::NumericVector code(nolab);
+        Rcpp::CharacterVector codeV(nolab);
 
+        // for some reason codes can be either doubles or strings. since we do
+        // not know which we want, we read everything as a string. compare it
+        // to figure out, what kind of type we have.
         for (int i=0; i < nolab; ++i)
         {
           double coden = 0;
-          coden = readbin(coden, sav, 0);
-          // Rcout << unkd0 << endl;
+
+          // read string and compare to an empty string. if the string contains
+          // binary data it will be empty
+          std::string empty = "";
+          std::string cV (8, ' ');
+          readstring(cV, sav, cV.size());
+
+          noNum = strcmp( cV.c_str(), empty.c_str());
+
+          // if its a double, do a memcpy, else trim whitespaces
+          if( !noNum ) {
+            memcpy(&coden , cV.c_str(), sizeof(double));
+            code(i) = coden;
+          } else {
+            cV = std::regex_replace(cV, std::regex("^ +| +$|( ) +"), "$1");
+            codeV(i) = cV;
+          }
+
+
           lablen = readbin(lablen, sav, 0);
           // Rprintf("Lablen: %d \n", lablen);
 
@@ -381,16 +364,19 @@ List sav(const char * filePath, const bool debug)
           lab = std::regex_replace(lab, std::regex("^ +| +$|( ) +"), "$1");
 
           label(i) = lab;
-          code(i) = coden;
-
-          // Rcout << "Label: " << lab << std::endl;
         }
 
 
         // export List with named numerics
         Rcpp::List Labeltable(0);
         code.attr("names") = label;
-        Labeltable.push_back(code);
+        codeV.attr("names") = label;
+
+        if (!noNum)
+          Labeltable.push_back(code);
+        else
+          Labeltable.push_back(codeV);
+
 
         Labell_list.push_back(Labeltable);
 
@@ -437,7 +423,7 @@ List sav(const char * filePath, const bool debug)
           readstring(document, sav, document.size());
           Document(i) = document;
 
-          // Rcout << document << std::endl;
+          Rcout << document << std::endl;
         }
 
         rtype = readbin(rtype, sav, 0);
