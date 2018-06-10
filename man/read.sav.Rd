@@ -5,7 +5,7 @@
 \title{read.sav}
 \usage{
 read.sav(file, convert.factors = TRUE, generate.factors = TRUE,
-  encoding = NULL, fromEncoding = NULL, use.missings = FALSE,
+  encoding = NULL, fromEncoding = NULL, use.missings = TRUE,
   debug = FALSE, override = FALSE)
 }
 \arguments{
@@ -13,19 +13,19 @@ read.sav(file, convert.factors = TRUE, generate.factors = TRUE,
 or an url. in this case the file will be downloaded and read befor it is
 used.}
 
-\item{convert.factors}{\emph{logical} if true numeric variables will be converted
-into a factor in R. SPSS can have labeld strings, currently this is not im-
-plemented.}
+\item{convert.factors}{\emph{logical} if true numeric or character variables
+will be converted into a factor in R.}
 
-\item{generate.factors}{\emph{logical} function to convert variables with only
-partial labels in to factors. e.g. 1 - low and 5 - high are provided, labels
+\item{generate.factors}{\emph{logical} function to convert variables with
+partial labels into factors. e.g. 1 - low and 5 - high are provided, labels
 2, 3 and 4 will be created. especially useful in combination with
 \code{use.missings=TRUE}.}
 
 \item{encoding}{\emph{string} locale to convert to.}
 
-\item{fromEncoding}{\emph{character.} encoding of the imported file. this
-information is stored inside the sav-file, information is currently unused.}
+\item{fromEncoding}{\emph{character.} encoding of the imported file. This
+information is stored inside the sav-file, but is currently unused. Still
+this can be used to define the inital encoding.}
 }
 \value{
 \code{readspss} returns a data.frame with additional objects
@@ -38,7 +38,8 @@ information is stored inside the sav-file, information is currently unused.}
 \item{datestamp}{datestamp}
 \item{timestamp}{timestamp}
 \item{varmatrix}{a matrix with information how the data is stored}
-\item{labnames}{list with the information which variable uses which label}
+\item{labnames}{list containing the information which variable uses which
+label}
 \item{missings}{a list containg information about the missing variables. if
 \code{use.missings=TRUE} this Information will be used to generate missings.}
 \item{vartype}{informations about a variable. is it numeric or string.}
@@ -49,9 +50,9 @@ Function to read a SPSS sav file into a data.frame().
 }
 \details{
 SPSS files are widely available, though for R long time only foreign
-and memisc provided functions to import sav-files. currently haven joined in.
-this package is an approach to join in, document the sav-format and provide
-additional options to import the data.
+and memisc provided functions to import sav-files. Lately haven joined.
+This package is an approach to offer another alternative, to document the
+sav-format and provide additional options to import the data.
 }
 \note{
 information to decrypt the sav-format was provided by tda
@@ -64,6 +65,4 @@ information to decrypt the sav-format was provided by tda
 }
 \author{
 Jan Marvin Garbuszus \email{jan.garbuszus@ruhr-uni-bochum.de}
-
-Sebastian Jeworutzki \email{sebastian.jeworutzki@ruhr-uni-bochum.de}
 }
