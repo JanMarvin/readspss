@@ -29,6 +29,7 @@ using namespace std;
 //' Reads the binary SPSS file
 //'
 //' @param filePath The full systempath to the dta file you want to import.
+//' @param debug print debug information
 //' @import Rcpp
 //' @export
 // [[Rcpp::export]]

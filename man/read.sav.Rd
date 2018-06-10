@@ -25,7 +25,17 @@ partial labels into factors. e.g. 1 - low and 5 - high are provided, labels
 
 \item{fromEncoding}{\emph{character.} encoding of the imported file. This
 information is stored inside the sav-file, but is currently unused. Still
-this can be used to define the inital encoding.}
+this option can be used to define the inital encoding by hand.}
+
+\item{use.missings}{\emph{logical} should missing values be converted.
+Defaults to TRUE.}
+
+\item{debug}{\emph{logical} provides additional debug information. Most
+likely not usefull to any user.}
+
+\item{override}{\emph{logical}. The filename provided in \code{file} is
+checked for the ending sav. If the fileending is different, nothing is read.
+This option can be used to override this behavior.}
 }
 \value{
 \code{readspss} returns a data.frame with additional objects
@@ -60,8 +70,8 @@ information to decrypt the sav-format was provided by tda
  \url{http://www.gnu.org/software/pspp/}
 }
 \seealso{
-\code{\link{foreign::read.sav}}, \code{memisc} and
-\code{\link{haven::read_sav}}.
+\code{\link[foreign]{read.spss}}, \code{memisc} and
+\code{\link[haven]{read_sav}}.
 }
 \author{
 Jan Marvin Garbuszus \email{jan.garbuszus@ruhr-uni-bochum.de}

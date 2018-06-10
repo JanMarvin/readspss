@@ -11,7 +11,7 @@ Authors@R: c(
     )
 Maintainer: Jan Marvin Garbuszus <jan.garbuszus@ruhr-uni-bochum.de>
 Description: Experimental function to read the SPSS file format.
-License: GPL-2
+License: GPL-2 | file LICENSE
 LazyData: TRUE
 Depends: magrittr
 Imports:

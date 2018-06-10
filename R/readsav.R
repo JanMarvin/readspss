@@ -30,7 +30,14 @@
 #' @param encoding \emph{string} locale to convert to.
 #' @param fromEncoding \emph{character.} encoding of the imported file. This
 #' information is stored inside the sav-file, but is currently unused. Still
-#' this can be used to define the inital encoding.
+#' this option can be used to define the inital encoding by hand.
+#' @param use.missings \emph{logical} should missing values be converted.
+#' Defaults to TRUE.
+#' @param debug \emph{logical} provides additional debug information. Most
+#' likely not usefull to any user.
+#' @param override \emph{logical}. The filename provided in \code{file} is
+#' checked for the ending sav. If the fileending is different, nothing is read.
+#' This option can be used to override this behavior.
 #'
 #' @details SPSS files are widely available, though for R long time only foreign
 #' and memisc provided functions to import sav-files. Lately haven joined.
@@ -59,11 +66,14 @@
 #'  \url{http://www.gnu.org/software/pspp/}
 #' @author Jan Marvin Garbuszus \email{jan.garbuszus@@ruhr-uni-bochum.de}
 #'
-#'@seealso \code{\link{foreign::read.sav}}, \code{memisc} and
-#'\code{\link{haven::read_sav}}.
+#'@seealso \code{\link[foreign]{read.spss}}, \code{memisc} and
+#'\code{\link[haven]{read_sav}}.
 
 #' @useDynLib readspss
+#' @importFrom magrittr "%>%"
 #' @importFrom tools file_ext
+#' @importFrom stats na.omit
+#' @importFrom utils download.file
 #' @export
 read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
                      encoding = NULL, fromEncoding = NULL, use.missings =
@@ -227,7 +237,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
           } else {
             warning(
               paste(
-                vnames[i], "Missing factor labels - no labels assigned.
+                names(data)[i], "Missing factor labels - no labels assigned.
                 Set option generate.factors=T to generate labels."
               )
               )

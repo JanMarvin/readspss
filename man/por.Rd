@@ -8,6 +8,8 @@ por(filePath, debug)
 }
 \arguments{
 \item{filePath}{The full systempath to the dta file you want to import.}
+
+\item{debug}{print debug information}
 }
 \description{
 Reads the binary SPSS file
