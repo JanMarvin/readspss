@@ -27,7 +27,10 @@
 #' partial labels into factors. e.g. 1 - low and 5 - high are provided, labels
 #' 2, 3 and 4 will be created. especially useful in combination with
 #' \code{use.missings=TRUE}.
-#' @param encoding \emph{string} locale to convert to.
+#' @param encoding \emph{logical} shall values be converted? If true, read.sav
+#' will try the charcode stored inside the sav-file. If this value is 2 or not
+#' available, fromEncoding can be used to change encoding.
+#' @param toEncoding \emph{string} locale to convert to.
 #' @param fromEncoding \emph{character.} encoding of the imported file. This
 #' information is stored inside the sav-file, but is currently unused. Still
 #' this option can be used to define the inital encoding by hand.
@@ -76,8 +79,8 @@
 #' @importFrom utils download.file
 #' @export
 read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
-                     encoding = NULL, fromEncoding = NULL, use.missings =
-                       TRUE, debug = FALSE, override = FALSE) {
+                     encoding = TRUE, fromEncoding = NULL, toEncoding = NULL,
+                     use.missings = TRUE, debug = FALSE, override = FALSE) {
 
   # Check if path is a url
   if (length(grep("^(http|ftp|https)://", file))) {
@@ -100,6 +103,14 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     return( NULL )
   }
 
+  knownCP <- c(`UCS-2LE` = 1200, `UCS-2BE` = 1201, macroman = 10000,
+               ` UCS-4LE` = 12000, `UCS-4BE` = 12001, `koi8-r` = 20866,
+               `koi8-u` = 21866, latin1 = 28591, latin2 = 28592, latin3 = 28593,
+               latin4 = 28594, `latin-9` = 28605, `ISO-2022-JP` = 50221,
+               `euc-jp` = 51932, `UTF-8` = 65001, ASCII = 20127, CP1250 = 1250,
+               CP1251 = 1251, CP1252 = 1252, CP1253 = 1253, CP1254 = 1254,
+               CP1255 = 1255, CP1256 = 1256, CP1257 = 1257, CP1258 = 1258,
+               CP874 = 874, CP936 = 936, C = 2)
 
   # import data using an rcpp routine
   data <- sav(filePath = filepath, debug)
@@ -110,6 +121,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   attr(data, "vartypes") <- NULL
   attr(data, "varnames") <- NULL
   attr(data, "varmat") <- NULL
+  attr(data, "label") <- NULL
   attr(data, "res") <- NULL
 
   label      <- attribs$label
@@ -185,25 +197,30 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   }
 
-  ## Encoding
-  if (!is.null(encoding)) {
-    # set from encoding
-    if (is.null(fromEncoding)) {
-      fromEncoding <- "CP1252"
-    }
+  if (is.null(fromEncoding)){
+    ccode <- attribs$charcode
+    if (is.null(ccode)) ccode <- 2
+    fromEncoding <- names(knownCP)[knownCP == ccode]
+  }
+
+  if (is.null(toEncoding))
+    toEncoding <- ""
+
+  ## Encoding // no encoding if fromEncoding == 2
+  if (encoding & fromEncoding != "C") {
 
     # varnames
-    names(data) <- read.encoding(names(data), fromEncoding, encoding)
+    names(data) <- read.encoding(names(data), fromEncoding, toEncoding)
 
 
     # label
     for (i in seq_along(label))
-      names(label[[i]][[1]]) <- read.encoding(names(label[[i]][[1]]),
+      names(label[[i]]) <- read.encoding(names(label[[i]]),
                                               fromEncoding = fromEncoding,
-                                              encoding = encoding)
+                                              encoding = toEncoding)
 
     # var.labels
-    val.labels <- read.encoding(val.labels, fromEncoding, encoding)
+    val.labels <- read.encoding(val.labels, fromEncoding, toEncoding)
     # print(val.labels)
   }
 
@@ -345,6 +362,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   attr(data, "datalabel") <- attribs$datalabel
   attr(data, "datestamp") <- attribs$datestamp
   attr(data, "timestamp") <- attribs$timestamp
+  attr(data, "label") <- label
 
   attr(data, "varmatrix") <- varmat
   attr(data, "val.label") <- val.labels

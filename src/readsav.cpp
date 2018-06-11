@@ -92,11 +92,11 @@ List sav(const char * filePath, const bool debug)
 
     n = readbin(n, sav, swapit);
 
-    if (n <= 0)
-      stop("Get out! File does not know how many observations there are.");
-
     if (debug)
       Rprintf("N: %d \n", n);
+
+    if (n <= 0)
+      stop("Get out! File does not know how many observations there are.");
 
     double bias = 0; // 100: compression bias
     bias = readbin(bias, sav, swapit);
@@ -117,7 +117,7 @@ List sav(const char * filePath, const bool debug)
 
     std::vector<string> varnames;
     std::vector<string> vallabels;
-    std::vector<int> vartype;
+    std::vector<int32_t> vartype;
 
     int8_t lablen = 0;
     int32_t lablen32 = 0;
@@ -323,6 +323,13 @@ List sav(const char * filePath, const bool debug)
     Rcpp::List EoHList = Rcpp::List();
     Rcpp::List lvarname;
     Rcpp::List lstring;
+    Rcpp::List doc;
+
+    int32_t subtyp = 0, size = 0, count = 0;
+    int32_t major = 0, minor = 0, rev = 0, macode = 0;
+    int32_t floatp = 0, compr = 0, endian = 0, charcode = 0;
+    double sysmiss = 0, highest = 0, lowest = 0;
+    int32_t measure = 0, width = 0, alignment = 0;
 
     while(rtype!=999 & rtype != 2)
     {
@@ -452,8 +459,10 @@ List sav(const char * filePath, const bool debug)
           readstring(document, sav, document.size());
           Document(i) = document;
 
-          Rcout << document << std::endl;
+          // Rcout << document << std::endl;
         }
+
+        doc.push_back( Document );
 
         rtype = readbin(rtype, sav, swapit);
 
@@ -468,12 +477,6 @@ List sav(const char * filePath, const bool debug)
         Rcpp::checkUserInterrupt();
 
         // Rcout << "gelesen!" << endl;
-
-        int32_t subtyp = 0, size = 0, count = 0;
-        int32_t major = 0, minor = 0, rev = 0, macode = 0;
-        int32_t floatp = 0, compr = 0, endian = 0, charcode = 0;
-        double sysmiss = 0, highest = 0, lowest = 0;
-        int32_t measure = 0, width = 0, alignment = 0;
 
         // subtype integer: 3 / floating: 4 / varsyst: 11
         subtyp = readbin(subtyp, sav, swapit);
@@ -552,6 +555,8 @@ List sav(const char * filePath, const bool debug)
           readstring(data, sav, data.size());
 
           // Rcout << data << std::endl;
+
+          Rcout << "unknown subtype detected" << std::endl;
         }
 
 
@@ -1060,6 +1065,7 @@ List sav(const char * filePath, const bool debug)
     df.attr("datalabel") = datalabel;
     df.attr("datestamp") = datestamp;
     df.attr("timestamp") = timestamp;
+    df.attr("filelabel") = filelabel;
     df.attr("vallabels") = vallabels;
     df.attr("varnames") = Varnames;
     df.attr("vartypes") = Vartype;
@@ -1073,6 +1079,11 @@ List sav(const char * filePath, const bool debug)
     df.attr("longvarname") = lvarname;
     df.attr("cflag") = cflag;
     df.attr("res") = res;
+    df.attr("endian") = endian;
+    df.attr("compression") = compr;
+    df.attr("charcode") = charcode;
+    df.attr("doc") = doc;
+
 
 
     return(df);

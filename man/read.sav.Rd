@@ -5,8 +5,8 @@
 \title{read.sav}
 \usage{
 read.sav(file, convert.factors = TRUE, generate.factors = TRUE,
-  encoding = NULL, fromEncoding = NULL, use.missings = TRUE,
-  debug = FALSE, override = FALSE)
+  encoding = TRUE, fromEncoding = NULL, toEncoding = NULL,
+  use.missings = TRUE, debug = FALSE, override = FALSE)
 }
 \arguments{
 \item{file}{\emph{string} a sav-file to import. can be a file on a computer
@@ -21,11 +21,15 @@ partial labels into factors. e.g. 1 - low and 5 - high are provided, labels
 2, 3 and 4 will be created. especially useful in combination with
 \code{use.missings=TRUE}.}
 
-\item{encoding}{\emph{string} locale to convert to.}
+\item{encoding}{\emph{logical} shall values be converted? If true, read.sav
+will try the charcode stored inside the sav-file. If this value is 2 or not
+available, fromEncoding can be used to change encoding.}
 
 \item{fromEncoding}{\emph{character.} encoding of the imported file. This
 information is stored inside the sav-file, but is currently unused. Still
 this option can be used to define the inital encoding by hand.}
+
+\item{toEncoding}{\emph{string} locale to convert to.}
 
 \item{use.missings}{\emph{logical} should missing values be converted.
 Defaults to TRUE.}
