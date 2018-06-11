@@ -208,9 +208,9 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     # vnames <- names(data)
     for (i in seq_along(label)) {
       # print(seq_along(val.labels))
-      labname <- unlist(labnames[[i]])
+      labname <- labnames[[i]]
       # vartype <- types[i]
-      labtable <- unlist(label[[i]])
+      labtable <- label[[i]]
 
       for (j in labname) {
         vartype <- vartypes[j]

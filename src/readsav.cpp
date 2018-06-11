@@ -375,19 +375,14 @@ List sav(const char * filePath, const bool debug)
           label(i) = lab;
         }
 
-
-        // export List with named numerics
-        Rcpp::List Labeltable(0);
+        // prepare release
         code.attr("names") = label;
         codeV.attr("names") = label;
 
         if (noNum)
-          Labeltable.push_back(codeV);
+          Labell_list.push_back(codeV);
         else
-          Labeltable.push_back(code);
-
-
-        Labell_list.push_back(Labeltable);
+          Labell_list.push_back(code);
 
         rtype = readbin(rtype, sav, 0);
       }
