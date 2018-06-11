@@ -346,7 +346,13 @@ List sav(const char * filePath, const bool debug)
           // if its a double, do a memcpy, else trim whitespaces
           if( noNum ) {
             cV = std::regex_replace(cV, std::regex("^ +| +$|( ) +"), "$1");
-            codeV(i) = cV;
+
+            // return something so that we can later create a factor
+            if(cV.compare(empty))
+              codeV(i) = NA_STRING;
+            else
+              codeV(i) = cV;
+
           } else {
             code(i) = coden;
           }

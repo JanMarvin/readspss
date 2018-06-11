@@ -215,25 +215,43 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
       for (j in labname) {
         vartype <- vartypes[j]
         varname <- varnames[j]
+        isNum   <- is.numeric(data[,varname])
+        anyNA   <- any(is.na(labtable))
 
-        # get unique values / omit NA)
-        varunique <- na.omit(unique(data[,varname]))
-        # print(varunique)
+        # get unique values / omit NA unless NA already in labtable
+        if (anyNA) {
+          varunique <- unique(data[,varname])
+        } else {
+          varunique <- na.omit(unique(data[,varname]))
+        }
+
+        if (isNum & all(is.na(labtable))) {
+          nam<- names(labtable)
+          labtable <- as.numeric(labtable)
+          names(labtable) <- nam
+        }
 
         # assign label if label set is complete
         if (all(varunique %in% labtable)) {
-          data[, varname] <- factor(data[, varname], levels=labtable,
-                                    labels=names(labtable))
+          data[, varname] <- fast_factor(data[, varname], y=labtable)
 
           # else generate labels from codes
         } else {
           if (generate.factors) {
-            names(varunique) <- as.character(varunique)
-            gen.lab  <-
-              sort(c(varunique[!varunique %in% labtable], labtable))
 
-            data[, varname] <- factor(data[, varname], levels = gen.lab,
-                                      labels = names(gen.lab))
+            names(varunique) <- as.character(varunique)
+
+            gen.lab  <-
+              sort(c(varunique[!varunique %in% labtable], labtable),
+                   na.last = TRUE)
+
+            if (isNum) {
+              nam <- names(gen.lab)
+              gen.lab <- as.numeric(gen.lab)
+              names(gen.lab) <- nam
+            }
+
+            data[, varname] <- fast_factor(data[, varname], y = gen.lab)
           } else {
             warning(
               paste(

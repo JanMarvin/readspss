@@ -5,6 +5,18 @@
 
 using namespace Rcpp;
 
+// fast_factor
+SEXP fast_factor(SEXP x, SEXP y);
+RcppExport SEXP _readspss_fast_factor(SEXP xSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type x(xSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(fast_factor(x, y));
+    return rcpp_result_gen;
+END_RCPP
+}
 // por
 List por(const char * filePath, const bool debug);
 RcppExport SEXP _readspss_por(SEXP filePathSEXP, SEXP debugSEXP) {
@@ -31,6 +43,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_readspss_fast_factor", (DL_FUNC) &_readspss_fast_factor, 2},
     {"_readspss_por", (DL_FUNC) &_readspss_por, 2},
     {"_readspss_sav", (DL_FUNC) &_readspss_sav, 2},
     {NULL, NULL, 0}
