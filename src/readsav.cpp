@@ -40,17 +40,19 @@ List sav(const char * filePath, const bool debug)
   std::ifstream sav(filePath, std::ios::in | std::ios::binary);
   if (sav) {
 
-    std::string spss (4, '\0');
 
     int32_t n = 0;
     int32_t k = 0;
+    bool is_spss = 0;
+    bool swapit = 0;
 
 
+    std::string spss (8, '\0');
     readstring(spss, sav, spss.size());
-    // Rprintf("%s \n", spss);
+    is_spss = std::regex_match(spss, std::regex("^\\$FL2@\\(#\\)$"));
 
-    // @(#) // todo add this as a check if not: bail out
-    sav.seekg(4, std::ios::cur);
+    if (!is_spss)
+      throw std::range_error("Can not read this file. Is it no SPSS sav file?");
 
     // Textfield 1
     //  SPSS DATA FILE
@@ -64,12 +66,15 @@ List sav(const char * filePath, const bool debug)
                                    std::regex("^ +| +$|( ) +"), "$1");
 
     if (debug)
-      Rprintf("Datalabel: %s \n", datalabel);
+      Rcout << "Datalabel:" << datalabel << std::endl;
 
     int arch=0; // file format? should be 2
-    arch = readbin(arch, sav, 0);
+    arch = readbin(arch, sav, swapit);
 
-    k = readbin(k, sav, 0);
+    if (arch != 2 || arch != 3)
+      swapit = 1;
+
+    k = readbin(k, sav, swapit);
 
     if (debug)
       Rprintf("K: %d \n", k);
@@ -82,10 +87,10 @@ List sav(const char * filePath, const bool debug)
 
     int32_t cflag=0, cwvariables = 0;
 
-    cflag = readbin(cflag, sav, 0); // cflag compression
-    cwvariables = readbin(cwvariables, sav, 0); // case weight variables
+    cflag = readbin(cflag, sav, swapit); // cflag compression
+    cwvariables = readbin(cwvariables, sav, swapit); // case weight variables
 
-    n = readbin(n, sav, 0);
+    n = readbin(n, sav, swapit);
 
     if (n <= 0)
       stop("Get out! File does not know how many observations there are.");
@@ -94,7 +99,7 @@ List sav(const char * filePath, const bool debug)
       Rprintf("N: %d \n", n);
 
     double bias = 0; // 100: compression bias
-    bias = readbin(bias, sav, 0);
+    bias = readbin(bias, sav, swapit);
 
     if (bias!=100)
       Rcpp::stop("bias != 100. Stop.");
@@ -132,19 +137,19 @@ List sav(const char * filePath, const bool debug)
     Rcpp::List varlist = Rcpp::List();
 
 
-    rtype = readbin(rtype, sav, 0);
+    rtype = readbin(rtype, sav, swapit);
     // Rprintf("Zahl in durchgang %d: %d \n", i,rtype);
 
     int32_t i = 0;
     while (rtype == 2) {
 
       // skip 20 bytes or read 5 unks
-      vtype = readbin(vtype, sav, 0);      // Variable type
-      vlflag = readbin(vlflag, sav, 0);    // Label flag
-      nmiss = readbin(nmiss, sav, 0);
+      vtype = readbin(vtype, sav, swapit);      // Variable type
+      vlflag = readbin(vlflag, sav, swapit);    // Label flag
+      nmiss = readbin(nmiss, sav, swapit);
 
       // bits of int32_t define digits, width and type
-      var4 = readbin(var4, sav, 0);
+      var4 = readbin(var4, sav, swapit);
 
       // print
       int8_t var41, var42, var43, var44;
@@ -156,7 +161,7 @@ List sav(const char * filePath, const bool debug)
 
       // write
       // 4 and 5 are most likely identical
-      var5 = readbin(var5, sav, 0);
+      var5 = readbin(var5, sav, swapit);
 
       int8_t var51, var52, var53, var54;
       var51 = (int8_t)var5;
@@ -200,7 +205,7 @@ List sav(const char * filePath, const bool debug)
 
       if(vlflag==1)
       {
-        rtype = readbin(rtype, sav, 0);
+        rtype = readbin(rtype, sav, swapit);
 
         // Wer kommt auf so eine Scheiße?
         // Max laenge laut interwebz: 255.
@@ -246,7 +251,7 @@ List sav(const char * filePath, const bool debug)
           Rcpp::NumericVector mOne(2);
           double miss0=0;
 
-          miss0 = readbin(miss0, sav, 0); // missing value: 9
+          miss0 = readbin(miss0, sav, swapit); // missing value: 9
 
           mOne(0) = nmiss;
           mOne(1) = miss0;
@@ -264,8 +269,8 @@ List sav(const char * filePath, const bool debug)
           Rcpp::NumericVector m2(3);
           double miss0=0, miss1=0;
 
-          miss0 = readbin(miss0, sav, 0); // 1. missing value
-          miss1 = readbin(miss1, sav, 0); // 2. missing value
+          miss0 = readbin(miss0, sav, swapit); // 1. missing value
+          miss1 = readbin(miss1, sav, swapit); // 2. missing value
 
           m2(0) = nmiss;
           m2(1) = miss0;
@@ -283,9 +288,9 @@ List sav(const char * filePath, const bool debug)
           Rcpp::NumericVector m3(4);
           double miss0=0, miss1=0, miss2=0;
 
-          miss0 = readbin(miss0, sav, 0); // 1. missing value
-          miss1 = readbin(miss1, sav, 0); // 2. missing value
-          miss2 = readbin(miss2, sav, 0); // 3. missing value
+          miss0 = readbin(miss0, sav, swapit); // 1. missing value
+          miss1 = readbin(miss1, sav, swapit); // 2. missing value
+          miss2 = readbin(miss2, sav, swapit); // 3. missing value
 
           m3(0) = nmiss;
           m3(1) = miss0;
@@ -304,7 +309,7 @@ List sav(const char * filePath, const bool debug)
       // while loop above ends with 999
       // do not read another byte if 999 was already reached
       if (rtype!=999)
-        rtype = readbin(rtype, sav, 0);
+        rtype = readbin(rtype, sav, swapit);
 
     }
 
@@ -336,7 +341,7 @@ List sav(const char * filePath, const bool debug)
 
       while (rtype == 3) {
 
-        nolab = readbin(nolab, sav, 0);
+        nolab = readbin(nolab, sav, swapit);
         // Rprintf("Nolab: %d \n", nolab);
         Rcpp::CharacterVector label(nolab);
         Rcpp::NumericVector code(nolab);
@@ -375,7 +380,7 @@ List sav(const char * filePath, const bool debug)
             }
 
 
-            lablen = readbin(lablen, sav, 0);
+            lablen = readbin(lablen, sav, swapit);
             // Rprintf("Lablen: %d \n", lablen);
 
             if (!((lablen+1)%8==0))
@@ -404,7 +409,7 @@ List sav(const char * filePath, const bool debug)
         else
           Labell_list.push_back(code);
 
-        rtype = readbin(rtype, sav, 0);
+        rtype = readbin(rtype, sav, swapit);
       }
 
       // label 4:
@@ -417,20 +422,20 @@ List sav(const char * filePath, const bool debug)
       {
         Rcpp::checkUserInterrupt();
 
-        nolabels = readbin(nolabels, sav, 0); // number of labels
+        nolabels = readbin(nolabels, sav, swapit); // number of labels
 
         Rcpp::NumericVector EoHUnks(nolabels);
 
 
         for (int i=0; i<nolabels; ++i) {
-          unk2 = readbin(unk2, sav, 0); // unk
+          unk2 = readbin(unk2, sav, swapit); // unk
 
           EoHUnks(i) = unk2;
           // Rprintf("End of Header bytes: %d \n", unk2);
 
         }
         EoHList.push_back(EoHUnks);
-        rtype = readbin(rtype, sav, 0);
+        rtype = readbin(rtype, sav, swapit);
       }
 
       while (rtype==6)
@@ -450,7 +455,7 @@ List sav(const char * filePath, const bool debug)
           Rcout << document << std::endl;
         }
 
-        rtype = readbin(rtype, sav, 0);
+        rtype = readbin(rtype, sav, swapit);
 
       }
 
@@ -471,9 +476,9 @@ List sav(const char * filePath, const bool debug)
         int32_t measure = 0, width = 0, alignment = 0;
 
         // subtype integer: 3 / floating: 4 / varsyst: 11
-        subtyp = readbin(subtyp, sav, 0);
-        size = readbin(size, sav, 0);
-        count = readbin(count, sav, 0);
+        subtyp = readbin(subtyp, sav, swapit);
+        size = readbin(size, sav, swapit);
+        count = readbin(count, sav, swapit);
 
 
         // Rprintf("rtype: %d \n", rtype);
@@ -484,22 +489,22 @@ List sav(const char * filePath, const bool debug)
         if (subtyp == 3) {
           // Rcout << "-- subtyp 3" << endl;
 
-          major = readbin(major, sav, 0);   // major version
-          minor = readbin(minor, sav, 0);   // minor version
-          rev = readbin(rev, sav, 0);       // revision
-          macode = readbin(macode, sav, 0); // machine code
-          floatp = readbin(floatp, sav, 0); // floating point pre
-          compr = readbin(compr, sav, 0);   // compression
-          endian = readbin(endian, sav, 0); // endianness
-          charcode = readbin(charcode, sav, 0); // charcode
+          major = readbin(major, sav, swapit);   // major version
+          minor = readbin(minor, sav, swapit);   // minor version
+          rev = readbin(rev, sav, swapit);       // revision
+          macode = readbin(macode, sav, swapit); // machine code
+          floatp = readbin(floatp, sav, swapit); // floating point pre
+          compr = readbin(compr, sav, swapit);   // compression
+          endian = readbin(endian, sav, swapit); // endianness
+          charcode = readbin(charcode, sav, swapit); // charcode
 
           // Rcout << subtyp << "/" << size << "/" << count << "/" << major  << "/" << minor  << "/" << rev  << "/" << macode  << "/" << floatp << "/" << compr  << "/" << endian  << "/" << charcode << std::endl;
 
         } else if (subtyp == 4) {
           // Rcout << "-- subtyp 4" << endl;
-          sysmiss = readbin(sysmiss, sav, 0);  // sysmiss always 3
-          highest = readbin(highest, sav, 0);  // highest
-          lowest = readbin(lowest, sav, 0);    // lowest
+          sysmiss = readbin(sysmiss, sav, swapit);  // sysmiss always 3
+          highest = readbin(highest, sav, swapit);  // highest
+          lowest = readbin(lowest, sav, swapit);    // lowest
 
           // Rcout << subtyp << "/" << size << "/" << count << "/" << sysmiss  << "/" << highest  << "/" << lowest << std::endl;
 
@@ -507,9 +512,9 @@ List sav(const char * filePath, const bool debug)
           // Rcout << "-- subtyp 11" << endl;
 
           for (int i=0; i < count/3; ++i) {
-            measure = readbin(measure, sav, 0);        // measure 1/nom 2/Ord 3/Metr
-            width = readbin(width, sav, 0);            // width
-            alignment = readbin(alignment, sav, 0);    // alignment
+            measure = readbin(measure, sav, swapit);        // measure 1/nom 2/Ord 3/Metr
+            width = readbin(width, sav, swapit);            // width
+            alignment = readbin(alignment, sav, swapit);    // alignment
 
             // Rcout << subtyp << "/" << size << "/" << count << "/" << measure  << "/" << width  << "/" << alignment  <<  std::endl;
           }
@@ -550,7 +555,7 @@ List sav(const char * filePath, const bool debug)
         }
 
 
-        rtype = readbin(rtype, sav, 0);
+        rtype = readbin(rtype, sav, swapit);
 
       }
 
@@ -619,7 +624,7 @@ List sav(const char * filePath, const bool debug)
     // Rcpp::stop("stop");
 
     int32_t unk8=0;
-    unk8 = readbin(unk8, sav, 0); // 0
+    unk8 = readbin(unk8, sav, swapit); // 0
 
     uint8_t val_b = 0;
     double val_d = 0;
@@ -685,7 +690,7 @@ List sav(const char * filePath, const bool debug)
         // Rcpp::Rcout << "read chunk" << endl;
 
 
-        chunk = readbin(val_d, sav, 0);
+        chunk = readbin(val_d, sav, swapit);
 
         IntegerVector chunkvec(8);
 
@@ -819,7 +824,7 @@ List sav(const char * filePath, const bool debug)
 
             case 0:
             {
-              val_d = readbin(val_d, sav, 0);
+              val_d = readbin(val_d, sav, swapit);
               REAL(VECTOR_ELT(df,kk))[nn] = val_d;
               // Rprintf("%f \n", val_d);
               break;
@@ -990,7 +995,7 @@ List sav(const char * filePath, const bool debug)
           // Rcout << val_d << std::endl;
 
           val_d = NA_REAL;
-          val_d = readbin(val_d, sav, 0);
+          val_d = readbin(val_d, sav, swapit);
           REAL(VECTOR_ELT(df,kk))[nn] = val_d;
           break;
         }
