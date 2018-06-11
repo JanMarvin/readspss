@@ -106,18 +106,24 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   attribs <- attributes(data)
 
+  attr(data, "vallabels") <- NULL
+  attr(data, "vartypes") <- NULL
+  attr(data, "varnames") <- NULL
+  attr(data, "varmat") <- NULL
+  attr(data, "res") <- NULL
+
   label      <- attribs$label
   val.labels <- attribs$vallabels
   vartypes   <- attribs$vartypes
-  unkmat     <- do.call("rbind", attribs$unkmat)
+  varmat     <- do.call("rbind", attribs$varmat)
+
+  varmat <- varmat[varmat[,1]>=0,]
 
 
   # convert NAs by missing information provided by SPSS.
   # these are just different missing values in Stata and NA in R.
   if (use.missings) {
     mvtab <- attribs$missings
-    varmat <- unkmat
-    varmat <- varmat[varmat[,1]>=0,]
     missinfo <- varmat[,3]
     missinfo <- which(missinfo %in% missinfo[missinfo != 0])
 
@@ -334,18 +340,15 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   }
 
 
+
   # prepare for return
   attr(data, "datalabel") <- attribs$datalabel
   attr(data, "datestamp") <- attribs$datestamp
   attr(data, "timestamp") <- attribs$timestamp
 
-  attr(data, "varmatrix") <- unkmat
+  attr(data, "varmatrix") <- varmat
   attr(data, "val.label") <- val.labels
-  attr(data, "labnames")  <- labnames
   attr(data, "missings")  <- attribs$missings
-  attr(data, "vartype")   <- attribs$vtype
-  attr(data, "lstring")   <- attribs$longstring
-  attr(data, "lvarname")  <- attribs$longvarname
 
   # return
   return(data)

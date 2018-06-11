@@ -125,11 +125,11 @@ List sav(const char * filePath, const bool debug)
     int32_t writeINT;
     std::string name (8, '\0');
 
-    int32_t vtype=0, vlflag=0, nmiss=0, unk4=0, unk5 = 0;
+    int32_t vtype=0, vlflag=0, nmiss=0, var4=0, var5 = 0;
 
 
     Rcpp::List missings = Rcpp::List();
-    Rcpp::List unklist = Rcpp::List();
+    Rcpp::List varlist = Rcpp::List();
 
 
     rtype = readbin(rtype, sav, 0);
@@ -138,146 +138,166 @@ List sav(const char * filePath, const bool debug)
     int32_t i = 0;
     while (rtype == 2) {
 
-      if (rtype == 2)
+      // skip 20 bytes or read 5 unks
+      vtype = readbin(vtype, sav, 0);      // Variable type
+      vlflag = readbin(vlflag, sav, 0);    // Label flag
+      nmiss = readbin(nmiss, sav, 0);
+
+      // bits of int32_t define digits, width and type
+      var4 = readbin(var4, sav, 0);
+
+      // print
+      int8_t var41, var42, var43, var44;
+
+      var41 = (int8_t)var4;
+      var42 = (var4 >> 8);
+      var43 = (var4 >> 16);
+      var44 = (var4 >> 24);
+
+      // write
+      // 4 and 5 are most likely identical
+      var5 = readbin(var5, sav, 0);
+
+      int8_t var51, var52, var53, var54;
+      var51 = (int8_t)var5;
+      var52 = (var5 >> 8);
+      var53 = (var5 >> 16);
+      var54 = (var5 >> 24);
+
+
+      Rcpp::NumericMatrix varmat(1,11);
+
+      // Store vars in matrix export as attr varmat
+      varmat(0,0)  = vtype;
+      varmat(0,1)  = vlflag;
+      varmat(0,2)  = nmiss; // 1, 2, 3 or -1, -2, -3 (range)
+      varmat(0,3)  = var41; // digits print format?
+      varmat(0,4)  = var42; // field width
+      varmat(0,5)  = var43; // format type
+      varmat(0,6)  = var44; // not used
+      varmat(0,7)  = var51; // digits write format?
+      varmat(0,8)  = var52; // field width
+      varmat(0,9)  = var53; // format type
+      varmat(0,10) = var54; // not used
+
+      varlist.push_back(varmat);
+
+      // Rcpp::Rcout << vtype <<"; "<< vlflag <<"; " << nmiss <<"; " << unk4 << "; "<< unk5 << endl;
+
+      vartype.push_back(vtype);
+
+
+      std::string nvarname (8, '\0');
+      // read variable name 8 bytes long upercase letters
+      readstring(nvarname, sav, nvarname.size());
+
+      // trim additional whitespaces
+      nvarname = std::regex_replace(nvarname,
+                                    std::regex("^ +| +$|( ) +"), "$1");
+
+      varnames.push_back(nvarname);
+      // Rcout << nvarname << std::endl;
+
+      if(vlflag==1)
       {
-        // skip 20 bytes or read 5 unks
-        vtype = readbin(vtype, sav, 0);      // Variable type
-        vlflag = readbin(vlflag, sav, 0);    // Label flag
-        nmiss = readbin(nmiss, sav, 0);
-        // 0/1/-2/-3 Number of missing labels. positive its one number, negative a range?
-        unk4 = readbin(unk4, sav, 0);
-        // oder sind es int8_ts? aber 2 8 5 0 macht so viel Sinn wie 329730
-        unk5 = readbin(unk5, sav, 0);        // 4 and 5 are equal.
+        rtype = readbin(rtype, sav, 0);
 
+        // Wer kommt auf so eine Scheiße?
+        // Max laenge laut interwebz: 255.
 
-        Rcpp::NumericMatrix unkmat(1,5);
+        int32_t origlen = rtype;
 
-        // Store unks in matrix export as attr unkmat
-        unkmat(0,0) = vtype;
-        unkmat(0,1) = vlflag;
-        unkmat(0,2) = nmiss; // 1, 2, 3 or -1, -2, -3 (range)
-        unkmat(0,3) = unk4; // print format?
-        unkmat(0,4) = unk5; // write format?
-
-        unklist.push_back(unkmat);
-
-        // Rcpp::Rcout << vtype <<"; "<< vlflag <<"; " << nmiss <<"; " << unk4 << "; "<< unk5 << endl;
-
-        vartype.push_back(vtype);
-
-
-        std::string nvarname (8, '\0');
-        // read variable name 8 bytes long upercase letters
-        readstring(nvarname, sav, nvarname.size());
-
-        // trim additional whitespaces
-        nvarname = std::regex_replace(nvarname,
-                                      std::regex("^ +| +$|( ) +"), "$1");
-
-        varnames.push_back(nvarname);
-        // Rcout << nvarname << std::endl;
-
-        if(vlflag==1)
+        if (!(rtype%4==0))
         {
-          rtype = readbin(rtype, sav, 0);
-
-          // Wer kommt auf so eine Scheiße?
-          // Max laenge laut interwebz: 255.
-
-          int32_t origlen = rtype;
-
-          if (!(rtype%4==0))
+          for(int i=1; i<4; ++i)
           {
-            for(int i=1; i<4; ++i)
-            {
-              if ((rtype+i)%4==0)
-                rtype = rtype+i;
-            }
+            if ((rtype+i)%4==0)
+              rtype = rtype+i;
           }
+        }
 
-          // Rprintf("%d \n", rtype);
-          std::string vallabel (rtype, '\0');
-          readstring(vallabel, sav, vallabel.size());
-
-
-          // trim additional whitespaces on the right
-          vallabel = std::regex_replace(vallabel,
-                                        std::regex("^ +| +$|( ) +"), "$1");
-          vallabels.push_back(vallabel);
-
-          rtype = origlen;
-
-          // Rprintf(" %d \n", rtype);
-          // Rcout << "Vallabel:" << vallabel << std::endl;
+        // Rprintf("%d \n", rtype);
+        std::string vallabel (rtype, '\0');
+        readstring(vallabel, sav, vallabel.size());
 
 
-          int8_t const nmisstype = std::abs(nmiss);
+        // trim additional whitespaces on the right
+        vallabel = std::regex_replace(vallabel,
+                                      std::regex("^ +| +$|( ) +"), "$1");
+        vallabels.push_back(vallabel);
 
-          // SPSS knows 5 different missing types. -3, -2 are range types. 1, 2,
-          // 3 are discrete types. Range types have min range and max range. -3
-          // has an additional discrete value.
-          switch(nmisstype)
-          {
+        rtype = origlen;
 
-          case 1:
-          {
-            // missing values
-            Rcpp::NumericVector mOne(2);
-            double miss0=0;
+        // Rprintf(" %d \n", rtype);
+        // Rcout << "Vallabel:" << vallabel << std::endl;
 
-            miss0 = readbin(miss0, sav, 0); // missing value: 9
 
-            mOne(0) = nmiss;
-            mOne(1) = miss0;
+        int8_t const nmisstype = std::abs(nmiss);
 
-            // Rcout << nmiss << ": "  << mOne(1) << endl;
+        // SPSS knows 5 different missing types. -3, -2 are range types. 1, 2,
+        // 3 are discrete types. Range types have min range and max range. -3
+        // has an additional discrete value.
+        switch(nmisstype)
+        {
 
-            missings.push_back(mOne);
-            break;
+        case 1:
+        {
+          // missing values
+          Rcpp::NumericVector mOne(2);
+          double miss0=0;
 
-          }
+          miss0 = readbin(miss0, sav, 0); // missing value: 9
 
-          case 2:
-          {
-            // missing values
-            Rcpp::NumericVector m2(3);
-            double miss0=0, miss1=0;
+          mOne(0) = nmiss;
+          mOne(1) = miss0;
 
-            miss0 = readbin(miss0, sav, 0); // 1. missing value
-            miss1 = readbin(miss1, sav, 0); // 2. missing value
+          // Rcout << nmiss << ": "  << mOne(1) << endl;
 
-            m2(0) = nmiss;
-            m2(1) = miss0;
-            m2(2) = miss1;
+          missings.push_back(mOne);
+          break;
 
-            // Rcout << nmiss << ": "  << m2(1) << " / " << m2(2)  << endl;
+        }
 
-            missings.push_back(m2);
-            break;
-          }
+        case 2:
+        {
+          // missing values
+          Rcpp::NumericVector m2(3);
+          double miss0=0, miss1=0;
 
-          case 3:
-          {
-            // missing values
-            Rcpp::NumericVector m3(4);
-            double miss0=0, miss1=0, miss2=0;
+          miss0 = readbin(miss0, sav, 0); // 1. missing value
+          miss1 = readbin(miss1, sav, 0); // 2. missing value
 
-            miss0 = readbin(miss0, sav, 0); // 1. missing value
-            miss1 = readbin(miss1, sav, 0); // 2. missing value
-            miss2 = readbin(miss2, sav, 0); // 3. missing value
+          m2(0) = nmiss;
+          m2(1) = miss0;
+          m2(2) = miss1;
 
-            m3(0) = nmiss;
-            m3(1) = miss0;
-            m3(2) = miss1;
-            m3(3) = miss2;
+          // Rcout << nmiss << ": "  << m2(1) << " / " << m2(2)  << endl;
 
-            // Rcout  << nmiss << ": " << m3(1) << " / " << m3(2) << " / " << m3(3) << endl;
+          missings.push_back(m2);
+          break;
+        }
 
-            missings.push_back(m3);
-            break;
-          }
+        case 3:
+        {
+          // missing values
+          Rcpp::NumericVector m3(4);
+          double miss0=0, miss1=0, miss2=0;
 
-          }
+          miss0 = readbin(miss0, sav, 0); // 1. missing value
+          miss1 = readbin(miss1, sav, 0); // 2. missing value
+          miss2 = readbin(miss2, sav, 0); // 3. missing value
+
+          m3(0) = nmiss;
+          m3(1) = miss0;
+          m3(2) = miss1;
+          m3(3) = miss2;
+
+          // Rcout  << nmiss << ": " << m3(1) << " / " << m3(2) << " / " << m3(3) << endl;
+
+          missings.push_back(m3);
+          break;
+        }
+
         }
       }
 
@@ -340,39 +360,39 @@ List sav(const char * filePath, const bool debug)
           noNum = std::regex_search(cV, std::regex("^[A-Za-z0-9]")) &&
             !std::regex_search(cV, std::regex("@$"));
 
-          // if its a double, do a memcpy, else trim whitespaces
-          if( noNum ) {
-            cV = std::regex_replace(cV, std::regex("^ +| +$|( ) +"), "$1");
+            // if its a double, do a memcpy, else trim whitespaces
+            if( noNum ) {
+              cV = std::regex_replace(cV, std::regex("^ +| +$|( ) +"), "$1");
 
-            // return something so that we can later create a factor
-            if(cV.compare(empty))
-              codeV(i) = cV;
+              // return something so that we can later create a factor
+              if(cV.compare(empty))
+                codeV(i) = cV;
 
-          } else {
+            } else {
 
-            memcpy(&coden , cV.c_str(), sizeof(double));
-            code(i) = coden;
-          }
-
-
-          lablen = readbin(lablen, sav, 0);
-          // Rprintf("Lablen: %d \n", lablen);
-
-          if (!((lablen+1)%8==0))
-          {
-            for(int i=1; i<8; ++i)
-            {
-              if (((lablen+1)+i)%8==0)
-                lablen = lablen+i;
+              memcpy(&coden , cV.c_str(), sizeof(double));
+              code(i) = coden;
             }
-          }
 
-          std::string lab (lablen, '\0');
-          readstring(lab, sav, lab.size());
 
-          lab = std::regex_replace(lab, std::regex("^ +| +$|( ) +"), "$1");
+            lablen = readbin(lablen, sav, 0);
+            // Rprintf("Lablen: %d \n", lablen);
 
-          label(i) = lab;
+            if (!((lablen+1)%8==0))
+            {
+              for(int i=1; i<8; ++i)
+              {
+                if (((lablen+1)+i)%8==0)
+                  lablen = lablen+i;
+              }
+            }
+
+            std::string lab (lablen, '\0');
+            readstring(lab, sav, lab.size());
+
+            lab = std::regex_replace(lab, std::regex("^ +| +$|( ) +"), "$1");
+
+            label(i) = lab;
         }
 
         // prepare release
@@ -631,8 +651,6 @@ List sav(const char * filePath, const bool debug)
       Rprintf("cflag: %d\n", cflag);
     }
 
-
-    Rcpp::List chunklist = Rcpp::List();
 
     if (cflag) {
 
@@ -1041,7 +1059,7 @@ List sav(const char * filePath, const bool debug)
     df.attr("varnames") = Varnames;
     df.attr("vartypes") = Vartype;
     df.attr("vtype") = vtyp;
-    df.attr("unkmat") = unklist;
+    df.attr("varmat") = varlist;
     df.attr("missings") = missings;
     df.attr("label") = Labell_list;
     df.attr("haslabel") = EoHList;
@@ -1049,7 +1067,6 @@ List sav(const char * filePath, const bool debug)
     df.attr("longstring") = lstring;
     df.attr("longvarname") = lvarname;
     df.attr("cflag") = cflag;
-    df.attr("chunklist") = chunklist;
     df.attr("res") = res;
 
 
