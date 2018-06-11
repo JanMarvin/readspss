@@ -556,7 +556,7 @@ List sav(const char * filePath, const bool debug)
 
           // Rcout << data << std::endl;
 
-          Rcout << "unknown subtype detected" << std::endl;
+          Rcout << "unknown subtype " << subtyp << " detected" << std::endl;
         }
 
 

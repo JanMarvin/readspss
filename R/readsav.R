@@ -199,7 +199,8 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   if (is.null(fromEncoding)){
     ccode <- attribs$charcode
-    if (is.null(ccode)) ccode <- 2
+
+    if (is.null(ccode) | ccode == 0) ccode <- 2
     fromEncoding <- names(knownCP)[knownCP == ccode]
   }
 
