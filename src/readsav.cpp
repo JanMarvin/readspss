@@ -312,7 +312,7 @@ List sav(const char * filePath, const bool debug)
       //
       // if second int >1 restart at double
 
-      bool noNum = 0;
+      bool noNum = 1;
 
       while (rtype == 3) {
 
@@ -335,15 +335,20 @@ List sav(const char * filePath, const bool debug)
           std::string cV (8, ' ');
           readstring(cV, sav, cV.size());
 
-          noNum = strcmp( cV.c_str(), empty.c_str());
+          // noNum = strcmp( cV.c_str(), empty.c_str());
+          // noNum = cV.rfind("\\", 0) == 0;
+
+          memcpy(&coden , cV.c_str(), sizeof(double));
+
+          if (coden > 0.0001)
+            noNum = 0;
 
           // if its a double, do a memcpy, else trim whitespaces
-          if( !noNum ) {
-            memcpy(&coden , cV.c_str(), sizeof(double));
-            code(i) = coden;
-          } else {
+          if( noNum ) {
             cV = std::regex_replace(cV, std::regex("^ +| +$|( ) +"), "$1");
             codeV(i) = cV;
+          } else {
+            code(i) = coden;
           }
 
 
