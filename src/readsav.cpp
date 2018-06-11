@@ -312,7 +312,7 @@ List sav(const char * filePath, const bool debug)
       //
       // if second int >1 restart at double
 
-      bool noNum = 1;
+      bool noNum = 0;
 
       while (rtype == 3) {
 
@@ -335,13 +335,10 @@ List sav(const char * filePath, const bool debug)
           std::string cV (8, ' ');
           readstring(cV, sav, cV.size());
 
-          // noNum = strcmp( cV.c_str(), empty.c_str());
-          // noNum = cV.rfind("\\", 0) == 0;
-
-          memcpy(&coden , cV.c_str(), sizeof(double));
-
-          if (coden > 0.0001)
-            noNum = 0;
+          // check for characters in the string lets hope SPSS does not allow
+          // characters starting with a numeric or special character
+          noNum = std::regex_search(cV, std::regex("^[A-Za-z0-9]")) &&
+            !std::regex_search(cV, std::regex("@$"));
 
           // if its a double, do a memcpy, else trim whitespaces
           if( noNum ) {
@@ -349,11 +346,11 @@ List sav(const char * filePath, const bool debug)
 
             // return something so that we can later create a factor
             if(cV.compare(empty))
-              codeV(i) = NA_STRING;
-            else
               codeV(i) = cV;
 
           } else {
+
+            memcpy(&coden , cV.c_str(), sizeof(double));
             code(i) = coden;
           }
 
@@ -384,10 +381,10 @@ List sav(const char * filePath, const bool debug)
         code.attr("names") = label;
         codeV.attr("names") = label;
 
-        if (!noNum)
-          Labeltable.push_back(code);
-        else
+        if (noNum)
           Labeltable.push_back(codeV);
+        else
+          Labeltable.push_back(code);
 
 
         Labell_list.push_back(Labeltable);
