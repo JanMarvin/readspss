@@ -197,6 +197,9 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   }
 
+
+  longvarname <- attribs$longvarname %>% unlist
+
   if (is.null(fromEncoding)){
     ccode <- attribs$charcode
 
@@ -223,9 +226,8 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     # var.labels
     val.labels <- read.encoding(val.labels, fromEncoding, toEncoding)
 
-    lvn <- attribs$longvarname %>% unlist
-    if (!identical(lvn, list())){
-      longvarname <- read.encoding(lvn,
+    if (!identical(longvarname, list())){
+      longvarname <- read.encoding(longvarname,
                                    fromEncoding, toEncoding)
     }
 
@@ -297,7 +299,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     }
 
 
-  if (!identical(longvarname, list())) {
+  if (!is.null(longvarname)) {
 
     # Sys.setlocale("LC_ALL", locale="C")
     longname <- longvarname %>%
@@ -331,6 +333,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
       pat <- replvec[[i]]
 
+
       # any variables to combine?
       if (length(pat) > 1 & grepl("001", pat[2])) {
         sel <- data[,names(data) %in% pat]
@@ -345,21 +348,21 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
         }
       }
-
-      # assign names stored in spss
-      # Previously the dataset used some different internal names usefull for
-      # combining different long strings. Now everything is cleaned up and we
-      # can apply the correct variable names
-      nams <- names(data)
-
-      new_nams <- do.call(rbind, longname) %>% as.matrix
-
-      for (i in seq_along(t(new_nams))) {
-        nams[nams == new_nams[i,1] ] <- new_nams[i,2]
-      }
-      names(data) <- nams
-
     }
+
+    # assign names stored in spss
+    # Previously the dataset used some different internal names usefull for
+    # combining different long strings. Now everything is cleaned up and we
+    # can apply the correct variable names
+    nams <- names(data)
+
+    new_nams <- do.call(rbind, longname)
+
+    for (i in 1:NROW(new_nams)) {
+      nams[nams == new_nams[i,1] ] <- new_nams[i,2]
+    }
+    names(data) <- nams
+
   }
 
 
