@@ -8,8 +8,6 @@
 #' @param y charactervector with labels
 #' @import Rcpp
 #' @export
-NULL
-
 fast_factor <- function(x, y) {
     .Call('_readspss_fast_factor', PACKAGE = 'readspss', x, y)
 }
