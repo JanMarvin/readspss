@@ -324,6 +324,7 @@ List sav(const char * filePath, const bool debug)
     Rcpp::List lvarname;
     Rcpp::List lstring;
     Rcpp::List doc;
+    Rcpp::CharacterVector enc(1);
 
     int32_t subtyp = 0, size = 0, count = 0;
     int32_t major = 0, minor = 0, rev = 0, macode = 0;
@@ -511,6 +512,32 @@ List sav(const char * filePath, const bool debug)
 
           // Rcout << subtyp << "/" << size << "/" << count << "/" << sysmiss  << "/" << highest  << "/" << lowest << std::endl;
 
+        } else if (subtyp == 7) {
+
+          std::string data (size*count, '\0');
+
+          readstring(data, sav, data.size());
+
+          data.erase(std::remove(data.begin(),
+                                 data.end(),
+                                 '\0'),
+                                 data.end());
+
+          // Rcout << data << std::endl;
+        } else if (subtyp == 8) {
+
+          // subtyp contains binary information in a single long string
+          // my example shows some kind of program
+
+          std::string data (size*count, '\0');
+
+          readstring(data, sav, data.size());
+
+          data.erase(std::remove(data.begin(),
+                                 data.end(),
+                                 '\0'),
+                                 data.end());
+
         } else if (subtyp == 11) {
           // Rcout << "-- subtyp 11" << endl;
 
@@ -528,6 +555,10 @@ List sav(const char * filePath, const bool debug)
           //
           std::string longvarname (count, '\0');
           readstring(longvarname, sav, count);
+
+
+          // longvarname = std::regex_replace(longvarname,
+          //                            std::regex("\t"), " ");
 
           lvarname.push_back( longvarname );
 
@@ -549,14 +580,83 @@ List sav(const char * filePath, const bool debug)
 
           // std::cout << longstring << std::endl;
 
+        } else if (subtyp == 16) {
+
+          int32_t unk = 0;
+
+          for (int i = 0; i<count; ++i) {
+
+            unk = readbin(unk, sav, swapit);
+
+            if (debug) Rprintf("sub 16: unk1 %d\n", unk);
+
+            unk = readbin(unk, sav, swapit);
+            if (debug) Rprintf("sub 16: unk2 %d\n", unk);
+
+          }
+
+          // std::string longstring (count, '\0');
+          // // readstring(longstring, sav, count);
+          //
+          //
+          // stop("debug");
+
+        } else if (subtyp == 18) {
+
+          // another subtyp containing only program output? looks like some kind
+          // of data base
+          std::string data (size*count, '\0');
+
+          readstring(data, sav, data.size());
+
+          data.erase(std::remove(data.begin(),
+                                 data.end(),
+                                 '\0'),
+                                 data.end());
+
+          // Rcout << data << std::endl;
+
+        } else if (subtyp == 20) {
+          std::string encoding (count, '\0');
+          readstring(encoding, sav, count);
+
+          encoding.erase(std::remove(encoding.begin(),
+                                     encoding.end(),
+                                       '\0'),
+                                       encoding.end());
+
+          enc(0) = encoding;
+
+
+        } else if (subtyp == 24) {
+
+          // seems like xml? dataview table format
+          std::string data (size*count, '\0');
+
+          readstring(data, sav, data.size());
+
+          data.erase(std::remove(data.begin(),
+                                 data.end(),
+                                 '\0'),
+                                 data.end());
+
+          // Rcout << data << std::endl;
+
         } else {
           std::string data (size*count, '\0');
 
           readstring(data, sav, data.size());
 
-          // Rcout << data << std::endl;
+          data.erase(std::remove(data.begin(),
+                                     data.end(),
+                                     '\0'),
+                                     data.end());
+
+          Rcout << data << std::endl;
 
           Rcout << "unknown subtype " << subtyp << " detected" << std::endl;
+
+          stop("debug");
         }
 
 
@@ -564,8 +664,8 @@ List sav(const char * filePath, const bool debug)
 
       }
 
-      if (debug)
-        Rprintf("rtype: %d \n", rtype);
+      // if (debug)
+      //   Rprintf("rtype: %d \n", rtype);
 
     }
 
@@ -1083,6 +1183,7 @@ List sav(const char * filePath, const bool debug)
     df.attr("compression") = compr;
     df.attr("charcode") = charcode;
     df.attr("doc") = doc;
+    df.attr("encoding") = enc;
 
 
 

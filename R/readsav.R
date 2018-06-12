@@ -200,15 +200,15 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   if (is.null(fromEncoding)){
     ccode <- attribs$charcode
 
-    if (is.null(ccode) | ccode == 0) ccode <- 2
     fromEncoding <- names(knownCP)[knownCP == ccode]
+    if (is.null(ccode) | ccode == 0) ccode <- 2
   }
 
   if (is.null(toEncoding))
     toEncoding <- ""
 
   ## Encoding // no encoding if fromEncoding == 2
-  if (encoding & fromEncoding != "C") {
+  if (encoding & ccode != 2) {
 
     # varnames
     names(data) <- read.encoding(names(data), fromEncoding, toEncoding)
@@ -217,11 +217,18 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     # label
     for (i in seq_along(label))
       names(label[[i]]) <- read.encoding(names(label[[i]]),
-                                              fromEncoding = fromEncoding,
-                                              encoding = toEncoding)
+                                         fromEncoding = fromEncoding,
+                                         encoding = toEncoding)
 
     # var.labels
     val.labels <- read.encoding(val.labels, fromEncoding, toEncoding)
+
+    lvn <- attribs$longvarname %>% unlist
+    if (!identical(lvn, list())){
+      longvarname <- read.encoding(lvn,
+                                   fromEncoding, toEncoding)
+    }
+
     # print(val.labels)
   }
 
@@ -289,15 +296,13 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
       }
     }
 
-  # some SPSS files contain long varnames.
-  # longvarname is created as empty list
-  longvarname <- attr(data, "longvarname")
 
   if (!identical(longvarname, list())) {
 
-    longname <- longvarname %>% unlist %>%
+    # Sys.setlocale("LC_ALL", locale="C")
+    longname <- longvarname %>%
       strsplit("\t") %>% unlist %>% strsplit("=")
-
+    # Sys.setlocale("LC_ALL", locale="de_DE.UTF-8")
 
     # If the imported data contains strings longer than nchar(255) the data is
     # scrambled at this point. SPSS separates longer strings in different pieces
@@ -337,24 +342,24 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
           data <- data[,!names(data) %in% pp]
 
           data[p1] <- do.call(paste0, sel)
+
         }
       }
+
+      # assign names stored in spss
+      # Previously the dataset used some different internal names usefull for
+      # combining different long strings. Now everything is cleaned up and we
+      # can apply the correct variable names
+      nams <- names(data)
+
+      new_nams <- do.call(rbind, longname) %>% as.matrix
+
+      for (i in seq_along(t(new_nams))) {
+        nams[nams == new_nams[i,1] ] <- new_nams[i,2]
+      }
+      names(data) <- nams
+
     }
-
-    # assign names stored in spss
-    # Previously the dataset used some different internal names usefull for
-    # combining different long strings. Now everything is cleaned up and we
-    # can apply the correct variable names
-    nams <- names(data)
-
-    new_nams <- do.call(rbind, longname)
-
-    for (i in 1:NROW(new_nams)) {
-      nams[nams == new_nams[i,1] ] <- new_nams[i,2]
-    }
-
-    names(data) <- nams
-
   }
 
 
