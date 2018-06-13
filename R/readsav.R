@@ -214,7 +214,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   if (encoding & ccode != 2) {
 
     # varnames
-    names(data) <- read.encoding(names(data), fromEncoding, toEncoding)
+    # names(data) <- read.encoding(names(data), fromEncoding, toEncoding)
 
 
     # label
@@ -299,7 +299,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     }
 
 
-  if (!is.null(longvarname)) {
+  if (!identical(longvarname, character(0))) {
 
     # Sys.setlocale("LC_ALL", locale="C")
     longname <- longvarname %>%  strsplit("=")

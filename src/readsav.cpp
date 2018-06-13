@@ -660,6 +660,20 @@ List sav(const char * filePath, const bool debug)
 
     }
 
+    if (charcode > 2) {
+      Rcpp::Environment base("package:base");
+      Rcpp::Function iconv = base["iconv"];
+
+
+      for (int i=0; i<varnames.size(); ++i) {
+        // Rcpp::Rcout << mystring << std::endl;
+        varnames[i] = Rcpp::as<std::string>(
+          iconv(varnames[i], Rcpp::Named("from","WINDOWS-1252"), Rcpp::Named("to",""))
+        );
+      }
+
+    }
+
 
     // Data Part -------------------------------------------------------------//
 
