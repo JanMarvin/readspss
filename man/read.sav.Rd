@@ -6,7 +6,8 @@
 \usage{
 read.sav(file, convert.factors = TRUE, generate.factors = TRUE,
   encoding = TRUE, fromEncoding = NULL, toEncoding = NULL,
-  use.missings = TRUE, debug = FALSE, override = FALSE)
+  use.missings = TRUE, debug = FALSE, override = FALSE,
+  convert.dates = TRUE)
 }
 \arguments{
 \item{file}{\emph{string} a sav-file to import. can be a file on a computer
@@ -40,6 +41,8 @@ likely not usefull to any user.}
 \item{override}{\emph{logical}. The filename provided in \code{file} is
 checked for the ending sav. If the fileending is different, nothing is read.
 This option can be used to override this behavior.}
+
+\item{convert.dates}{\emph{logical}. Should dates be converted on the fly?}
 }
 \value{
 \code{readspss} returns a data.frame with additional objects

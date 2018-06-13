@@ -41,6 +41,7 @@
 #' @param override \emph{logical}. The filename provided in \code{file} is
 #' checked for the ending sav. If the fileending is different, nothing is read.
 #' This option can be used to override this behavior.
+#' @param convert.dates \emph{logical}. Should dates be converted on the fly?
 #'
 #' @details SPSS files are widely available, though for R long time only foreign
 #' and memisc provided functions to import sav-files. Lately haven joined.
@@ -80,7 +81,8 @@
 #' @export
 read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
                      encoding = TRUE, fromEncoding = NULL, toEncoding = NULL,
-                     use.missings = TRUE, debug = FALSE, override = FALSE) {
+                     use.missings = TRUE, debug = FALSE, override = FALSE,
+                     convert.dates = TRUE) {
 
   # Check if path is a url
   if (length(grep("^(http|ftp|https)://", file))) {
@@ -136,7 +138,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   # convert NAs by missing information provided by SPSS.
   # these are just different missing values in Stata and NA in R.
-  if (use.missings) {
+  if (use.missings & !identical(attribs$missings, list())) {
     mvtab <- attribs$missings
     missinfo <- varmat[,3]
     missinfo <- which(missinfo %in% missinfo[missinfo != 0])
@@ -379,6 +381,23 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   }
 
+  if (convert.dates) {
+
+    isdate <- varmat[,6] %in% c(20,23,24,38,39)
+    istime <- varmat[,6] %in% c(21,22,25)
+
+    if (any(isdate)) {
+      for (nam in nams[isdate]) {
+        data[,nam] <- as.Date(as.POSIXct(data[,nam], origin="1582-10-14"))
+      }
+    }
+    if (any(istime)) {
+      for (nam in nams[isdate]) {
+        data[,nam] <- as.POSIXct(data[,nam], origin="1582-10-14")
+      }
+    }
+
+  }
 
 
   # prepare for return
