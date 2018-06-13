@@ -22,6 +22,9 @@
 #include <streambuf>
 #include <regex>
 
+#include <boost/algorithm/string/classification.hpp> // Include boost::for is_any_of
+#include <boost/algorithm/string/split.hpp> // Include for boost::split
+
 using namespace Rcpp;
 using namespace std;
 
@@ -43,12 +46,13 @@ List sav(const char * filePath, const bool debug)
 
     int32_t n = 0;
     int32_t k = 0;
+    int32_t charcode = 0;
     bool is_spss = 0;
     bool swapit = 0;
 
 
     std::string spss (8, '\0');
-    readstring(spss, sav, spss.size());
+    spss = readstring(spss, sav, spss.size(), charcode);
     is_spss = std::regex_match(spss, std::regex("^\\$FL2@\\(#\\)$"));
 
     if (!is_spss)
@@ -59,7 +63,7 @@ List sav(const char * filePath, const bool debug)
     //  OS
     //  (Software) Version?
     std::string datalabel (56, '\0');
-    readstring(datalabel, sav, datalabel.size());
+    datalabel = readstring(datalabel, sav, datalabel.size(), charcode);
 
     // trim additional whitespaces
     datalabel = std::regex_replace(datalabel,
@@ -106,14 +110,18 @@ List sav(const char * filePath, const bool debug)
 
     // creation date 9 dd_mmm_yy
     std::string datestamp (9, '\0');
-    readstring(datestamp, sav, datestamp.size());
+    datestamp = readstring(datestamp, sav, datestamp.size(), charcode);
 
     // creation time 8 hh:mm:ss
     std::string timestamp (8, '\0');
-    readstring(timestamp, sav, timestamp.size());
+    timestamp = readstring(timestamp, sav, timestamp.size(), charcode);
 
     std::string filelabel (67, '\0');
-    readstring(filelabel, sav, filelabel.size());
+    filelabel = readstring(filelabel, sav, filelabel.size(), charcode);
+
+
+    filelabel = std::regex_replace(filelabel,
+                                  std::regex("^ +| +$|( ) +"), "$1");
 
     std::vector<string> varnames;
     std::vector<string> vallabels;
@@ -194,7 +202,7 @@ List sav(const char * filePath, const bool debug)
 
       std::string nvarname (8, '\0');
       // read variable name 8 bytes long upercase letters
-      readstring(nvarname, sav, nvarname.size());
+      nvarname = readstring(nvarname, sav, nvarname.size(), charcode);
 
       // trim additional whitespaces
       nvarname = std::regex_replace(nvarname,
@@ -223,7 +231,7 @@ List sav(const char * filePath, const bool debug)
 
         // Rprintf("%d \n", rtype);
         std::string vallabel (rtype, '\0');
-        readstring(vallabel, sav, vallabel.size());
+        vallabel = readstring(vallabel, sav, vallabel.size(), charcode);
 
 
         // trim additional whitespaces on the right
@@ -321,14 +329,16 @@ List sav(const char * filePath, const bool debug)
     // how to determine length?
 
     Rcpp::List EoHList = Rcpp::List();
-    Rcpp::List lvarname;
-    Rcpp::List lstring;
     Rcpp::List doc;
     Rcpp::CharacterVector enc(1);
 
+    std::vector<std::string> lvname;
+    std::vector<std::string> lstr;
+
+
     int32_t subtyp = 0, size = 0, count = 0;
     int32_t major = 0, minor = 0, rev = 0, macode = 0;
-    int32_t floatp = 0, compr = 0, endian = 0, charcode = 0;
+    int32_t floatp = 0, compr = 0, endian = 0;
     double sysmiss = 0, highest = 0, lowest = 0;
     int32_t measure = 0, width = 0, alignment = 0;
 
@@ -366,7 +376,7 @@ List sav(const char * filePath, const bool debug)
           // binary data it will be empty
           std::string empty = "";
           std::string cV (8, ' ');
-          readstring(cV, sav, cV.size());
+          cV = readstring(cV, sav, cV.size(), charcode);
 
           // check for characters in the string lets hope SPSS does not allow
           // characters starting with a numeric or special character
@@ -401,7 +411,7 @@ List sav(const char * filePath, const bool debug)
             }
 
             std::string lab (lablen, '\0');
-            readstring(lab, sav, lab.size());
+            lab = readstring(lab, sav, lab.size(), charcode);
 
             lab = std::regex_replace(lab, std::regex("^ +| +$|( ) +"), "$1");
 
@@ -457,7 +467,7 @@ List sav(const char * filePath, const bool debug)
         // Rcout << " --- Documentation --- " << std::endl;
         for (int i = 0; i < nlines; ++i)
         {
-          readstring(document, sav, document.size());
+          document = readstring(document, sav, document.size(), charcode);
           Document(i) = document;
 
           // Rcout << document << std::endl;
@@ -516,13 +526,14 @@ List sav(const char * filePath, const bool debug)
 
           std::string data (size*count, '\0');
 
-          readstring(data, sav, data.size());
+          // ignore this
+          data = readstring(data, sav, data.size(), 0);
 
-          data.erase(std::remove(data.begin(),
-                                 data.end(),
-                                 '\0'),
-                                 data.end());
-
+          // data.erase(std::remove(data.begin(),
+          //                        data.end(),
+          //                        '\0'),
+          //                        data.end());
+          //
           // Rcout << data << std::endl;
         } else if (subtyp == 8) {
 
@@ -531,12 +542,13 @@ List sav(const char * filePath, const bool debug)
 
           std::string data (size*count, '\0');
 
-          readstring(data, sav, data.size());
+          // ignore this
+          data = readstring(data, sav, data.size(), 0);
 
-          data.erase(std::remove(data.begin(),
-                                 data.end(),
-                                 '\0'),
-                                 data.end());
+          // data.erase(std::remove(data.begin(),
+          //                        data.end(),
+          //                        '\0'),
+          //                        data.end());
 
         } else if (subtyp == 11) {
           // Rcout << "-- subtyp 11" << endl;
@@ -552,33 +564,31 @@ List sav(const char * filePath, const bool debug)
         } else if (subtyp == 13) {
           // very long varnames
           // Rcout << "-- subtyp 13" << endl;
-          //
+
           std::string longvarname (count, '\0');
-          readstring(longvarname, sav, count);
+          longvarname = readstring(longvarname, sav, count, charcode);
 
+          // // split string in c++
+          // std::stringstream lss(longvarname);
+          // std::istream_iterator<std::string> begin(lss);
+          // std::istream_iterator<std::string> end;
+          // std::vector<std::string> lvname(begin, end);
+          // std::copy(lvname.begin(), lvname.end(),
+          //           std::ostream_iterator<std::string>(std::clog, "\t"));
 
-          // longvarname = std::regex_replace(longvarname,
-          //                            std::regex("\t"), " ");
+          boost::split(lvname, longvarname,
+                       boost::is_any_of("\t"), boost::token_compress_on);
 
-          lvarname.push_back( longvarname );
-
-          // Rcout << longvarname << std::endl;
 
         } else if (subtyp == 14) {
           // very long strings
           // Rcout << "--- subtyp 14 ---" << endl;
           std::string longstring (count, '\0');
-          readstring(longstring, sav, count);
+          longstring = readstring(longstring, sav, count, charcode);
 
-          // remove null termination from string
-          longstring.erase(std::remove(longstring.begin(),
-                                       longstring.end(),
-                                       '\0'),
-                                       longstring.end());
+          boost::split(lstr, longstring,
+                       boost::is_any_of("\t"), boost::token_compress_on);
 
-          lstring.push_back( longstring );
-
-          // std::cout << longstring << std::endl;
 
         } else if (subtyp == 16) {
 
@@ -607,23 +617,14 @@ List sav(const char * filePath, const bool debug)
           // of data base
           std::string data (size*count, '\0');
 
-          readstring(data, sav, data.size());
-
-          data.erase(std::remove(data.begin(),
-                                 data.end(),
-                                 '\0'),
-                                 data.end());
+          // ignore this
+          data = readstring(data, sav, data.size(), 0);
 
           // Rcout << data << std::endl;
 
         } else if (subtyp == 20) {
           std::string encoding (count, '\0');
-          readstring(encoding, sav, count);
-
-          encoding.erase(std::remove(encoding.begin(),
-                                     encoding.end(),
-                                       '\0'),
-                                       encoding.end());
+          encoding = readstring(encoding, sav, count, charcode);
 
           enc(0) = encoding;
 
@@ -633,30 +634,20 @@ List sav(const char * filePath, const bool debug)
           // seems like xml? dataview table format
           std::string data (size*count, '\0');
 
-          readstring(data, sav, data.size());
-
-          data.erase(std::remove(data.begin(),
-                                 data.end(),
-                                 '\0'),
-                                 data.end());
+          // ignore this
+          data = readstring(data, sav, data.size(), 0);
 
           // Rcout << data << std::endl;
 
         } else {
           std::string data (size*count, '\0');
 
-          readstring(data, sav, data.size());
-
-          data.erase(std::remove(data.begin(),
-                                     data.end(),
-                                     '\0'),
-                                     data.end());
+          // ignore this
+          readstring(data, sav, data.size(), 0);
 
           Rcout << data << std::endl;
 
           Rcout << "unknown subtype " << subtyp << " detected" << std::endl;
-
-          stop("debug");
         }
 
 
@@ -668,6 +659,7 @@ List sav(const char * filePath, const bool debug)
       //   Rprintf("rtype: %d \n", rtype);
 
     }
+
 
     // Data Part -------------------------------------------------------------//
 
@@ -883,7 +875,7 @@ List sav(const char * filePath, const bool debug)
 
               std::string val_s (len, '\0');
 
-              readstring(val_s, sav, val_s.size());
+              val_s = readstring(val_s, sav, val_s.size(), charcode);
 
               start.append( val_s );
 
@@ -955,7 +947,7 @@ List sav(const char * filePath, const bool debug)
 
               std::string val_s (len, '\0');
 
-              readstring(val_s, sav, val_s.size());
+              val_s = readstring(val_s, sav, val_s.size(), charcode);
               start.append( val_s );
 
               res_kk = res[kk];
@@ -1113,7 +1105,7 @@ List sav(const char * filePath, const bool debug)
           len = ceil(len/8) * 8;
 
           std::string val_s ((int32_t)len, '\0');
-          readstring(val_s, sav, val_s.size());
+          val_s = readstring(val_s, sav, val_s.size(), charcode);
 
           // shorten the string to the actual size reported by SPSS
           val_s.erase(type, std::string::npos);
@@ -1175,8 +1167,8 @@ List sav(const char * filePath, const bool debug)
     df.attr("label") = Labell_list;
     df.attr("haslabel") = EoHList;
     df.attr("data") = data;
-    df.attr("longstring") = lstring;
-    df.attr("longvarname") = lvarname;
+    df.attr("longstring") = lstr;
+    df.attr("longvarname") = lvname;
     df.attr("cflag") = cflag;
     df.attr("res") = res;
     df.attr("endian") = endian;

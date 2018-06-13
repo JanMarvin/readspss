@@ -39,7 +39,7 @@ List por(const char * filePath, const bool debug)
   std::ifstream por(filePath, std::ios::in | std::ios::binary);
   if (por) {
 
-
+    int32_t charcode = 0;
     // int32_t n = 0;
     // int32_t k = 0;<
 
@@ -49,23 +49,23 @@ List por(const char * filePath, const bool debug)
     std::string spss (40, '\0');
 
     // 1
-    readstring(spss, por, spss.size());
+    readstring(spss, por, spss.size(), charcode);
     Rcout << spss << std::endl;
 
     // 2
-    readstring(spss, por, spss.size());
+    readstring(spss, por, spss.size(), charcode);
     Rcout << spss << std::endl;
 
     // 3
-    readstring(spss, por, spss.size());
+    readstring(spss, por, spss.size(), charcode);
     Rcout << spss << std::endl;
 
     // 4
-    readstring(spss, por, spss.size());
+    readstring(spss, por, spss.size(), charcode);
     Rcout << spss << std::endl;
 
     // 5
-    readstring(spss, por, spss.size());
+    readstring(spss, por, spss.size(), charcode);
     Rcout << spss << std::endl;
 
     // Rcpp::stop("Debug!");
@@ -80,21 +80,21 @@ List por(const char * filePath, const bool debug)
 
     // Digits 0 - 9
     std::string digits (10, '\0');
-    readstring(digits, por, digits.size());
+    readstring(digits, por, digits.size(), charcode);
 
     if (debug)
       Rcout << "digits: " << digits << std::endl;
 
     // Capitals
     std::string capitals (26, '\0');
-    readstring(capitals, por, capitals.size());
+    readstring(capitals, por, capitals.size(), charcode);
 
     if (debug)
       Rcout << "capitals: " << capitals << std::endl;
 
     // lowercase
     std::string lower (26, '\0');
-    readstring(lower, por, lower.size());
+    readstring(lower, por, lower.size(), charcode);
 
     if (debug)
       Rcout << "lower: " << lower << std::endl;
@@ -102,7 +102,7 @@ List por(const char * filePath, const bool debug)
 
     // random
     std::string random (62, '\0');
-    readstring(random, por, random.size());
+    readstring(random, por, random.size(), charcode);
 
     if (debug)
       Rcout << "random: " << random << std::endl;

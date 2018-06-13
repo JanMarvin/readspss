@@ -226,21 +226,21 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     # var.labels
     val.labels <- read.encoding(val.labels, fromEncoding, toEncoding)
 
-    if (!identical(longvarname, list())){
-      longvarname <- read.encoding(longvarname,
-                                   fromEncoding, toEncoding)
-    }
+    # if (!identical(longvarname, list())){
+    #   longvarname <- read.encoding(longvarname,
+    #                                fromEncoding, toEncoding)
+    # }
 
     # print(val.labels)
   }
 
-  labnames <- attr(data, "haslabel")
-  varnames <- attr(data, "varnames")
+  labnames <- attribs$haslabel
+  varnames <- attribs$varnames
 
   if (convert.factors) {
     # vnames <- names(data)
     for (i in seq_along(label)) {
-      # print(seq_along(val.labels))
+
       labname <- labnames[[i]]
       # vartype <- types[i]
       labtable <- label[[i]]
@@ -259,7 +259,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
         }
 
         if (isNum & all(is.na(labtable))) {
-          nam<- names(labtable)
+          nam <- names(labtable)
           labtable <- as.numeric(labtable)
           names(labtable) <- nam
         }
@@ -302,8 +302,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   if (!is.null(longvarname)) {
 
     # Sys.setlocale("LC_ALL", locale="C")
-    longname <- longvarname %>%
-      strsplit("\t") %>% unlist %>% strsplit("=")
+    longname <- longvarname %>%  strsplit("=")
     # Sys.setlocale("LC_ALL", locale="de_DE.UTF-8")
 
     # If the imported data contains strings longer than nchar(255) the data is
