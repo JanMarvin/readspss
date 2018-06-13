@@ -37,7 +37,7 @@ using namespace std;
 //' @import Rcpp
 //' @export
 // [[Rcpp::export]]
-List sav(const char * filePath, const bool debug, const std::string encStr)
+List sav(const char * filePath, const bool debug, std::string encStr)
 {
 
   std::ifstream sav(filePath, std::ios::in | std::ios::binary);
@@ -49,6 +49,16 @@ List sav(const char * filePath, const bool debug, const std::string encStr)
     int32_t charcode = 0;
     bool is_spss = 0;
     bool swapit = 0;
+
+    std::string na = "NA";
+
+    bool noencoding = false;
+
+    if (encStr.compare(na)==0){
+      encStr = "";
+      noencoding = true;
+    }
+
 
     std::string empty = "";
 
@@ -503,8 +513,8 @@ List sav(const char * filePath, const bool debug, const std::string encStr)
           charcode = readbin(charcode, sav, swapit); // charcode
 
 
-          if (encStr.compare(empty) != 0)
-            std::string encStr = codepage(charcode);
+          if ((encStr.compare(empty) == 0) & (!noencoding))
+            encStr = codepage(charcode);
 
           // Rcout << subtyp << "/" << size << "/" << count << "/" << major  << "/" << minor  << "/" << rev  << "/" << macode  << "/" << floatp << "/" << compr  << "/" << endian  << "/" << charcode << std::endl;
 

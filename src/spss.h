@@ -130,12 +130,12 @@ static std::string readstring(std::string mystring, std::istream& sav,
     Rcpp::Environment base("package:base");
     Rcpp::Function iconv = base["iconv"];
 
-    // Rcpp::Rcout << mystring << std::endl;
+    // Rcout << "encoding from " << encStr << std::endl;
+
     mystring = Rcpp::as<std::string>(
       iconv(mystring, Rcpp::Named("from", encStr), Rcpp::Named("to",""))
     );
   }
-  // Rcout << mystring << std::endl;
 
   return(mystring);
 }

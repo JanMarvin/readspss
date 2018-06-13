@@ -104,9 +104,10 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   }
 
   encStr <- ""
-
-  if (!is.null(toEncoding))
-    encStr <- toEncoding
+  if (!is.null(fromEncoding))
+    encStr <- fromEncoding
+  if (encoding == FALSE)
+    encStr <- "NA"
 
   # import data using an rcpp routine
   data <- sav(filePath = filepath, debug, encStr)
@@ -211,11 +212,11 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     # label
     for (i in seq_along(label))
       names(label[[i]]) <- read.encoding(names(label[[i]]),
-                                         fromEncoding = fromEncoding,
+                                         fromEncoding = encStr,
                                          encoding = toEncoding)
 
     # var.labels
-    val.labels <- read.encoding(val.labels, fromEncoding, toEncoding)
+    val.labels <- read.encoding(val.labels, encStr, toEncoding)
 
     # if (!identical(longvarname, list())){
     #   longvarname <- read.encoding(longvarname,

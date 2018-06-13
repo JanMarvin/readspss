@@ -31,14 +31,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // sav
-List sav(const char * filePath, const bool debug, const std::string encStr);
+List sav(const char * filePath, const bool debug, std::string encStr);
 RcppExport SEXP _readspss_sav(SEXP filePathSEXP, SEXP debugSEXP, SEXP encStrSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const char * >::type filePath(filePathSEXP);
     Rcpp::traits::input_parameter< const bool >::type debug(debugSEXP);
-    Rcpp::traits::input_parameter< const std::string >::type encStr(encStrSEXP);
+    Rcpp::traits::input_parameter< std::string >::type encStr(encStrSEXP);
     rcpp_result_gen = Rcpp::wrap(sav(filePath, debug, encStr));
     return rcpp_result_gen;
 END_RCPP
