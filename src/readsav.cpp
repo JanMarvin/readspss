@@ -274,36 +274,31 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           double miss0 = 0;
           bool noNum = false;
 
+          if (vtype != 0)
+            noNum = true;
+
           for (int i = 0; i < nmisstype; ++i) {
 
-            // read string and compare to an empty string. if the string contains
-            // binary data it will be empty
-            std::string mV (8, ' ');
-            mV = readstring(mV, sav, mV.size(), "");
+
+            if (noNum) {
+              // read string and compare to an empty string. if the string contains
+              // binary data it will be empty
+              std::string mV (8, ' ');
+              mV = readstring(mV, sav, mV.size(), "");
 
 
-            noNum = std::regex_search(mV, std::regex("^[A-Za-z0-9]")) &&
-              !std::regex_search(mV, std::regex("@$"));
+              mV = std::regex_replace(mV, std::regex("^ +| +$|( ) +"), "$1");
 
+              missingV(0) = nmiss;
+              missingV(i+1) = mV;
 
-              // if its a double, do a memcpy, else trim whitespaces
-              if( noNum ) {
-                mV = std::regex_replace(mV, std::regex("^ +| +$|( ) +"), "$1");
+            } else {
 
-                missingV(0) = nmiss;
-                missingV(i+1) = mV;
+              miss0 = readbin(miss0, sav, swapit);
 
-                // Rcout << mV << std::endl;
-
-              } else {
-
-                memcpy(&miss0 , mV.c_str(), sizeof(double));
-
-                missing(0) = nmiss;
-                missing(i+1) = miss0;
-
-                // Rcout << miss0 << std::endl;
-              }
+              missing(0) = nmiss;
+              missing(i+1) = miss0;
+            }
 
           }
 
