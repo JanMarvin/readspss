@@ -48,7 +48,8 @@ test_that( "first-test", {
 df <- df_r <- df_h <- df_f <- NULL
 df <- system.file("extdata", "testdata.sav", package="readspss")
 
-df_r <- read.sav(df, convert.factors = FALSE, use.missings = FALSE)
+df_r <- read.sav(df, convert.factors = FALSE, use.missings = FALSE,
+                 convert.dates = FALSE)
 
 suppressWarnings( # caused by foreign
 df_f <- read.spss(df, to.data.frame = TRUE, use.value.labels = FALSE,
