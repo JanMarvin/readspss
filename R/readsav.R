@@ -104,8 +104,13 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   }
 
   encStr <- ""
-  if (!is.null(fromEncoding))
+  forceEncoding <- FALSE
+
+  if (!is.null(fromEncoding)) {
     encStr <- fromEncoding
+    forceEncoding <- TRUE
+  }
+
   if (encoding == FALSE)
     encStr <- "NA"
 
@@ -202,8 +207,9 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   if (is.null(toEncoding))
     toEncoding <- ""
 
-  ## Encoding // no encoding if fromEncoding == 2
-  if (encoding & encStr != "") {
+  # Encoding // no encoding if fromEncoding == 2
+  # avoid encoding of already encoded strings
+  if (encoding & encStr != "" & forceEncoding == FALSE) {
 
     # varnames
     # names(data) <- read.encoding(names(data), fromEncoding, toEncoding)

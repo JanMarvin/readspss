@@ -1199,6 +1199,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
     df.attr("doc") = doc;
     df.attr("encoding") = enc;
     df.attr("encStr") = encStr;
+    df.attr("noencoding") = noencoding;
 
 
 
