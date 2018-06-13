@@ -122,7 +122,7 @@ List sav(const char * filePath, const bool debug, const std::string encStr)
 
 
     filelabel = std::regex_replace(filelabel,
-                                  std::regex("^ +| +$|( ) +"), "$1");
+                                   std::regex("^ +| +$|( ) +"), "$1");
 
     std::vector<string> varnames;
     std::vector<string> vallabels;
@@ -242,75 +242,65 @@ List sav(const char * filePath, const bool debug, const std::string encStr)
 
         rtype = origlen;
 
-        // Rprintf(" %d \n", rtype);
-        // Rcout << "Vallabel:" << vallabel << std::endl;
-
+        // -----------------------------------------
+        //  missings
+        //
 
         int8_t const nmisstype = std::abs(nmiss);
 
         // SPSS knows 5 different missing types. -3, -2 are range types. 1, 2,
         // 3 are discrete types. Range types have min range and max range. -3
         // has an additional discrete value.
-        switch(nmisstype)
-        {
 
-        case 1:
-        {
+
+        if (nmisstype > 0) {
+
           // missing values
-          Rcpp::NumericVector mOne(2);
-          double miss0=0;
+          // Vector needs to be of size n+1, because the first value will be
+          // nmisstype followed by nmisstype values
+          Rcpp::NumericVector missing(nmisstype+1);
+          Rcpp::CharacterVector missingV(nmisstype+1);
 
-          miss0 = readbin(miss0, sav, swapit); // missing value: 9
+          double miss0 = 0;
+          bool noNum = false;
 
-          mOne(0) = nmiss;
-          mOne(1) = miss0;
+          for (int i = 0; i < nmisstype; ++i) {
 
-          // Rcout << nmiss << ": "  << mOne(1) << endl;
+            // read string and compare to an empty string. if the string contains
+            // binary data it will be empty
+            std::string mV (8, ' ');
+            mV = readstring(mV, sav, mV.size(), "");
 
-          missings.push_back(mOne);
-          break;
 
-        }
+            noNum = std::regex_search(mV, std::regex("^[A-Za-z0-9]")) &&
+              !std::regex_search(mV, std::regex("@$"));
 
-        case 2:
-        {
-          // missing values
-          Rcpp::NumericVector m2(3);
-          double miss0=0, miss1=0;
 
-          miss0 = readbin(miss0, sav, swapit); // 1. missing value
-          miss1 = readbin(miss1, sav, swapit); // 2. missing value
+              // if its a double, do a memcpy, else trim whitespaces
+              if( noNum ) {
+                mV = std::regex_replace(mV, std::regex("^ +| +$|( ) +"), "$1");
 
-          m2(0) = nmiss;
-          m2(1) = miss0;
-          m2(2) = miss1;
+                missingV(0) = nmiss;
+                missingV(i+1) = mV;
 
-          // Rcout << nmiss << ": "  << m2(1) << " / " << m2(2)  << endl;
+                // Rcout << mV << std::endl;
 
-          missings.push_back(m2);
-          break;
-        }
+              } else {
 
-        case 3:
-        {
-          // missing values
-          Rcpp::NumericVector m3(4);
-          double miss0=0, miss1=0, miss2=0;
+                memcpy(&miss0 , mV.c_str(), sizeof(double));
 
-          miss0 = readbin(miss0, sav, swapit); // 1. missing value
-          miss1 = readbin(miss1, sav, swapit); // 2. missing value
-          miss2 = readbin(miss2, sav, swapit); // 3. missing value
+                missing(0) = nmiss;
+                missing(i+1) = miss0;
 
-          m3(0) = nmiss;
-          m3(1) = miss0;
-          m3(2) = miss1;
-          m3(3) = miss2;
+                // Rcout << miss0 << std::endl;
+              }
 
-          // Rcout  << nmiss << ": " << m3(1) << " / " << m3(2) << " / " << m3(3) << endl;
+          }
 
-          missings.push_back(m3);
-          break;
-        }
+          if (noNum)
+            missings.push_back(missingV);
+          else
+            missings.push_back(missing);
 
         }
       }
