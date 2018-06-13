@@ -16,6 +16,7 @@ fast_factor <- function(x, y) {
 #'
 #' @param filePath The full systempath to the dta file you want to import.
 #' @param debug print debug information
+#' @param encStr encoding string
 #' @import Rcpp
 #' @export
 por <- function(filePath, debug, encStr) {
@@ -26,6 +27,7 @@ por <- function(filePath, debug, encStr) {
 #'
 #' @param filePath The full systempath to the dta file you want to import.
 #' @param debug print debug information
+#' @param encStr encoding string
 #' @import Rcpp
 #' @export
 sav <- function(filePath, debug, encStr) {

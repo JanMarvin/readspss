@@ -10,6 +10,8 @@ por(filePath, debug, encStr)
 \item{filePath}{The full systempath to the dta file you want to import.}
 
 \item{debug}{print debug information}
+
+\item{encStr}{encoding string}
 }
 \description{
 Reads the binary SPSS file

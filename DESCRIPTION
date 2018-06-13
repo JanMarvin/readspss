@@ -13,11 +13,11 @@ Maintainer: Jan Marvin Garbuszus <jan.garbuszus@ruhr-uni-bochum.de>
 Description: Experimental function to read the SPSS file format.
 License: GPL-2 | file LICENSE
 LazyData: TRUE
-Depends: magrittr, BH
+Depends: magrittr
 Imports:
     Rcpp (>= 0.11.2)
 Suggests: testthat, foreign, haven
-LinkingTo: Rcpp
+LinkingTo: Rcpp, BH
 SystemRequirements: C++11
 ByteCompile: yes
 RoxygenNote: 6.0.1

@@ -34,6 +34,7 @@ using namespace std;
 //'
 //' @param filePath The full systempath to the dta file you want to import.
 //' @param debug print debug information
+//' @param encStr encoding string
 //' @import Rcpp
 //' @export
 // [[Rcpp::export]]
