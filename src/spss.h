@@ -100,9 +100,9 @@ static const std::string codepage(int cp) {
   case 51932:
     res = "euc-jp";
     break;
-  case 65001:
-    res = "UTF-8";
-    break;
+  // case 65001:
+  //   res = "UTF-8";
+  //   break;
   }
 
   return(res);
@@ -117,7 +117,7 @@ static std::string readstring(std::string mystring, std::istream& sav,
   if (!sav.read(&mystring[0], nchar))
     Rcpp::warning("char: a binary read error occurred");
 
-  if (cp > 2) {
+  if (cp > 2 & cp < 65001) {
 
     // remove null termination from string
     mystring.erase(std::remove(mystring.begin(),

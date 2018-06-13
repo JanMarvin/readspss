@@ -301,50 +301,62 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   if (!identical(longvarname, character(0))) {
 
-    # Sys.setlocale("LC_ALL", locale="C")
+    # contains long varname (e.g. when longer varnames are provided or if the
+    # dataset contains long strings)
     longname <- longvarname %>%  strsplit("=")
-    # Sys.setlocale("LC_ALL", locale="de_DE.UTF-8")
 
-    # If the imported data contains strings longer than nchar(255) the data is
-    # scrambled at this point. SPSS separates longer strings in different pieces
-    # of size 255. The rcpp import already sorted the data in variables. These
-    # variables are now combined. Variable names are split after a few letters
-    # used for identification. Since SPSS can use variable names of 8 characters
-    # they trim the name down to max of 5. They add three digits identifying the
-    # order of the long strings. E.g. "Var1, Var1001, Var1002".
-    # Unsure if 999 is the limit.
+    # contains varname and absolute length eg
+    # A258=00258
+    longstring <- attribs$longstring
 
-    nams <- names(data)
+    # only applicable, if dataset contains longstrings
+    if (!identical(longstring, character(0))) {
 
-    replvec <- lapply(
-      longname,
-      function(x){
-        # grep for identical variable names (not sure if SPSS considers the
-        # possiblilty of similar cases. are Value1 and Value2 the same?)
-        nams[
-          grep(pattern = strtrim(x[[1]], 5), nams)
-          ]
-      })
-
-    # print(replvec)
-
-    for (i in length(replvec):1) {
-
-      pat <- replvec[[i]]
+      longstring <- longstring[!longstring==""] %>%
+        strsplit("=") %>% sapply(function(x)x[[1]])
 
 
-      # any variables to combine?
-      if (length(pat) > 1 & grepl("001", pat[2])) {
-        sel <- data[,names(data) %in% pat]
+      # If the imported data contains strings longer than nchar(255) the data is
+      # scrambled at this point. SPSS separates longer strings in different pieces
+      # of size 255. The rcpp import already sorted the data in variables. These
+      # variables are now combined. Variable names are split after a few letters
+      # used for identification. Since SPSS can use variable names of 8 characters
+      # they trim the name down to max of 5. They add three digits identifying the
+      # order of the long strings. E.g. "Var1, Var1001, Var1002".
+      # Unsure if 999 is the limit.
 
-        if (all(sapply(sel, is.character))) {
-          pp <- pat[-1]; p1 <- pat[1]
+      nams <- names(data)
 
-          # remove columns pat[2:n]
-          data <- data[,!names(data) %in% pp]
+      replvec <- lapply(
+        longstring,
+        function(x){
+          # grep for identical variable names (not sure if SPSS considers the
+          # possiblilty of similar cases. are Value1 and Value2 the same?)
+          nams[
+            grep(pattern = strtrim(x[[1]], 5), nams)
+            ]
+        })
 
-          data[p1] <- do.call(paste0, sel)
+      # print(replvec)
 
+      for (i in length(replvec):1) {
+
+        pat <- replvec[[i]]
+
+
+        # any variables to combine?
+        if (length(pat) > 1 & grepl("001", pat[2])) {
+          sel <- data[,names(data) %in% pat]
+
+          if (all(sapply(sel, is.character))) {
+            pp <- pat[-1]; p1 <- pat[1]
+
+            # remove columns pat[2:n]
+            data <- data[,!names(data) %in% pp]
+
+            data[p1] <- do.call(paste0, sel)
+
+          }
         }
       }
     }
@@ -354,12 +366,17 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     # combining different long strings. Now everything is cleaned up and we
     # can apply the correct variable names
     nams <- names(data)
+    names(nams) <- nams
 
-    new_nams <- do.call(rbind, longname)
+    # new_nams <- do.call(rbind, longname)
+    new_nams <- sapply(longname, function(x){
+      z <- x[[2]]
+      names(z) <- x[[1]]
+      z
+    })
 
-    for (i in 1:NROW(new_nams)) {
-      nams[nams == new_nams[i,1] ] <- new_nams[i,2]
-    }
+    nams <- replace(nams, which(nams %in% names(new_nams)), values = new_nams)
+
     names(data) <- nams
 
   }
