@@ -18,8 +18,8 @@ fast_factor <- function(x, y) {
 #' @param debug print debug information
 #' @import Rcpp
 #' @export
-por <- function(filePath, debug) {
-    .Call('_readspss_por', PACKAGE = 'readspss', filePath, debug)
+por <- function(filePath, debug, encStr) {
+    .Call('_readspss_por', PACKAGE = 'readspss', filePath, debug, encStr)
 }
 
 #' Reads the binary SPSS file
@@ -28,7 +28,7 @@ por <- function(filePath, debug) {
 #' @param debug print debug information
 #' @import Rcpp
 #' @export
-sav <- function(filePath, debug) {
-    .Call('_readspss_sav', PACKAGE = 'readspss', filePath, debug)
+sav <- function(filePath, debug, encStr) {
+    .Call('_readspss_sav', PACKAGE = 'readspss', filePath, debug, encStr)
 }
 

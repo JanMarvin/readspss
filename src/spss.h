@@ -111,13 +111,15 @@ static const std::string codepage(int cp) {
 
 
 static std::string readstring(std::string mystring, std::istream& sav,
-                              int nchar, int cp)
+                              int nchar, std::string encStr)
 {
 
   if (!sav.read(&mystring[0], nchar))
     Rcpp::warning("char: a binary read error occurred");
 
-  if (cp > 2 & cp < 65001) {
+  std::string empty = "";
+
+  if (encStr.compare(empty) != 0) {
 
     // remove null termination from string
     mystring.erase(std::remove(mystring.begin(),
@@ -125,15 +127,12 @@ static std::string readstring(std::string mystring, std::istream& sav,
                                '\0'),
                                mystring.end());
 
-    std::string cps = codepage(cp);
-    // Rcpp::Rcout << "conversion to " << cps << std::endl;
-
     Rcpp::Environment base("package:base");
     Rcpp::Function iconv = base["iconv"];
 
     // Rcpp::Rcout << mystring << std::endl;
     mystring = Rcpp::as<std::string>(
-      iconv(mystring, Rcpp::Named("from","WINDOWS-1252"), Rcpp::Named("to",""))
+      iconv(mystring, Rcpp::Named("from", encStr), Rcpp::Named("to",""))
     );
   }
   // Rcout << mystring << std::endl;

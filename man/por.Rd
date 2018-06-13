@@ -4,7 +4,7 @@
 \alias{por}
 \title{Reads the binary SPSS file}
 \usage{
-por(filePath, debug)
+por(filePath, debug, encStr)
 }
 \arguments{
 \item{filePath}{The full systempath to the dta file you want to import.}

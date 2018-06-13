@@ -4,7 +4,7 @@
 \alias{sav}
 \title{Reads the binary SPSS file}
 \usage{
-sav(filePath, debug)
+sav(filePath, debug, encStr)
 }
 \arguments{
 \item{filePath}{The full systempath to the dta file you want to import.}

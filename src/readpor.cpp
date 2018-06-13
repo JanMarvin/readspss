@@ -33,13 +33,12 @@ using namespace std;
 //' @import Rcpp
 //' @export
 // [[Rcpp::export]]
-List por(const char * filePath, const bool debug)
+List por(const char * filePath, const bool debug, std::string encStr)
 {
 
   std::ifstream por(filePath, std::ios::in | std::ios::binary);
   if (por) {
 
-    int32_t charcode = 0;
     // int32_t n = 0;
     // int32_t k = 0;<
 
@@ -49,23 +48,23 @@ List por(const char * filePath, const bool debug)
     std::string spss (40, '\0');
 
     // 1
-    readstring(spss, por, spss.size(), charcode);
+    spss = readstring(spss, por, spss.size(), encStr);
     Rcout << spss << std::endl;
 
     // 2
-    readstring(spss, por, spss.size(), charcode);
+    spss = readstring(spss, por, spss.size(), encStr);
     Rcout << spss << std::endl;
 
     // 3
-    readstring(spss, por, spss.size(), charcode);
+    spss = readstring(spss, por, spss.size(), encStr);
     Rcout << spss << std::endl;
 
     // 4
-    readstring(spss, por, spss.size(), charcode);
+    spss = readstring(spss, por, spss.size(), encStr);
     Rcout << spss << std::endl;
 
     // 5
-    readstring(spss, por, spss.size(), charcode);
+    spss = readstring(spss, por, spss.size(), encStr);
     Rcout << spss << std::endl;
 
     // Rcpp::stop("Debug!");
@@ -80,21 +79,21 @@ List por(const char * filePath, const bool debug)
 
     // Digits 0 - 9
     std::string digits (10, '\0');
-    readstring(digits, por, digits.size(), charcode);
+    digits = readstring(digits, por, digits.size(), encStr);
 
     if (debug)
       Rcout << "digits: " << digits << std::endl;
 
     // Capitals
     std::string capitals (26, '\0');
-    readstring(capitals, por, capitals.size(), charcode);
+    capitals = readstring(capitals, por, capitals.size(), encStr);
 
     if (debug)
       Rcout << "capitals: " << capitals << std::endl;
 
     // lowercase
     std::string lower (26, '\0');
-    readstring(lower, por, lower.size(), charcode);
+    lower = readstring(lower, por, lower.size(), encStr);
 
     if (debug)
       Rcout << "lower: " << lower << std::endl;
@@ -102,7 +101,7 @@ List por(const char * filePath, const bool debug)
 
     // random
     std::string random (62, '\0');
-    readstring(random, por, random.size(), charcode);
+    random = readstring(random, por, random.size(), encStr);
 
     if (debug)
       Rcout << "random: " << random << std::endl;
@@ -426,7 +425,7 @@ List por(const char * filePath, const bool debug)
 //
 //         int32_t subtyp = 0, size = 0, count = 0;
 //         int32_t major = 0, minor = 0, rev = 0, macode = 0;
-//         int32_t floatp = 0, compr = 0, endian = 0, charcode = 0;
+//         int32_t floatp = 0, compr = 0, endian = 0, encStr = 0;
 //         double sysmiss = 0, highest = 0, lowest = 0;
 //         int32_t measure = 0, width = 0, alignment = 0;
 //
@@ -445,9 +444,9 @@ List por(const char * filePath, const bool debug)
 //           floatp = readbin(floatp, por, 0); // floating point pre
 //           compr = readbin(compr, por, 0);   // compression
 //           endian = readbin(endian, por, 0); // endianness
-//           charcode = readbin(charcode, por, 0); // charcode
+//           encStr = readbin(encStr, por, 0); // encStr
 //
-//           // Rcout << subtyp << "/" << size << "/" << count << "/" << major  << "/" << minor  << "/" << rev  << "/" << macode  << "/" << floatp << "/" << compr  << "/" << endian  << "/" << charcode << std::endl;
+//           // Rcout << subtyp << "/" << size << "/" << count << "/" << major  << "/" << minor  << "/" << rev  << "/" << macode  << "/" << floatp << "/" << compr  << "/" << endian  << "/" << encStr << std::endl;
 //
 //         } else if (subtyp == 4) {
 //           // Rcout << "-- subtyp 4" << endl;

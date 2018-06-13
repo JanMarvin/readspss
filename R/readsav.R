@@ -103,17 +103,13 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     return( NULL )
   }
 
-  knownCP <- c(`UCS-2LE` = 1200, `UCS-2BE` = 1201, macroman = 10000,
-               ` UCS-4LE` = 12000, `UCS-4BE` = 12001, `koi8-r` = 20866,
-               `koi8-u` = 21866, latin1 = 28591, latin2 = 28592, latin3 = 28593,
-               latin4 = 28594, `latin-9` = 28605, `ISO-2022-JP` = 50221,
-               `euc-jp` = 51932, `UTF-8` = 65001, ASCII = 20127, CP1250 = 1250,
-               CP1251 = 1251, CP1252 = 1252, CP1253 = 1253, CP1254 = 1254,
-               CP1255 = 1255, CP1256 = 1256, CP1257 = 1257, CP1258 = 1258,
-               CP874 = 874, CP936 = 936, C = 2)
+  encStr <- ""
+
+  if (!is.null(toEncoding))
+    encStr <- toEncoding
 
   # import data using an rcpp routine
-  data <- sav(filePath = filepath, debug)
+  data <- sav(filePath = filepath, debug, encStr)
 
   attribs <- attributes(data)
 
@@ -200,18 +196,13 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   longvarname <- attribs$longvarname %>% unlist
 
-  if (is.null(fromEncoding)){
-    ccode <- attribs$charcode
-
-    fromEncoding <- names(knownCP)[knownCP == ccode]
-    if (is.null(ccode) | ccode == 0) ccode <- 2
-  }
+  encStr = attribs$encStr
 
   if (is.null(toEncoding))
     toEncoding <- ""
 
   ## Encoding // no encoding if fromEncoding == 2
-  if (encoding & ccode != 2) {
+  if (encoding & encStr != "") {
 
     # varnames
     # names(data) <- read.encoding(names(data), fromEncoding, toEncoding)
