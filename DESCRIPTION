@@ -1,8 +1,7 @@
 Package: readspss
 Type: Package
 Title: Import SPSS sav-files
-Version: 0.1.1
-Date: 2015-10-11
+Version: 0.2
 Authors@R: c(
     person("Jan Marvin", "Garbuszus",
     email = "jan.garbuszus@ruhr-uni-bochum.de", role = c("aut", "cre")),

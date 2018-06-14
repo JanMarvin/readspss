@@ -16,6 +16,8 @@ only(tested with minimal examples).
 In addition readspss ships some additional informations like the datalabel,
 date- and timestamp.
 
+Reading of sav-files is feature complete.
+
 ## Installation
 
 master:
