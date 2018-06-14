@@ -100,9 +100,9 @@ static const std::string codepage(int cp) {
   case 51932:
     res = "euc-jp";
     break;
-  // case 65001:
-  //   res = "UTF-8";
-  //   break;
+    // case 65001:
+    //   res = "UTF-8";
+    //   break;
   }
 
   return(res);
@@ -111,33 +111,46 @@ static const std::string codepage(int cp) {
 
 
 static std::string readstring(std::string mystring, std::istream& sav,
-                              int nchar, std::string encStr)
+                              int nchar)
 {
 
   if (!sav.read(&mystring[0], nchar))
     Rcpp::warning("char: a binary read error occurred");
 
+
+  // // remove null termination from string
+  // mystring.erase(std::remove(mystring.begin(),
+  //                            mystring.end(),
+  //                            '\0'),
+  //                            mystring.end());
+
+
+  return(mystring);
+}
+
+
+template <typename T>
+static T Riconv(T &mystring, std::string &encStr) {
+
+  // Rcout << "encoding from " << encStr << std::endl;
+  // Rcout << mystring << std::endl;
+
   std::string empty = "";
 
   if (encStr.compare(empty) != 0) {
 
-    // remove null termination from string
-    mystring.erase(std::remove(mystring.begin(),
-                               mystring.end(),
-                               '\0'),
-                               mystring.end());
-
     Rcpp::Environment base("package:base");
     Rcpp::Function iconv = base["iconv"];
 
-    // Rcout << "encoding from " << encStr << std::endl;
-
-    mystring = Rcpp::as<std::string>(
+    mystring = Rcpp::as<T>(
       iconv(mystring, Rcpp::Named("from", encStr), Rcpp::Named("to",""))
     );
   }
 
+  // Rcout << mystring << std::endl;
+
   return(mystring);
+
 }
 
 static void debug(std::istream& sav, int size) {

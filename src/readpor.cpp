@@ -49,23 +49,23 @@ List por(const char * filePath, const bool debug, std::string encStr)
     std::string spss (40, '\0');
 
     // 1
-    spss = readstring(spss, por, spss.size(), encStr);
+    spss = readstring(spss, por, spss.size());
     Rcout << spss << std::endl;
 
     // 2
-    spss = readstring(spss, por, spss.size(), encStr);
+    spss = readstring(spss, por, spss.size());
     Rcout << spss << std::endl;
 
     // 3
-    spss = readstring(spss, por, spss.size(), encStr);
+    spss = readstring(spss, por, spss.size());
     Rcout << spss << std::endl;
 
     // 4
-    spss = readstring(spss, por, spss.size(), encStr);
+    spss = readstring(spss, por, spss.size());
     Rcout << spss << std::endl;
 
     // 5
-    spss = readstring(spss, por, spss.size(), encStr);
+    spss = readstring(spss, por, spss.size());
     Rcout << spss << std::endl;
 
     // Rcpp::stop("Debug!");
@@ -80,21 +80,21 @@ List por(const char * filePath, const bool debug, std::string encStr)
 
     // Digits 0 - 9
     std::string digits (10, '\0');
-    digits = readstring(digits, por, digits.size(), encStr);
+    digits = readstring(digits, por, digits.size());
 
     if (debug)
       Rcout << "digits: " << digits << std::endl;
 
     // Capitals
     std::string capitals (26, '\0');
-    capitals = readstring(capitals, por, capitals.size(), encStr);
+    capitals = readstring(capitals, por, capitals.size());
 
     if (debug)
       Rcout << "capitals: " << capitals << std::endl;
 
     // lowercase
     std::string lower (26, '\0');
-    lower = readstring(lower, por, lower.size(), encStr);
+    lower = readstring(lower, por, lower.size());
 
     if (debug)
       Rcout << "lower: " << lower << std::endl;
@@ -102,7 +102,7 @@ List por(const char * filePath, const bool debug, std::string encStr)
 
     // random
     std::string random (62, '\0');
-    random = readstring(random, por, random.size(), encStr);
+    random = readstring(random, por, random.size());
 
     if (debug)
       Rcout << "random: " << random << std::endl;

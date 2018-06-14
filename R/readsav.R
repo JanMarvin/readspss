@@ -201,9 +201,6 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   }
 
-
-  longvarname <- attribs$longvarname %>% unlist
-
   encStr = attribs$encStr
 
   if (is.null(toEncoding))
@@ -212,10 +209,6 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   # Encoding // no encoding if fromEncoding == 2
   # avoid encoding of already encoded strings
   if (encoding & encStr != "" & forceEncoding == FALSE) {
-
-    # varnames
-    # names(data) <- read.encoding(names(data), fromEncoding, toEncoding)
-
 
     # label
     for (i in seq_along(label))
@@ -226,12 +219,6 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     # var.labels
     val.labels <- read.encoding(val.labels, encStr, toEncoding)
 
-    # if (!identical(longvarname, list())){
-    #   longvarname <- read.encoding(longvarname,
-    #                                fromEncoding, toEncoding)
-    # }
-
-    # print(val.labels)
   }
 
   labnames <- attribs$haslabel
@@ -296,10 +283,15 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
           }
         }
       }
-    }
+  }
 
 
-  if (!identical(longvarname, character(0))) {
+  longvarname <- attribs$longvarname
+
+  haslongvarname <- !identical(longvarname, "") &
+    !identical(longvarname, character(0))
+
+  if ( haslongvarname ) {
 
     # contains long varname (e.g. when longer varnames are provided or if the
     # dataset contains long strings)
@@ -309,8 +301,11 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     # A258=00258
     longstring <- attribs$longstring
 
+    haslongstring <- !identical(longstring, "") &
+      !identical(longstring, character(0))
+
     # only applicable, if dataset contains longstrings
-    if (!identical(longstring, character(0))) {
+    if ( haslongstring ) {
 
       longstring <- longstring[!longstring==""] %>%
         strsplit("=") %>% sapply(function(x)x[[1]])
@@ -407,7 +402,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   attr(data, "label") <- label
 
   attr(data, "varmatrix") <- varmat
-  attr(data, "val.label") <- val.labels
+  attr(data, "variable.label") <- val.labels
   attr(data, "missings")  <- attribs$missings
 
   # return
