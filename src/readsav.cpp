@@ -52,16 +52,15 @@ List sav(const char * filePath, const bool debug, std::string encStr)
     bool swapit = 0;
 
     std::string na = "NA";
+    std::string empty = "";
 
-    bool noencoding = false;
+    bool doenc = true;
 
-    if (encStr.compare(na)==0){
+    if (encStr.compare(na)==0 | encStr.compare(empty)==0 ){
       encStr = "";
-      noencoding = true;
+      doenc = false;
     }
 
-
-    std::string empty = "";
 
     std::string spss (8, '\0');
     spss = readstring(spss, sav, spss.size());
@@ -81,7 +80,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
     datalabel = std::regex_replace(datalabel,
                                    std::regex("^ +| +$|( ) +"), "$1");
 
-    datalabel = Riconv(datalabel, encStr);
+    if(doenc) datalabel = Riconv(datalabel, encStr);
 
     if (debug)
       Rcout << "Datalabel:" << datalabel << std::endl;
@@ -137,7 +136,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
     filelabel = std::regex_replace(filelabel,
                                    std::regex("^ +| +$|( ) +"), "$1");
 
-    filelabel = Riconv(filelabel, encStr);
+    if(doenc) filelabel = Riconv(filelabel, encStr);
 
     std::vector<string> varnames;
     std::vector<string> vallabels;
@@ -389,7 +388,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
             // if its a double, do a memcpy, else trim whitespaces
             if( noNum ) {
-              cV = Riconv(cV, encStr);
+              if(doenc) cV = Riconv(cV, encStr);
               cV = std::regex_replace(cV, std::regex("^ +| +$|( ) +"), "$1");
 
 
@@ -421,7 +420,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
             lab = std::regex_replace(lab, std::regex("^ +| +$|( ) +"), "$1");
 
-            lab = Riconv(lab, encStr);
+            if(doenc) lab = Riconv(lab, encStr);
 
             label(i) = lab;
         }
@@ -477,7 +476,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
         {
           document = readstring(document, sav, document.size());
 
-          document = Riconv(document, encStr);
+          if(doenc) document = Riconv(document, encStr);
 
           Document(i) = document;
 
@@ -524,8 +523,10 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           charcode = readbin(charcode, sav, swapit); // charcode
 
 
-          if ((encStr.compare(empty) == 0) & (!noencoding))
+          if ((encStr.compare(na) == 0)) {
             encStr = codepage(charcode);
+            doenc = true;
+          }
 
           // Rcout << subtyp << "/" << size << "/" << count << "/" << major  << "/" << minor  << "/" << rev  << "/" << macode  << "/" << floatp << "/" << compr  << "/" << endian  << "/" << charcode << std::endl;
 
@@ -582,15 +583,15 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           // very long varnames
           // Rcout << "-- subtyp 13" << endl;
 
-          std::string longvarname (count, '\0');
-          longvarname = readstring(longvarname, sav, count);
+          std::string lv (count, '\0');
+          longvarname = readstring(lv, sav, count);
 
 
         } else if (subtyp == 14) {
           // very long strings
           // Rcout << "--- subtyp 14 ---" << endl;
-          std::string longstring (count, '\0');
-          longstring = readstring(longstring, sav, count);
+          std::string ls (count, '\0');
+          longstring = readstring(ls, sav, count);
 
 
         } else if (subtyp == 16) {
@@ -658,24 +659,26 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
     }
 
-    if (encStr.compare(empty) != 0) {
+    if (doenc) {
 
       if (debug)
         Rcout << "encoding" << std::endl;
 
       longstring = Riconv(longstring, encStr);
-      boost::split(lstr, longstring,
-                   boost::is_any_of("\t"), boost::token_compress_on);
 
       longvarname = Riconv(longvarname, encStr);
-      boost::split(lvname, longvarname,
-                   boost::is_any_of("\t"), boost::token_compress_on);
 
       varnames = Riconv(varnames, encStr);
 
       vallabels = Riconv(vallabels, encStr);
 
     }
+
+    // split. could fail for some locales if encoding is suppressed
+    boost::split(lstr, longstring,
+                 boost::is_any_of("\t"), boost::token_compress_on);
+    boost::split(lvname, longvarname,
+                 boost::is_any_of("\t"), boost::token_compress_on);
 
 
     // Data Part -------------------------------------------------------------//
@@ -903,7 +906,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
                 start = std::regex_replace(start,
                                            std::regex("^ +| +$|( ) +"), "$1");
 
-                start = Riconv(start, encStr);
+                if(doenc) start = Riconv(start, encStr);
 
                 as<CharacterVector>(df[kk])[nn] = start;
 
@@ -981,7 +984,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
                 start = std::regex_replace(start,
                                            std::regex("^ +| +$|( ) +"), "$1");
 
-                start = Riconv(start, encStr);
+                if(doenc) start = Riconv(start, encStr);
 
                 as<CharacterVector>(df[kk])[nn] = start;
 
@@ -1137,7 +1140,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           val_s = std::regex_replace(val_s,
                                      std::regex("^ +| +$|( ) +"), "$1");
 
-          val_s = Riconv(val_s, encStr);
+          if(doenc) val_s = Riconv(val_s, encStr);
 
           // Rcpp::Rcout << val_s << std::endl;
           as<CharacterVector>(df[kk])[nn] = val_s;
@@ -1202,7 +1205,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
     df.attr("charcode") = charcode;
     df.attr("encoding") = enc;
     df.attr("encStr") = encStr;
-    df.attr("noencoding") = noencoding;
+    df.attr("doenc") = doenc;
 
 
 
