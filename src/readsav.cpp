@@ -1137,6 +1137,8 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           val_s = std::regex_replace(val_s,
                                      std::regex("^ +| +$|( ) +"), "$1");
 
+          val_s = Riconv(val_s, encStr);
+
           // Rcpp::Rcout << val_s << std::endl;
           as<CharacterVector>(df[kk])[nn] = val_s;
 
