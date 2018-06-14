@@ -22,8 +22,8 @@
 #include <streambuf>
 #include <regex>
 
-#include <boost/algorithm/string/classification.hpp> // Include boost::for is_any_of
-#include <boost/algorithm/string/split.hpp> // Include for boost::split
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
 
 using namespace Rcpp;
 using namespace std;
@@ -161,7 +161,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
 
     rtype = readbin(rtype, sav, swapit);
-    // Rprintf("Zahl in durchgang %d: %d \n", i,rtype);
 
     int32_t i = 0;
     while (rtype == 2) {
@@ -208,9 +207,8 @@ List sav(const char * filePath, const bool debug, std::string encStr)
       varmat(0,9)  = var53; // format type
       varmat(0,10) = var54; // not used
 
-      varlist.push_back(varmat);
-
-      // Rcpp::Rcout << vtype <<"; "<< vlflag <<"; " << nmiss <<"; " << unk4 << "; "<< unk5 << endl;
+      if (vtype > -1) // -1 is of no further useage
+        varlist.push_back(varmat);
 
       vartype.push_back(vtype);
 
@@ -224,13 +222,11 @@ List sav(const char * filePath, const bool debug, std::string encStr)
                                     std::regex("^ +| +$|( ) +"), "$1");
 
       varnames.push_back(nvarname);
-      // Rcout << nvarname << std::endl;
 
       if(vlflag==1)
       {
         rtype = readbin(rtype, sav, swapit);
 
-        // Wer kommt auf so eine Scheiße?
         // Max laenge laut interwebz: 255.
 
         int32_t origlen = rtype;
@@ -456,7 +452,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           unk2 = readbin(unk2, sav, swapit); // unk
 
           EoHUnks(i) = unk2;
-          // Rprintf("End of Header bytes: %d \n", unk2);
 
         }
         EoHList.push_back(EoHUnks);
@@ -480,7 +475,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
           Document(i) = document;
 
-          // Rcout << document << std::endl;
         }
 
         doc.push_back( Document );
@@ -497,18 +491,11 @@ List sav(const char * filePath, const bool debug, std::string encStr)
       while (rtype==7) {
         Rcpp::checkUserInterrupt();
 
-        // Rcout << "gelesen!" << endl;
-
         // subtype integer: 3 / floating: 4 / varsyst: 11
         subtyp = readbin(subtyp, sav, swapit);
         size = readbin(size, sav, swapit);
         count = readbin(count, sav, swapit);
 
-
-        // Rprintf("rtype: %d \n", rtype);
-        // Rprintf("subtyp: %d \n", subtyp);
-        // Rprintf("size: %d \n", size);
-        // Rprintf("count: %d \n", count);
 
         if (subtyp == 3) {
           // Rcout << "-- subtyp 3" << endl;
@@ -528,15 +515,11 @@ List sav(const char * filePath, const bool debug, std::string encStr)
             doenc = true;
           }
 
-          // Rcout << subtyp << "/" << size << "/" << count << "/" << major  << "/" << minor  << "/" << rev  << "/" << macode  << "/" << floatp << "/" << compr  << "/" << endian  << "/" << charcode << std::endl;
-
         } else if (subtyp == 4) {
           // Rcout << "-- subtyp 4" << endl;
           sysmiss = readbin(sysmiss, sav, swapit);  // sysmiss always 3
           highest = readbin(highest, sav, swapit);  // highest
           lowest = readbin(lowest, sav, swapit);    // lowest
-
-          // Rcout << subtyp << "/" << size << "/" << count << "/" << sysmiss  << "/" << highest  << "/" << lowest << std::endl;
 
         } else if (subtyp == 7) {
 
@@ -545,7 +528,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           std::string data (size*count, '\0');
 
           // ignore this
-          data = readstring(data, sav, data.size());
+          readstring(data, sav, data.size());
 
           // data.erase(std::remove(data.begin(),
           //                        data.end(),
@@ -561,7 +544,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           std::string data (size*count, '\0');
 
           // ignore this
-          data = readstring(data, sav, data.size());
+          readstring(data, sav, data.size());
 
           // data.erase(std::remove(data.begin(),
           //                        data.end(),
@@ -569,14 +552,12 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           //                        data.end());
 
         } else if (subtyp == 11) {
-          // Rcout << "-- subtyp 11" << endl;
 
           for (int i=0; i < count/3; ++i) {
-            measure = readbin(measure, sav, swapit);        // measure 1/nom 2/Ord 3/Metr
-            width = readbin(width, sav, swapit);            // width
-            alignment = readbin(alignment, sav, swapit);    // alignment
+            measure = readbin(measure, sav, swapit);     // 1/nom 2/Ord 3/Metr
+            width = readbin(width, sav, swapit);         // width
+            alignment = readbin(alignment, sav, swapit); // alignment
 
-            // Rcout << subtyp << "/" << size << "/" << count << "/" << measure  << "/" << width  << "/" << alignment  <<  std::endl;
           }
 
         } else if (subtyp == 13) {
@@ -617,7 +598,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           std::string data (size*count, '\0');
 
           // ignore this
-          data = readstring(data, sav, data.size());
+          readstring(data, sav, data.size());
 
           // Rcout << data << std::endl;
 
@@ -634,7 +615,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           std::string data (size*count, '\0');
 
           // ignore this
-          data = readstring(data, sav, data.size());
+          readstring(data, sav, data.size());
 
           // Rcout << data << std::endl;
 
@@ -653,9 +634,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
         rtype = readbin(rtype, sav, swapit);
 
       }
-
-      // if (debug)
-      //   Rprintf("rtype: %d \n", rtype);
 
     }
 
@@ -711,11 +689,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
     if (debug)
       Rprintf("-- Start: Data Part \n");
 
-    // if (cflag) {
-    //   kv = k;
-    //   vtyp = vartype;
-    //   vnam = varnames;
-    // }
 
     // 1. Create Rcpp::List
     Rcpp::List df(kv);
@@ -733,12 +706,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
       break;
       }
     }
-
-    // Rcout << vtyp << std::endl;
-    // Rcout << vnam << std::endl;
-    // Rprintf("kv: %d \n", kv);
-
-    // Rcpp::stop("stop");
 
     int32_t unk8=0;
     unk8 = readbin(unk8, sav, swapit); // 0
@@ -776,25 +743,16 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
     if (cflag) {
 
-      // for (int ii = 0; ii < res.size(); ++ii) {
 
-      // int rr = res[ii];
       std::string start = "";
-      //
-      // Rprintf("ii: %d \n", rr);
-      //
-      // int jj = 0;
-
 
 
       int chunkdone = 0;
-
       int res_i = 0;
       int kk_i = 0;
       int32_t res_kk = 0;
 
-      while (!eof /* jj < rr && !eof && !chunkdone*/ ) {
-        // Rprintf("%d - %d\n", rr, jj);
+      while (!eof) {
 
         Rcpp::checkUserInterrupt();
 
@@ -803,8 +761,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
         // chunk is 8 bit long. it gives the structure of the data. If it contains
         // only uint8_t it stores 8 vals. If data contains doubles it stores a
         // 253 and the next 8 byte will be the double.
-
-        // Rcpp::Rcout << "read chunk" << endl;
 
 
         chunk = readbin(val_d, sav, swapit);
@@ -825,11 +781,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
         // combine strings
         int16_t lastval = 0;
 
-        // Rcout << "kk: " << kk << std::endl;
-
-        // Rprintf("res: %d\n", res_kk);
-        // Rprintf("res_i: %d\n", res_i);
-
         for (int8_t i=0; i<8; ++i)
         {
 
@@ -842,10 +793,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           // Steht eine 253 im code, dann folgt die an der Stelle erwartete Zahl
           // im naechsten double block.
 
-          // Rprintf("val_b: %d \n", val_b);
-
-          // Rcpp::stop("break!");
-          //
           int32_t len = 0;
           int32_t const type = vartype[kk_i];
           len = type;
@@ -853,17 +800,11 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           // if (debug) {
           //   Rprintf("val_b: %d - type: %d - kk: %d\n", val_b, type, kk);
           // }
-          //
-          // Rprintf("kk: %d \n", kk);
-          // Rprintf("nn: %d \n", nn);
 
           if (kk_i == vartype.size()-1)
             kk_i = 0;
           else
             kk_i++;
-
-          // Rprintf("val_b: %d \n", val_b);
-          // Rprintf("type: %d \n", type);
 
           switch (val_b)
           {
@@ -976,9 +917,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
               res_kk = res[kk];
 
               if ((res_i >= res_kk-1)) {
-                // Rprintf("kk: %d; nn: %d; res_i %d; res_kk %d\n",
-                //         kk, nn, res_i, res_kk);
-                // Rcpp::Rcout << start << std::endl;
 
                 // trim additional whitespaces
                 start = std::regex_replace(start,
@@ -995,9 +933,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
               } else {
                 res_i++;
               }
-
-              // start.append( val_s );
-              // jj++;
 
 
               break;
@@ -1063,12 +998,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
 
             }
-
-            // if (i == 7) {
-            //   chunkdone = 1;
-            //
-            //   Rcout << "stop: chunkdone" << std::endl;
-            // }
           }
 
           // Rprintf(" type: %d\n", type);
@@ -1115,8 +1044,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
         case 0:
         {
-          // Rcout << val_d << std::endl;
-
           val_d = NA_REAL;
           val_d = readbin(val_d, sav, swapit);
           REAL(VECTOR_ELT(df,kk))[nn] = val_d;
@@ -1157,9 +1084,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           kk = 0;
         }
 
-        // Rprintf("ii: %d \n", ii);
-        // Rprintf("kk: %d \n", kk);
-
       }
     }
 
@@ -1170,7 +1094,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
     df.attr("names") = vnam;
     df.attr("class") = "data.frame";
 
-    // debug(sav, 10);
 
     if (debug)
       Rprintf("-- End: Data Part \n");
