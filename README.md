@@ -44,7 +44,7 @@ as a reminder.
 
 
 ```R
-dd <- read.sav(file, encoding = "UTF-8", convert.factors = TRUE)
+dd <- read.sav(file, convert.factors = TRUE, use.missings = FALSE)
 
 dx <- read.spss(file, to.data.frame = TRUE, use.missings = FALSE)
 
