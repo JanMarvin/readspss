@@ -754,6 +754,10 @@ List sav(const char * filePath, const bool debug, std::string encStr)
       std::string start = "";
       int32_t res_i = 0, res_kk = 0, kk_i = 0;
 
+      // res_kk is the amount of chunks required to read until the
+      // string is completely read
+      res_kk = res[kk];
+
       while (!eof) { // start data import until nn = n
 
         Rcpp::checkUserInterrupt();
@@ -839,11 +843,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
               val_s = readstring(val_s, sav, val_s.size());
               start.append( val_s );
 
-
-              // res_kk is the amount of chunks required to read until the
-              // string is completely read
-              res_kk = res[kk];
-
               // if res_i == res_kk the full string was read and
               // can be written else continue the string
               if (res_i == res_kk-1) {
@@ -854,7 +853,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
 
                 if(doenc) start = Riconv(start, encStr);
-
                 as<CharacterVector>(df[kk])[nn] = start;
 
                 // string completly written, reset start and res_i
@@ -863,7 +861,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
                 res_i = 0;
               } else {
                 // string will be continued
-                res_i++;
+                ++res_i;
               }
 
               break;
@@ -920,8 +918,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
               start.append( val_s );
 
 
-              res_kk = res[kk];
-
               if (res_i == res_kk-1) {
 
                 // trim additional whitespaces to the right
@@ -929,14 +925,13 @@ List sav(const char * filePath, const bool debug, std::string encStr)
                                            std::regex(" +$"), "$1");
 
                 if(doenc) start = Riconv(start, encStr);
-
                 as<CharacterVector>(df[kk])[nn] = start;
 
                 // reset
                 start = "";
                 res_i = 0;
               } else {
-                res_i++;
+                ++res_i;
               }
 
 
@@ -953,8 +948,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
               // 254 indicates that string chunks read before should be interpreted
               // as a single string.
 
-              res_kk = res[kk];
-
               if (res_i == res_kk-1) {
 
                 // trim additional whitespaces to the right
@@ -969,7 +962,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
               res_i = 0;
             } else {
               start.append("        ");
-              res_i++;
+              ++res_i;
             }
 
             break;
@@ -1000,12 +993,14 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           }
 
 
-          if (res_i == 0)
-            kk++;
+          if (res_i == 0) {
+            ++kk;
+            res_kk = res[kk];
+          }
 
           // Update kk iterator. If kk is k, update nn to start in next row.
           if (kk == kv) {
-            nn++;
+            ++nn;
 
             // Rprintf("nn: %d", nn);
             // some files are not ended with 252, ensure that no out of bounds
@@ -1075,10 +1070,10 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
         }
 
-        kk++;
+        ++kk;
 
         if (kk == kv) {
-          nn++;
+          ++nn;
           kk = 0;
         }
 
