@@ -44,28 +44,24 @@ List sav(const char * filePath, const bool debug, std::string encStr)
   std::ifstream sav(filePath, std::ios::in | std::ios::binary);
   if (sav) {
 
+    bool is_spss = 0, swapit = 0, autoenc = 0;
 
-    int32_t n = 0;
-    int32_t k = 0;
+    int32_t n = 0, k = 0;
     int32_t charcode = 0;
-    bool is_spss = 0;
-    bool swapit = 0;
-    bool autoenc = 0;
 
-    std::string na = "NA";
-    std::string empty = "";
+    std::string na = "NA", empty = "";
 
     // by default encode. This changes if the user specified encoding FALSE
-    bool doenc = true, noenc = false;
+    bool doenc = 1, noenc = 0;
 
     // if encStr == NA, set doenc = false and encStr to "" to avoid messing
     // with iconv
     if (encStr.compare(na)==0) {
       encStr = "";
-      doenc = false, noenc = true;
+      doenc = 0, noenc = 1;
     }
     if (encStr.compare(empty) == 0)
-      doenc = false;
+      doenc = 0;
 
 
     std::string spss (8, '\0');
@@ -143,22 +139,14 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
     if(doenc) filelabel = Riconv(filelabel, encStr);
 
-    std::vector<string> varnames;
-    std::vector<string> vallabels;
+    std::vector<string> varnames, vallabels;
     std::vector<int32_t> vartype;
 
     int8_t lablen = 0;
-    int32_t lablen32 = 0;
-    int32_t nolab = 0;
     int32_t rtype = 0;
-    int32_t typeINT = 0;
-    int32_t has_var_label;
-    int32_t n_missing_values;
-    int32_t printINT;
-    int32_t writeINT;
     std::string name (8, '\0');
 
-    int32_t vtype=0, vlflag=0, nmiss=0, var4=0, var5 = 0;
+    int32_t vtype=0, vlflag=0, nmiss=0, var4=0, var5 = 0, nolab = 0;
 
 
     Rcpp::List missings = Rcpp::List();
@@ -286,7 +274,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
           for (int i = 0; i < nmisstype; ++i) {
 
-
             if (noNum) {
               std::string mV (8, '\0');
               mV = readstring(mV, sav, mV.size());
@@ -326,11 +313,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
       Rcout << "-- end of header" << std::endl;
 
 
-    Rcpp::List Label_list = Rcpp::List();
-    // how to determine length?
-
-    Rcpp::List EoHList = Rcpp::List();
-    Rcpp::List doc;
+    Rcpp::List Label_list, haslabel, doc;
     Rcpp::CharacterVector enc(1);
 
     std::vector<std::string> lvname;
@@ -338,6 +321,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
     std::string longstring;
     std::string longvarname;
+    std::string encoding;
 
 
     int32_t subtyp = 0, size = 0, count = 0;
@@ -364,10 +348,9 @@ List sav(const char * filePath, const bool debug, std::string encStr)
       while (rtype == 3) {
 
         nolab = readbin(nolab, sav, swapit);
-        // Rprintf("Nolab: %d \n", nolab);
-        Rcpp::CharacterVector label(nolab);
+
+        Rcpp::CharacterVector label(nolab), codeV(nolab);
         Rcpp::NumericVector code(nolab);
-        Rcpp::CharacterVector codeV(nolab);
 
         // for some reason codes can be either doubles or strings. since we do
         // not know which we want, we read everything as a string. compare it
@@ -391,24 +374,21 @@ List sav(const char * filePath, const bool debug, std::string encStr)
               if(doenc) cV = Riconv(cV, encStr);
               cV = std::regex_replace(cV, std::regex("^ +| +$"), "$1");
 
-
               // return something so that we can later create a factor
               if(cV.compare(empty) != 0)
                 codeV(i) = cV;
 
             } else {
-
               memcpy(&coden , cV.c_str(), sizeof(double));
               code(i) = coden;
             }
 
 
             lablen = readbin(lablen, sav, swapit);
-            // Rprintf("Lablen: %d \n", lablen);
 
             if (!((lablen+1)%8==0))
             {
-              for(int i=1; i<8; ++i)
+              for(int8_t i=1; i<8; ++i)
               {
                 if (((lablen+1)+i)%8==0)
                   lablen = lablen+i;
@@ -417,7 +397,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
             std::string lab (lablen, '\0');
             lab = readstring(lab, sav, lab.size());
-
             lab = std::regex_replace(lab, std::regex("^ +| +$"), "$1");
 
             if(doenc) lab = Riconv(lab, encStr);
@@ -426,13 +405,14 @@ List sav(const char * filePath, const bool debug, std::string encStr)
         }
 
         // prepare release
-        code.attr("names") = label;
-        codeV.attr("names") = label;
 
-        if (noNum)
+        if (noNum){
+          codeV.attr("names") = label;
           Label_list.push_back(codeV);
-        else
+        } else{
+          code.attr("names") = label;
           Label_list.push_back(code);
+        }
 
         rtype = readbin(rtype, sav, swapit);
       }
@@ -442,23 +422,23 @@ List sav(const char * filePath, const bool debug, std::string encStr)
       // first int: 4
       // second int: number of combined labels
       // (second int) ints: unk
-      int32_t nolabels = 0, unk2 = 0;
+      int32_t nolabels = 0, lab_id = 0;
       while (rtype==4)
       {
         Rcpp::checkUserInterrupt();
 
         nolabels = readbin(nolabels, sav, swapit); // number of labels
 
-        Rcpp::NumericVector EoHUnks(nolabels);
+        Rcpp::NumericVector haslab(nolabels);
 
 
         for (int i=0; i<nolabels; ++i) {
-          unk2 = readbin(unk2, sav, swapit); // unk
+          lab_id = readbin(lab_id, sav, swapit); // unk
 
-          EoHUnks(i) = unk2;
+          haslab(i) = lab_id;
 
         }
-        EoHList.push_back(EoHUnks);
+        haslabel.push_back(haslab);
         rtype = readbin(rtype, sav, swapit);
       }
 
@@ -497,12 +477,16 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
         // subtype integer: 3 / floating: 4 / varsyst: 11
         subtyp = readbin(subtyp, sav, swapit);
-        size = readbin(size, sav, swapit);
-        count = readbin(count, sav, swapit);
+        size   = readbin(size, sav, swapit);
+        count  = readbin(count, sav, swapit);
 
+        std::string data (size*count, '\0');
 
-        if (subtyp == 3) {
-          // Rcout << "-- subtyp 3" << endl;
+        switch(subtyp)
+        {
+
+        case 3:
+        {
 
           major = readbin(major, sav, swapit);   // major version
           minor = readbin(minor, sav, swapit);   // minor version
@@ -525,67 +509,60 @@ List sav(const char * filePath, const bool debug, std::string encStr)
             }
           }
 
-        } else if (subtyp == 4) {
-          // Rcout << "-- subtyp 4" << endl;
+          break;
+        }
+
+        case 4:
+        {
           sysmiss = readbin(sysmiss, sav, swapit);  // sysmiss always 3
           highest = readbin(highest, sav, swapit);  // highest
           lowest = readbin(lowest, sav, swapit);    // lowest
 
-        } else if (subtyp == 7) {
+          break;
+        }
 
+        case 7:
+        case 8: // my example shows some kind of program
+        case 17: // variable view
+        case 18:
+        case 24:// seems like xml? dataview table format
+        {
           // sav.seekg(size*count);
 
-          std::string data (size*count, '\0');
-
           // ignore this
           readstring(data, sav, data.size());
 
-          // data.erase(std::remove(data.begin(),
-          //                        data.end(),
-          //                        '\0'),
-          //                        data.end());
-          //
-          // Rcout << data << std::endl;
-        } else if (subtyp == 8) {
+          break;
+        }
 
-          // subtyp contains binary information in a single long string
-          // my example shows some kind of program
-
-          std::string data (size*count, '\0');
-
-          // ignore this
-          readstring(data, sav, data.size());
-
-          // data.erase(std::remove(data.begin(),
-          //                        data.end(),
-          //                        '\0'),
-          //                        data.end());
-
-        } else if (subtyp == 11) {
+        case 11:
+        {
 
           for (int i=0; i < count/3; ++i) {
-            measure = readbin(measure, sav, swapit);     // 1/nom 2/Ord 3/Metr
-            width = readbin(width, sav, swapit);         // width
-            alignment = readbin(alignment, sav, swapit); // alignment
-          }
+          measure = readbin(measure, sav, swapit);     // 1/nom 2/Ord 3/Metr
+          width = readbin(width, sav, swapit);         // width
+          alignment = readbin(alignment, sav, swapit); // alignment
+        }
 
-        } else if (subtyp == 13) {
-          // very long varnames
-          // Rcout << "-- subtyp 13" << endl;
+          break;
+        }
 
-          std::string lv (count, '\0');
-          longvarname = readstring(lv, sav, count);
+        case 13:
+        {
+          longvarname = readstring(data, sav, count);
 
+          break;
+        }
 
-        } else if (subtyp == 14) {
-          // very long strings
-          // Rcout << "--- subtyp 14 ---" << endl;
-          std::string ls (count, '\0');
-          longstring = readstring(ls, sav, count);
+        case 14:
+        {
+          longstring = readstring(data, sav, count);
 
+          break;
+        }
 
-        } else if (subtyp == 16) {
-
+        case 16:
+        {
           // unsure what this is about
           // count is 2
           // unk is a number
@@ -602,55 +579,29 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
           }
 
-        } else if (subtyp == 17) {
-          // variable view
+          break;
+        }
 
-          // another subtyp containing only program output?
-          std::string data (size*count, '\0');
-
-          // ignore this
-          data = readstring(data, sav, data.size());
-
-          if (debug)
-            Rcout << data << std::endl;
-
-        } else if (subtyp == 18) {
-
-          // some SPSS information
-          std::string data (size*count, '\0');
-
-          // ignore this
-          data = readstring(data, sav, data.size());
-
-          if (debug)
-            Rcout << data << std::endl;
-
-        } else if (subtyp == 20) {
-          std::string encoding (count, '\0');
-          encoding = readstring(encoding, sav, count);
+        case 20:
+        {
+          encoding = readstring(data, sav, count);
 
           enc(0) = encoding;
 
+          break;
+        }
 
-        } else if (subtyp == 24) {
-
-          // seems like xml? dataview table format
-          std::string data (size*count, '\0');
-
-          // ignore this
-          readstring(data, sav, data.size());
-
-          // Rcout << data << std::endl;
-
-        } else {
-          std::string data (size*count, '\0');
-
+        default:
+        {
           // ignore this
           readstring(data, sav, data.size());
 
           Rcout << data << std::endl;
 
           Rcout << "unknown subtype " << subtyp << " detected" << std::endl;
+
+          break;
+        }
         }
 
 
@@ -800,16 +751,17 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           int32_t const type = vartype[kk_i];
           len = type;
 
-          // if (debug) {
-          //   Rprintf("val_b: %d - type: %d - kk: %d - nn: %d\n",
-          //           val_b, type, kk, nn);
-          // }
+          if (debug) {
+            Rprintf("val_b: %d - type: %d - kk: %d - nn: %d\n",
+                    val_b, type, kk+1, nn+1);
+          }
 
 
+          // vartype begins at 1
           if (kk_i == vartype.size()-1)
             kk_i = 0;
           else
-            kk_i++;
+            ++kk_i;
 
           switch (val_b)
           {
@@ -950,9 +902,9 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
               if (res_i == res_kk-1) {
 
-                // trim additional whitespaces to the right
-                start = std::regex_replace(start,
-                                           std::regex(" +$"), "$1");
+              // trim additional whitespaces to the right
+              start = std::regex_replace(start,
+                                         std::regex(" +$"), "$1");
 
               if(doenc) start = Riconv(start, encStr);
               as<CharacterVector>(df[kk])[nn] = start;
@@ -1109,7 +1061,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
     df.attr("varmat") = varlist;
     df.attr("missings") = missings;
     df.attr("label") = Label_list;
-    df.attr("haslabel") = EoHList;
+    df.attr("haslabel") = haslabel;
     df.attr("longstring") = lstr;
     df.attr("longvarname") = lvname;
     df.attr("cflag") = cflag;
