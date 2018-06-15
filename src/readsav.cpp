@@ -56,14 +56,16 @@ List sav(const char * filePath, const bool debug, std::string encStr)
     std::string empty = "";
 
     // by default encode. This changes if the user specified encoding FALSE
-    bool doenc = true;
+    bool doenc = true, noenc = false;
 
     // if encStr == NA, set doenc = false and encStr to "" to avoid messing
     // with iconv
     if (encStr.compare(na)==0) {
       encStr = "";
-      doenc = false;
+      doenc = false, noenc = true;
     }
+    if (encStr.compare(empty) == 0)
+      doenc = false;
 
 
     std::string spss (8, '\0');
@@ -512,10 +514,15 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           charcode = readbin(charcode, sav, swapit); // charcode
 
           // not forcefully userdefined or NA == ""
-          if ((encStr.compare(empty) == 0) & (doenc)) {
+          if ((encStr.compare(empty) == 0) & (!noenc)) {
             encStr = codepage(charcode);
-            doenc = true;
-            autoenc = true;
+
+            // if a codepage was found, recode else not
+            // most likely it is already UTF-8 or otherwise unknown
+            if (encStr.compare(empty) != 0) {
+              doenc = true;
+              autoenc = true;
+            }
           }
 
         } else if (subtyp == 4) {
