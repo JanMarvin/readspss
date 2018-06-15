@@ -155,7 +155,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
     rtype = readbin(rtype, sav, swapit);
 
-    int32_t i = 0;
     while (rtype == 2) {
 
       // skip 20 bytes or read 5 unks
@@ -330,7 +329,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
     double sysmiss = 0, highest = 0, lowest = 0;
     int32_t measure = 0, width = 0, alignment = 0;
 
-    while(rtype!=999 & rtype != 2)
+    while((rtype!=999) & (rtype != 2))
     {
       Rcpp::checkUserInterrupt();
 
