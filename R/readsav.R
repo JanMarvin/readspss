@@ -77,7 +77,7 @@
 #' @importFrom magrittr "%>%"
 #' @importFrom tools file_ext
 #' @importFrom stats na.omit
-#' @importFrom utils download.file
+#' @importFrom utils download.file localeToCharset
 #' @export
 read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
                      encoding = TRUE, fromEncoding = NULL, toEncoding = NULL,
@@ -106,6 +106,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   }
 
   encStr <- ""
+  ownEnc <- localeToCharset(locale = Sys.getlocale("LC_CTYPE"))[1]
   forceEncoding <- FALSE
 
   if (!is.null(fromEncoding)) {
@@ -117,7 +118,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     encStr <- "NA"
 
   # import data using an rcpp routine
-  data <- sav(filePath = filepath, debug, encStr)
+  data <- sav(filePath = filepath, debug, encStr, ownEnc)
 
   attribs <- attributes(data)
 
@@ -201,14 +202,14 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   }
 
-  encStr = attribs$encStr
+  encStr <- attribs$encStr
 
   if (is.null(toEncoding))
     toEncoding <- ""
 
   # Encoding // no encoding if fromEncoding == 2
   # avoid encoding of already encoded strings
-  if (isTRUE(encoding) & encStr != "" & forceEncoding == FALSE) {
+  if (isTRUE(encoding) & encStr != "" & encStr != ownEnc) {
 
     # label
     for (i in seq_along(label))

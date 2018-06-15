@@ -54,8 +54,7 @@ df_r <- read.sav(df, convert.factors = FALSE, use.missings = FALSE,
 suppressWarnings( # caused by foreign
 df_f <- read.spss(df, to.data.frame = TRUE, use.value.labels = FALSE,
                   use.missings = FALSE, stringsAsFactors=FALSE,
-                  trim_values = TRUE, trim.factor.names = TRUE,
-                  reencode = FALSE)
+                  trim_values = TRUE, trim.factor.names = TRUE)
 )
 
 

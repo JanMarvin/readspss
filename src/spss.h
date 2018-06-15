@@ -100,9 +100,9 @@ static const std::string codepage(int cp) {
   case 51932:
     res = "euc-jp";
     break;
-    // case 65001:
-    //   res = "UTF-8";
-    //   break;
+    case 65001:
+      res = "UTF-8";
+      break;
   }
 
   return(res);

@@ -35,10 +35,12 @@ using namespace std;
 //' @param filePath The full systempath to the dta file you want to import.
 //' @param debug print debug information
 //' @param encStr encoding string
+//' @param ownEnc encoding provided by localeToCharset
 //' @import Rcpp
 //' @export
 // [[Rcpp::export]]
-List sav(const char * filePath, const bool debug, std::string encStr)
+List sav(const char * filePath, const bool debug, std::string encStr,
+         std::string const ownEnc)
 {
 
   std::ifstream sav(filePath, std::ios::in | std::ios::binary);
@@ -501,8 +503,8 @@ List sav(const char * filePath, const bool debug, std::string encStr)
             encStr = codepage(charcode);
 
             // if a codepage was found, recode else not
-            // most likely it is already UTF-8 or otherwise unknown
-            if (encStr.compare(empty) != 0) {
+            // do not encode if in matching encoding
+            if ((encStr.compare(empty) != 0) & (encStr.compare(ownEnc) != 0)) {
               doenc = true;
               autoenc = true;
             }

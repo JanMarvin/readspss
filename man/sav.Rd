@@ -4,7 +4,7 @@
 \alias{sav}
 \title{Reads the binary SPSS file}
 \usage{
-sav(filePath, debug, encStr)
+sav(filePath, debug, encStr, ownEnc)
 }
 \arguments{
 \item{filePath}{The full systempath to the dta file you want to import.}
@@ -12,6 +12,8 @@ sav(filePath, debug, encStr)
 \item{debug}{print debug information}
 
 \item{encStr}{encoding string}
+
+\item{ownEnc}{encoding provided by localeToCharset}
 }
 \description{
 Reads the binary SPSS file

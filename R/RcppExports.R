@@ -28,9 +28,10 @@ por <- function(filePath, debug, encStr) {
 #' @param filePath The full systempath to the dta file you want to import.
 #' @param debug print debug information
 #' @param encStr encoding string
+#' @param ownEnc encoding provided by localeToCharset
 #' @import Rcpp
 #' @export
-sav <- function(filePath, debug, encStr) {
-    .Call('_readspss_sav', PACKAGE = 'readspss', filePath, debug, encStr)
+sav <- function(filePath, debug, encStr, ownEnc) {
+    .Call('_readspss_sav', PACKAGE = 'readspss', filePath, debug, encStr, ownEnc)
 }
 
