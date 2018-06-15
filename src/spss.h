@@ -117,23 +117,12 @@ static std::string readstring(std::string mystring, std::istream& sav,
   if (!sav.read(&mystring[0], nchar))
     Rcpp::warning("char: a binary read error occurred");
 
-
-  // // remove null termination from string
-  // mystring.erase(std::remove(mystring.begin(),
-  //                            mystring.end(),
-  //                            '\0'),
-  //                            mystring.end());
-
-
   return(mystring);
 }
 
 
 template <typename T>
 static T Riconv(T &mystring, std::string &encStr) {
-
-  // Rcout << "encoding from " << encStr << std::endl;
-  // Rcout << mystring << std::endl;
 
   std::string empty = "";
 
@@ -146,8 +135,6 @@ static T Riconv(T &mystring, std::string &encStr) {
       iconv(mystring, Rcpp::Named("from", encStr), Rcpp::Named("to",""))
     );
   }
-
-  // Rcout << mystring << std::endl;
 
   return(mystring);
 

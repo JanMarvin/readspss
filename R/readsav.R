@@ -307,7 +307,6 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
       longstring <- longstring[!longstring==""] %>%
         strsplit("=") %>% sapply(function(x)x[[1]])
 
-
       # If the imported data contains strings longer than nchar(255) the data is
       # scrambled at this point. SPSS separates longer strings in different pieces
       # of size 255. The rcpp import already sorted the data in variables. These
@@ -328,8 +327,6 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
             grep(pattern = strtrim(x[[1]], 5), nams)
             ]
         })
-
-      # print(replvec)
 
       for (i in length(replvec):1) {
 
