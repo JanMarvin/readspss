@@ -73,7 +73,7 @@
 #'@seealso \code{\link[foreign]{read.spss}}, \code{memisc} and
 #'\code{\link[haven]{read_sav}}.
 
-#' @useDynLib readspss
+#' @useDynLib readspss, .registration=TRUE
 #' @importFrom magrittr "%>%"
 #' @importFrom tools file_ext
 #' @importFrom stats na.omit
