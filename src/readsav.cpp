@@ -664,6 +664,9 @@ List sav(const char * filePath, const bool debug, std::string encStr)
     if (debug)
       Rprintf("-- Start: Data Part \n");
 
+    // if (debug)
+    //   n = 1;
+
 
     // 1. Create Rcpp::List
     Rcpp::List df(kv);
@@ -705,10 +708,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
       std::string start = "";
       int32_t res_i = 0, res_kk = 0, kk_i = 0;
 
-      // res_kk is the amount of chunks required to read until the
-      // string is completely read
-      res_kk = res[kk];
-
       while (!eof) { // start data import until nn = n
 
         Rcpp::checkUserInterrupt();
@@ -735,9 +734,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
         u.d = chunk;
 
-        // combine strings
-        int16_t lastval = 0;
-
         for (int8_t i=0; i<8; ++i)
         {
 
@@ -745,23 +741,28 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
           // 0 = empty
           // 1:251 = numeric/string
-          // jede 253 follow up on a string or double in next block
+          // each 253 follow up on a string or double in next block
 
           int32_t len = 0;
           int32_t const type = vartype[kk_i];
           len = type;
 
-          if (debug) {
-            Rprintf("val_b: %d - type: %d - kk: %d - nn: %d\n",
-                    val_b, type, kk+1, nn+1);
-          }
+          // kk_i is index of the original number of variables
+          // kk_i is reset once kv the new number of varialbes is reachead
+          ++kk_i;
 
 
-          // vartype begins at 1
-          if (kk_i == vartype.size()-1)
-            kk_i = 0;
-          else
-            ++kk_i;
+          // if (debug) {
+          //   Rprintf("val_b: %d - type: %d - kk: %d - nn: %d\n",
+          //           val_b, type, kk+1, nn+1);
+          //
+          //   Rprintf("res_i: %d\n", res_i);
+          // }
+
+
+          // res_kk is the amount of chunks required to read until the
+          // string is completely read
+          res_kk = res[kk];
 
           switch (val_b)
           {
@@ -897,8 +898,8 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
           case 254:
             {
-              // 254 indicates that string chunks read before should be interpreted
-              // as a single string.
+              // 254 indicates that string chunks read before should be
+              // interpreted as a single string.
 
               if (res_i == res_kk-1) {
 
@@ -945,10 +946,9 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           }
 
 
-          if (res_i == 0) {
+          // variable is read
+          if (res_i == 0)
             ++kk;
-            res_kk = res[kk];
-          }
 
           // Update kk iterator. If kk is k, update nn to start in next row.
           if (kk == kv) {
@@ -966,8 +966,9 @@ List sav(const char * filePath, const bool debug, std::string encStr)
               break;
             }
 
-            // reset k
+            // reset k and res_kk
             kk = 0;
+            kk_i = 0;
           }
 
         }
