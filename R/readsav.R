@@ -372,6 +372,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   if (convert.dates) {
 
+    nams   <- names(data)
     isdate <- varmat[,6] %in% c(20,23,24,38,39)
     istime <- varmat[,6] %in% c(21,22,25)
 
