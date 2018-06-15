@@ -1,6 +1,6 @@
 Package: readspss
 Type: Package
-Title: Import SPSS sav-files
+Title: Importing SPSS Files
 Version: 0.3.1
 Authors@R: c(
     person("Jan Marvin", "Garbuszus",
