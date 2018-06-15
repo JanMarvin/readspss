@@ -46,7 +46,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
   std::ifstream sav(filePath, std::ios::in | std::ios::binary);
   if (sav) {
 
-    bool is_spss = 0, swapit = 0, autoenc = 0;
+    bool is_spss = false, swapit = false, autoenc = false;
 
     int32_t n = 0, k = 0;
     int32_t charcode = 0;
@@ -54,16 +54,16 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     std::string na = "NA", empty = "";
 
     // by default encode. This changes if the user specified encoding FALSE
-    bool doenc = 1, noenc = 0;
+    bool doenc = true, noenc = 0;
 
     // if encStr == NA, set doenc = false and encStr to "" to avoid messing
     // with iconv
     if (encStr.compare(na)==0) {
       encStr = "";
-      doenc = 0, noenc = 1;
+      doenc = false, noenc = true;
     }
     if (encStr.compare(empty) == 0)
-      doenc = 0;
+      doenc = false;
 
 
     std::string spss (8, '\0');
@@ -93,7 +93,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     arch = readbin(arch, sav, swapit);
 
     if (arch != 2 || arch != 3)
-      swapit = 1;
+      swapit = true;
 
     k = readbin(k, sav, swapit);
 
@@ -273,7 +273,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
           if (vtype != 0)
             noNum = true;
 
-          for (int i = 0; i < nmisstype; ++i) {
+          for (int32_t i = 0; i < nmisstype; ++i) {
 
             if (noNum) {
               std::string mV (8, '\0');
@@ -1074,6 +1074,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     df.attr("charcode") = charcode;
     df.attr("encoding") = enc;
     df.attr("encStr") = encStr;
+    df.attr("ownEnc") = ownEnc;
     df.attr("doenc") = doenc;
     df.attr("autoenc") = autoenc;
 

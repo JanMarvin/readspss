@@ -134,8 +134,6 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   vartypes   <- attribs$vartypes
   varmat     <- do.call("rbind", attribs$varmat)
 
-  varmat <- varmat[varmat[,1]>=0,]
-
 
   # convert NAs by missing information provided by SPSS.
   # these are just different missing values in Stata and NA in R.
@@ -209,7 +207,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   # Encoding // no encoding if fromEncoding == 2
   # avoid encoding of already encoded strings
-  if (isTRUE(encoding) & encStr != "" & encStr != ownEnc) {
+  if (isTRUE(encoding) & (encStr != "") & (encStr != ownEnc)) {
 
     # label
     for (i in seq_along(label))
@@ -407,6 +405,13 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   attr(data, "varmatrix") <- varmat
   attr(data, "variable.label") <- val.labels
   attr(data, "missings")  <- attribs$missings
+  attr(data, "endian") <- attribs$endian
+  attr(data, "cflag") <- attribs$cflag
+  attr(data, "encStr") <- attribs$encStr
+  attr(data, "ownEnc") <- attribs$ownEnc
+  attr(data, "autoenc") <- attribs$autoenc
+  attr(data, "doenc") <- attribs$doenc
+
 
   # return
   return(data)
