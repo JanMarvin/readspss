@@ -578,6 +578,9 @@ List sav(const char * filePath, const bool debug, std::string encStr)
         } else if (subtyp == 16) {
 
           // unsure what this is about
+          // count is 2
+          // unk is two numbers, second is 0
+          // for count 2 unk appears to be N-obs
           int32_t unk = 0;
 
           for (int i = 0; i<count; ++i) {
@@ -797,9 +800,10 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           int32_t const type = vartype[kk_i];
           len = type;
 
-          // if (debug) {
-          //   Rprintf("val_b: %d - type: %d - kk: %d\n", val_b, type, kk);
-          // }
+          if (debug) {
+            Rprintf("val_b: %d - type: %d - kk: %d - nn: %d\n",
+                    val_b, type, kk, nn);
+          }
 
           if (kk_i == vartype.size()-1)
             kk_i = 0;
@@ -823,8 +827,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
             case 0:
             {
-              // Rprintf("- %d \n", val_b-100);
-              REAL(VECTOR_ELT(df,kk))[nn] = val_b-100;
+              REAL(VECTOR_ELT(df,kk))[nn] = val_b - 100;
               break;
             }
 
@@ -834,18 +837,20 @@ List sav(const char * filePath, const bool debug, std::string encStr)
               if (len==-1 || (len !=0 && len !=8) )
                 len = 8;
 
+              // beginning of a new string
               std::string val_s (len, '\0');
-
               val_s = readstring(val_s, sav, val_s.size());
-
               start.append( val_s );
 
-              if ((res_i >= res_kk-1) || (res_i+1 == res_kk)) {
-                // Rcpp::Rcout << start << std::endl;
 
-                // trim additional whitespaces
+              res_kk = res[kk];
+
+              if (res_i == res_kk-1) {
+
+                // trim additional whitespaces to the right
                 start = std::regex_replace(start,
-                                           std::regex("^ +| +$|( ) +"), "$1");
+                                           std::regex(" +$"), "$1");
+
 
                 if(doenc) start = Riconv(start, encStr);
 
@@ -910,20 +915,21 @@ List sav(const char * filePath, const bool debug, std::string encStr)
                 len = 8;
 
               std::string val_s (len, '\0');
-
               val_s = readstring(val_s, sav, val_s.size());
               start.append( val_s );
 
+
               res_kk = res[kk];
 
-              if ((res_i >= res_kk-1)) {
+              if (res_i == res_kk-1) {
 
-                // trim additional whitespaces
+                // trim additional whitespaces to the right
                 start = std::regex_replace(start,
-                                           std::regex("^ +| +$|( ) +"), "$1");
+                                           std::regex(" +$"), "$1");
 
                 if(doenc) start = Riconv(start, encStr);
 
+                // Rcpp::Rcout << start << std::endl;
                 as<CharacterVector>(df[kk])[nn] = start;
 
                 // reset start
@@ -948,26 +954,24 @@ List sav(const char * filePath, const bool debug, std::string encStr)
               // 254 indicates that string chunks read before should be interpreted
               // as a single string. This is currently handled in R.
 
-              // std::string val_s = "";
-              //
-              // as<CharacterVector>(df[kk])[nn] = val_s;
+              res_kk = res[kk];
 
-              if (res_i > 0) {
-              // Rprintf("kk: %d; nn: %d; res_i %d\n", kk, nn, res_i);
-              // Rcpp::Rcout << start << std::endl;
+              if (res_i == res_kk-1) {
 
-              // trim additional whitespaces
-              start = std::regex_replace(start,
-                                         std::regex("^ +| +$|( ) +"), "$1");
+                // trim additional whitespaces to the right
+                start = std::regex_replace(start,
+                                           std::regex(" +$"), "$1");
 
+              if(doenc) start = Riconv(start, encStr);
               as<CharacterVector>(df[kk])[nn] = start;
 
               // reset start
               start = "";
               kk++;
               res_i = 0;
-            } else if (type >= 0) {
-              kk++;
+            } else {
+              start.append("        ");
+              res_i++;
             }
 
             break;
