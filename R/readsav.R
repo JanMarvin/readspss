@@ -282,6 +282,25 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
       }
   }
 
+  if (convert.dates) {
+
+    nams   <- names(data)
+    isdate <- varmat[,6] %in% c(20,23,24,38,39)
+    istime <- varmat[,6] %in% c(21,22,25)
+
+    if (any(isdate)) {
+      for (nam in nams[isdate]) {
+        data[,nam] <- as.Date(as.POSIXct(data[,nam], origin="1582-10-14"))
+      }
+    }
+    if (any(istime)) {
+      for (nam in nams[isdate]) {
+        data[,nam] <- as.POSIXct(data[,nam], origin="1582-10-14")
+      }
+    }
+
+  }
+
 
   longvarname <- attribs$longvarname
 
@@ -304,28 +323,35 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     # only applicable, if dataset contains longstrings
     if ( haslongstring ) {
 
-      longstring <- longstring[!longstring==""] %>%
-        strsplit("=") %>% sapply(function(x)x[[1]])
+      longstring <- longstring[!longstring==""] %>% strsplit("=")
 
       # If the imported data contains strings longer than nchar(255) the data is
-      # scrambled at this point. SPSS separates longer strings in different pieces
-      # of size 255. The rcpp import already sorted the data in variables. These
-      # variables are now combined. Variable names are split after a few letters
-      # used for identification. Since SPSS can use variable names of 8 characters
-      # they trim the name down to max of 5. They add three digits identifying the
-      # order of the long strings. E.g. "Var1, Var1001, Var1002".
-      # Unsure if 999 is the limit.
+      # scrambled at this point. SPSS separates longer strings in different
+      # pieces of size 255. The rcpp import already sorted the data in
+      # variables. These variables are now combined. Variable names are split
+      # after five letters used for identification. Since SPSS can use variable
+      # names of 8 characters they trim the name down to max of 5. They add
+      # some digit used to identify the order of the long strings. E.g.
+      # "Var1, Var1001, Var1002", but similar "STRING_5" and "STRIN0".
+      # Unsure if there is some kind of trustworthy method
 
       nams <- names(data)
 
       replvec <- lapply(
         longstring,
         function(x){
-          # grep for identical variable names (not sure if SPSS considers the
-          # possiblilty of similar cases. are Value1 and Value2 the same?)
-          nams[
-            grep(pattern = strtrim(x[[1]], 5), nams)
-            ]
+
+          nam <- x[[1]]
+
+          # get name and the amount of SPSS strings required to store
+          # such a string. use this to calculate the number of varnames
+          # next to the one stated in the string. this is somewhat risky,
+          # but grepl adds some checks
+          len <- as.numeric(x[[2]])
+          len <- ceiling(len/255) - 1
+
+          p <- which(nams %in% nam)
+          nams[p : (p + len)]
         })
 
       for (i in length(replvec):1) {
@@ -334,7 +360,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
 
         # any variables to combine?
-        if (length(pat) > 1 & grepl("001", pat[2])) {
+        if (length(pat) > 1 & grepl("0", pat[2])) {
           sel <- data[,names(data) %in% pat]
 
           if (all(sapply(sel, is.character))) {
@@ -367,25 +393,6 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     nams <- replace(nams, which(nams %in% names(new_nams)), values = new_nams)
 
     names(data) <- nams
-
-  }
-
-  if (convert.dates) {
-
-    nams   <- names(data)
-    isdate <- varmat[,6] %in% c(20,23,24,38,39)
-    istime <- varmat[,6] %in% c(21,22,25)
-
-    if (any(isdate)) {
-      for (nam in nams[isdate]) {
-        data[,nam] <- as.Date(as.POSIXct(data[,nam], origin="1582-10-14"))
-      }
-    }
-    if (any(istime)) {
-      for (nam in nams[isdate]) {
-        data[,nam] <- as.POSIXct(data[,nam], origin="1582-10-14")
-      }
-    }
 
   }
 
