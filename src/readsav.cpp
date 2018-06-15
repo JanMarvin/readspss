@@ -122,8 +122,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
     double bias = 0; // 100: compression bias
     bias = readbin(bias, sav, swapit);
 
-    if (bias!=100)
-      Rcpp::stop("bias != 100. Stop.");
+    if (bias!=100) Rcpp::stop("bias != 100. Stop.");
 
     // creation date 9 dd_mmm_yy
     std::string datestamp (9, '\0');
@@ -185,11 +184,12 @@ List sav(const char * filePath, const bool debug, std::string encStr)
       var43 = (var4 >> 16);
       var44 = (var4 >> 24);
 
-      // write
       // 4 and 5 are most likely identical
       var5 = readbin(var5, sav, swapit);
 
+      // write
       int8_t var51, var52, var53, var54;
+
       var51 = (int8_t)var5;
       var52 = (var5 >> 8);
       var53 = (var5 >> 16);
@@ -286,9 +286,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
 
             if (noNum) {
-              // read string and compare to an empty string. if the string contains
-              // binary data it will be empty
-              std::string mV (8, ' ');
+              std::string mV (8, '\0');
               mV = readstring(mV, sav, mV.size());
 
 
@@ -326,7 +324,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
       Rcout << "-- end of header" << std::endl;
 
 
-    Rcpp::List Labell_list = Rcpp::List();
+    Rcpp::List Label_list = Rcpp::List();
     // how to determine length?
 
     Rcpp::List EoHList = Rcpp::List();
@@ -430,9 +428,9 @@ List sav(const char * filePath, const bool debug, std::string encStr)
         codeV.attr("names") = label;
 
         if (noNum)
-          Labell_list.push_back(codeV);
+          Label_list.push_back(codeV);
         else
-          Labell_list.push_back(code);
+          Label_list.push_back(code);
 
         rtype = readbin(rtype, sav, swapit);
       }
@@ -562,7 +560,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
             measure = readbin(measure, sav, swapit);     // 1/nom 2/Ord 3/Metr
             width = readbin(width, sav, swapit);         // width
             alignment = readbin(alignment, sav, swapit); // alignment
-
           }
 
         } else if (subtyp == 13) {
@@ -656,18 +653,17 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
     }
 
-    if (doenc) {
+    // encStr should not be empty otherwise
+    // the iconv call would be useless
+    if (doenc & (encStr.compare(empty)!=0)) {
 
       if (debug)
         Rcout << "encoding" << std::endl;
 
-      longstring = Riconv(longstring, encStr);
-
+      longstring  = Riconv(longstring, encStr);
       longvarname = Riconv(longvarname, encStr);
-
-      varnames = Riconv(varnames, encStr);
-
-      vallabels = Riconv(vallabels, encStr);
+      varnames    = Riconv(varnames, encStr);
+      vallabels   = Riconv(vallabels, encStr);
 
     }
 
@@ -688,8 +684,12 @@ List sav(const char * filePath, const bool debug, std::string encStr)
     CharacterVector Varnames = wrap(varnames);
 
 
+    // select only numerics or the beginning of strings. This enables
+    // reading into fewer columns and reduces the overhead in the R code
     CharacterVector vnam = Varnames[Vartype >= 0];
     IntegerVector vtyp = Vartype[Vartype >= 0];
+
+    // if k is set to be the number of available numerics and string variables
     int32_t kv = vnam.size();
 
 
@@ -701,8 +701,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
       Rcout << vnam << std::endl;
       Rcout << vtyp << std::endl;
       Rcout << res << std::endl;
-      Rcout << vtyp << std::endl;
-      Rcout << Vartype << std::endl;
     }
 
     if (debug)
@@ -729,30 +727,13 @@ List sav(const char * filePath, const bool debug, std::string encStr)
     int32_t unk8=0;
     unk8 = readbin(unk8, sav, swapit); // 0
 
+
+    bool eof = 0;
     uint8_t val_b = 0;
-    double val_d = 0;
-    uint32_t cells = 0;
-    cells = n*k;
-    uint32_t remaining_cells = 0;
-
-    remaining_cells = cells;
-
-
-    Rcpp::NumericVector data(cells);
-    Rcpp::CharacterVector type(cells);
-
+    int32_t nn = 0, kk = 0;
 
     // data is read in 8 byte chunks. k*n/8 (data remains)
-    double chunk = 0;
-
-
-
-    int32_t nn = 0;
-    int32_t kk = 0;
-    bool eof = 0;
-
-
-    int32_t iter = 0;
+    double chunk = 0, val_d = 0;
 
 
     if (debug) {
@@ -760,27 +741,22 @@ List sav(const char * filePath, const bool debug, std::string encStr)
     }
 
 
+    // cflag 1 = compression int8_t - bias
     if (cflag) {
 
-
       std::string start = "";
+      int32_t res_i = 0, res_kk = 0, kk_i = 0;
 
-
-      int chunkdone = 0;
-      int res_i = 0;
-      int kk_i = 0;
-      int32_t res_kk = 0;
-
-      while (!eof) {
+      while (!eof) { // start data import until nn = n
 
         Rcpp::checkUserInterrupt();
+
 
         // data is stored rowwise-ish.
 
         // chunk is 8 bit long. it gives the structure of the data. If it contains
         // only uint8_t it stores 8 vals. If data contains doubles it stores a
         // 253 and the next 8 byte will be the double.
-
 
         chunk = readbin(val_d, sav, swapit);
 
@@ -805,12 +781,9 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
           val_b = u.byte[i];
 
-          // chunk verarbeiten
-          // 0 = Leer
-          // 1:251 = gut!
-          // jede 253 = es folgt ein double
-          // Steht eine 253 im code, dann folgt die an der Stelle erwartete Zahl
-          // im naechsten double block.
+          // 0 = empty
+          // 1:251 = numeric/string
+          // jede 253 follow up on a string or double in next block
 
           int32_t len = 0;
           int32_t const type = vartype[kk_i];
@@ -820,6 +793,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           //   Rprintf("val_b: %d - type: %d - kk: %d - nn: %d\n",
           //           val_b, type, kk, nn);
           // }
+
 
           if (kk_i == vartype.size()-1)
             kk_i = 0;
@@ -859,8 +833,12 @@ List sav(const char * filePath, const bool debug, std::string encStr)
               start.append( val_s );
 
 
+              // res_kk is the amount of chunks required to read until the
+              // string is completely read
               res_kk = res[kk];
 
+              // if res_i == res_kk the full string was read and
+              // can be written else continue the string
               if (res_i == res_kk-1) {
 
                 // trim additional whitespaces to the right
@@ -872,11 +850,12 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
                 as<CharacterVector>(df[kk])[nn] = start;
 
-                // reset start
+                // string completly written, reset start and res_i
+                // and switch to next cell
                 start = "";
-                kk++;
                 res_i = 0;
               } else {
+                // string will be continued
                 res_i++;
               }
 
@@ -890,10 +869,9 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
           case 252:
             {
-              // Rcpp::Rcout << "## Debug ... 252" << std::endl;
+              // 252 should be end of file, but as many things
+              // it is not required to be inside the file
               eof = true;
-              break;
-
               break;
             }
 
@@ -945,12 +923,10 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
                 if(doenc) start = Riconv(start, encStr);
 
-                // Rcpp::Rcout << start << std::endl;
                 as<CharacterVector>(df[kk])[nn] = start;
 
-                // reset start
+                // reset
                 start = "";
-                kk++;
                 res_i = 0;
               } else {
                 res_i++;
@@ -968,7 +944,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           case 254:
             {
               // 254 indicates that string chunks read before should be interpreted
-              // as a single string. This is currently handled in R.
+              // as a single string.
 
               res_kk = res[kk];
 
@@ -983,7 +959,6 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
               // reset start
               start = "";
-              kk++;
               res_i = 0;
             } else {
               start.append("        ");
@@ -1004,25 +979,21 @@ List sav(const char * filePath, const bool debug, std::string encStr)
             {
               // Rcout << NA_REAL << std::endl;
               REAL(VECTOR_ELT(df,kk))[nn] = NA_REAL;
-              // kk++;
               break;
             }
             default:
             {
               as<CharacterVector>(df[kk])[nn] = NA_STRING;
-              kk++;
               break;
             }
               break;
             }
-
 
             }
           }
 
-          // Rprintf(" type: %d\n", type);
 
-          if (type == 0)
+          if (res_i == 0)
             kk++;
 
           // Update kk iterator. If kk is k, update nn to start in next row.
@@ -1135,9 +1106,8 @@ List sav(const char * filePath, const bool debug, std::string encStr)
     df.attr("vtype") = vtyp;
     df.attr("varmat") = varlist;
     df.attr("missings") = missings;
-    df.attr("label") = Labell_list;
+    df.attr("label") = Label_list;
     df.attr("haslabel") = EoHList;
-    df.attr("data") = data;
     df.attr("longstring") = lstr;
     df.attr("longvarname") = lvname;
     df.attr("cflag") = cflag;
