@@ -208,16 +208,13 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   # Encoding // no encoding if fromEncoding == 2
   # avoid encoding of already encoded strings
-  if (encoding & encStr != "" & forceEncoding == FALSE) {
+  if (isTRUE(encoding) & encStr != "" & forceEncoding == FALSE) {
 
     # label
     for (i in seq_along(label))
       names(label[[i]]) <- read.encoding(names(label[[i]]),
                                          fromEncoding = encStr,
                                          encoding = toEncoding)
-
-    # var.labels
-    val.labels <- read.encoding(val.labels, encStr, toEncoding)
 
   }
 

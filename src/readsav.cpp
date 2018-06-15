@@ -50,13 +50,17 @@ List sav(const char * filePath, const bool debug, std::string encStr)
     int32_t charcode = 0;
     bool is_spss = 0;
     bool swapit = 0;
+    bool autoenc = 0;
 
     std::string na = "NA";
     std::string empty = "";
 
+    // by default encode. This changes if the user specified encoding FALSE
     bool doenc = true;
 
-    if (encStr.compare(na)==0 | encStr.compare(empty)==0 ){
+    // if encStr == NA, set doenc = false and encStr to "" to avoid messing
+    // with iconv
+    if (encStr.compare(na)==0) {
       encStr = "";
       doenc = false;
     }
@@ -509,10 +513,11 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           endian = readbin(endian, sav, swapit); // endianness
           charcode = readbin(charcode, sav, swapit); // charcode
 
-
-          if ((encStr.compare(na) == 0)) {
+          // not forcefully userdefined or NA == ""
+          if ((encStr.compare(empty) == 0) & (doenc)) {
             encStr = codepage(charcode);
             doenc = true;
+            autoenc = true;
           }
 
         } else if (subtyp == 4) {
@@ -579,9 +584,11 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
           // unsure what this is about
           // count is 2
-          // unk is two numbers, second is 0
-          // for count 2 unk appears to be N-obs
-          int32_t unk = 0;
+          // unk is a number
+          // for count 2 unk appears to be N-obs: Did SPSS allow n > int32 at
+          // some point of time and coud not adjust it in the header for back-
+          // ward compatibilty?
+          int64_t unk = 0;
 
           for (int i = 0; i<count; ++i) {
 
@@ -589,21 +596,30 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
             if (debug) Rprintf("sub 16: unk1 %d\n", unk);
 
-            unk = readbin(unk, sav, swapit);
-            if (debug) Rprintf("sub 16: unk2 %d\n", unk);
-
           }
 
-        } else if (subtyp == 18) {
+        } else if (subtyp == 17) {
+          // variable view
 
-          // another subtyp containing only program output? looks like some kind
-          // of data base
+          // another subtyp containing only program output?
           std::string data (size*count, '\0');
 
           // ignore this
-          readstring(data, sav, data.size());
+          data = readstring(data, sav, data.size());
 
-          // Rcout << data << std::endl;
+          if (debug)
+            Rcout << data << std::endl;
+
+        } else if (subtyp == 18) {
+
+          // some SPSS information
+          std::string data (size*count, '\0');
+
+          // ignore this
+          data = readstring(data, sav, data.size());
+
+          if (debug)
+            Rcout << data << std::endl;
 
         } else if (subtyp == 20) {
           std::string encoding (count, '\0');
@@ -800,10 +816,10 @@ List sav(const char * filePath, const bool debug, std::string encStr)
           int32_t const type = vartype[kk_i];
           len = type;
 
-          if (debug) {
-            Rprintf("val_b: %d - type: %d - kk: %d - nn: %d\n",
-                    val_b, type, kk, nn);
-          }
+          // if (debug) {
+          //   Rprintf("val_b: %d - type: %d - kk: %d - nn: %d\n",
+          //           val_b, type, kk, nn);
+          // }
 
           if (kk_i == vartype.size()-1)
             kk_i = 0;
@@ -1133,6 +1149,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
     df.attr("encoding") = enc;
     df.attr("encStr") = encStr;
     df.attr("doenc") = doenc;
+    df.attr("autoenc") = autoenc;
 
 
 
