@@ -82,7 +82,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
     // trim additional whitespaces
     datalabel = std::regex_replace(datalabel,
-                                   std::regex("^ +| +$|( ) +"), "$1");
+                                   std::regex("^ +| +$"), "$1");
 
     if(doenc) datalabel = Riconv(datalabel, encStr);
 
@@ -138,7 +138,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
 
     filelabel = std::regex_replace(filelabel,
-                                   std::regex("^ +| +$|( ) +"), "$1");
+                                   std::regex("^ +| +$"), "$1");
 
     if(doenc) filelabel = Riconv(filelabel, encStr);
 
@@ -223,7 +223,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
       // trim additional whitespaces
       nvarname = std::regex_replace(nvarname,
-                                    std::regex("^ +| +$|( ) +"), "$1");
+                                    std::regex("^ +| +$"), "$1");
 
       varnames.push_back(nvarname);
 
@@ -251,7 +251,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
         // trim additional whitespaces on the right
         vallabel = std::regex_replace(vallabel,
-                                      std::regex("^ +| +$|( ) +"), "$1");
+                                      std::regex("^ +| +$"), "$1");
 
         vallabels.push_back(vallabel);
 
@@ -292,7 +292,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
               mV = readstring(mV, sav, mV.size());
 
 
-              mV = std::regex_replace(mV, std::regex("^ +| +$|( ) +"), "$1");
+              mV = std::regex_replace(mV, std::regex("^ +| +$"), "$1");
 
               missingV(0) = nmiss;
               missingV(i+1) = mV;
@@ -389,7 +389,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
             // if its a double, do a memcpy, else trim whitespaces
             if( noNum ) {
               if(doenc) cV = Riconv(cV, encStr);
-              cV = std::regex_replace(cV, std::regex("^ +| +$|( ) +"), "$1");
+              cV = std::regex_replace(cV, std::regex("^ +| +$"), "$1");
 
 
               // return something so that we can later create a factor
@@ -418,7 +418,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
             std::string lab (lablen, '\0');
             lab = readstring(lab, sav, lab.size());
 
-            lab = std::regex_replace(lab, std::regex("^ +| +$|( ) +"), "$1");
+            lab = std::regex_replace(lab, std::regex("^ +| +$"), "$1");
 
             if(doenc) lab = Riconv(lab, encStr);
 
@@ -1085,7 +1085,7 @@ List sav(const char * filePath, const bool debug, std::string encStr)
 
           // trim additional whitespaces
           val_s = std::regex_replace(val_s,
-                                     std::regex("^ +| +$|( ) +"), "$1");
+                                     std::regex("^ +| +$"), "$1");
 
           if(doenc) val_s = Riconv(val_s, encStr);
 
