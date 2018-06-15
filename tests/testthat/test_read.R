@@ -39,7 +39,7 @@ df_f <- read.spss(df, to.data.frame = TRUE, use.value.labels = FALSE,
                   use.missings = FALSE, stringsAsFactors=FALSE)
 
 test_that( "first-test", {
-  expect_true (datacompare(df_r, df_f) )
+  expect_true(datacompare(df_r, df_f) )
   })
 
 
@@ -56,6 +56,11 @@ df_f <- read.spss(df, to.data.frame = TRUE, use.value.labels = FALSE,
                   use.missings = FALSE, stringsAsFactors=FALSE,
                   trim_values = TRUE, trim.factor.names = TRUE)
 )
+
+
+df_f[["string_500"]] <- paste0(df_f[["string_500"]], df_f[["STRIN0"]])
+df_f$STRIN0 <- NULL
+
 
 # trim_values does not work? so we trim
 chars <- sapply(df_f, is.character)
