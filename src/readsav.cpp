@@ -92,8 +92,11 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     // file format? should be 2 or 3
     arch = readbin(arch, sav, swapit);
 
-    if ((arch <2) & (arch > 3))
+    if ((arch <2) | (arch > 3))
       swapit = true;
+
+    if (debug)
+      Rprintf("swapit: %d\n", swapit);
 
     k = readbin(k, sav, swapit);
 
@@ -166,6 +169,8 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     rtype = readbin(rtype, sav, swapit);
 
 
+    if (debug)
+      Rprintf("rtype: %d\n", rtype);
 
     while( rtype < 999 )
     {
@@ -185,12 +190,13 @@ List sav(const char * filePath, const bool debug, std::string encStr,
       int32_t typeINT = 0, has_var_label = 0, n_missing_values = 0,
         printINT = 0, writeINT = 0, lablen32 = 0;
 
-      while (rtype == 2) {
+      while (rtype == 2)
+      {
 
         // skip 20 bytes or read 5 unks
-        vtype = readbin(vtype, sav, swapit);      // Variable type
+        vtype  = readbin(vtype, sav, swapit);     // Variable type
         vlflag = readbin(vlflag, sav, swapit);    // Label flag
-        nmiss = readbin(nmiss, sav, swapit);
+        nmiss  = readbin(nmiss, sav, swapit);
 
         // bits of int32_t define digits, width and type
         var4 = readbin(var4, sav, swapit);
@@ -246,6 +252,16 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
         varnames.push_back(nvarname);
 
+        if (debug) {
+          Rcout << nvarname << std::endl;
+          Rprintf("vflag %d\n", vlflag);
+          Rprintf("nmiss %d\n", nmiss);
+          Rprintf("var41 %d\n", var41);
+          Rprintf("var42 %d\n", var42);
+          Rprintf("var43 %d\n", var43);
+          Rprintf("var44 %d\n", var44);
+        }
+
         int32_t origlen = 0;
         if(vlflag==1)
         {
@@ -258,11 +274,10 @@ List sav(const char * filePath, const bool debug, std::string encStr,
             for(int i=1; i<4; ++i)
             {
               if ((origlen+i)%4==0)
-                origlen = origlen+i;
+                origlen = origlen + i;
             }
           }
 
-          // Rprintf("%d \n", rtype);
           std::string vallabel (origlen, '\0');
           vallabel = readstring(vallabel, sav, vallabel.size());
 
@@ -272,60 +287,64 @@ List sav(const char * filePath, const bool debug, std::string encStr,
                                         std::regex("^ +| +$"), "$1");
 
           vallabels.push_back(vallabel);
+        }
 
-          // -----------------------------------------
-          //  missings
-          //
+        // -----------------------------------------
+        //  missings
+        //
 
-          int8_t const nmisstype = std::abs(nmiss);
+        int8_t const nmisstype = std::abs(nmiss);
 
-          // SPSS knows 5 different missing types. -3, -2 are range types. 1, 2,
-          // 3 are discrete types. Range types have min range and max range. -3
-          // has an additional discrete value.
-
-
-          if (nmisstype > 0) {
-
-            // missing values
-            // Vector needs to be of size n+1, because the first value will be
-            // nmisstype followed by nmisstype values
-            Rcpp::NumericVector missing(nmisstype+1);
-            Rcpp::CharacterVector missingV(nmisstype+1);
-
-            double miss0 = 0;
-            bool noNum = false;
-
-            if (vtype != 0)
-              noNum = true;
-
-            for (int32_t i = 0; i < nmisstype; ++i) {
-
-              if (noNum) {
-                std::string mV (8, '\0');
-                mV = readstring(mV, sav, mV.size());
+        // SPSS knows 5 different missing types. -3, -2 are range types. 1, 2,
+        // 3 are discrete types. Range types have min range and max range. -3
+        // has an additional discrete value.
 
 
-                mV = std::regex_replace(mV, std::regex("^ +| +$"), "$1");
+        if (debug)
+          Rprintf("vflag %d\n", vlflag);
 
-                missingV(0) = nmiss;
-                missingV(i+1) = mV;
+        // PSPP states that long strings are handled differently
+        if (nmisstype > 0) {
 
-              } else {
+          // missing values
+          // Vector needs to be of size n+1, because the first value will be
+          // nmisstype followed by nmisstype values
+          Rcpp::NumericVector missing(nmisstype+1);
+          Rcpp::CharacterVector missingV(nmisstype+1);
 
-                miss0 = readbin(miss0, sav, swapit);
+          double miss0 = 0;
+          bool noNum = false;
 
-                missing(0) = nmiss;
-                missing(i+1) = miss0;
-              }
+          if (vtype != 0)
+            noNum = true;
 
+          for (int32_t i = 0; i < nmisstype; ++i) {
+
+            if (noNum) {
+              std::string mV (8, '\0');
+              mV = readstring(mV, sav, mV.size());
+
+
+              mV = std::regex_replace(mV, std::regex("^ +| +$"), "$1");
+
+              missingV(0) = nmiss;
+              missingV(i+1) = mV;
+
+            } else {
+
+              miss0 = readbin(miss0, sav, swapit);
+
+              missing(0) = nmiss;
+              missing(i+1) = miss0;
             }
 
-            if (noNum)
-              missings.push_back(missingV);
-            else
-              missings.push_back(missing);
-
           }
+
+          if (noNum)
+            missings.push_back(missingV);
+          else
+            missings.push_back(missing);
+
         }
 
         break;
@@ -366,6 +385,8 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
             } else {
               memcpy(&coden , cV.c_str(), sizeof(double));
+              if (swapit) coden = swap_endian(coden);
+
               code(i) = coden;
             }
 
@@ -450,7 +471,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
           // trim additional whitespaces to the right
           docline = std::regex_replace(docline,
-                                        std::regex(" +$"), "$1");
+                                       std::regex(" +$"), "$1");
 
           Document(i) = docline;
 
@@ -464,7 +485,8 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
 
       // additional information
-      while (rtype==7) {
+      while (rtype==7)
+      {
         Rcpp::checkUserInterrupt();
 
         // subtype integer: 3 / floating: 4 / varsyst: 11
@@ -607,7 +629,10 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
           Rcout << data << std::endl;
 
-          Rcout << "unknown subtype " << subtyp << " detected" << std::endl;
+          Rcout << "unknown subtype " << subtyp << " detected." << std::endl;
+          Rcout << "most likely no readson to worry. but if you want\n" <<
+            "to help me out and can share a row of this datafile, \n" <<
+              "please mail me!" << std::endl;
 
           break;
         }
@@ -732,7 +757,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
         // only uint8_t it stores 8 vals. If data contains doubles it stores a
         // 253 and the next 8 byte will be the double.
 
-        chunk = readbin(val_d, sav, swapit);
+        chunk = readbin(val_d, sav, 0);
 
         IntegerVector chunkvec(8);
 
