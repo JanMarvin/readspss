@@ -15,7 +15,7 @@ LazyData: TRUE
 Depends: magrittr
 Imports:
     Rcpp (>= 0.11.2)
-Suggests: testthat, foreign, haven
+Suggests: testthat, foreign, datasets
 LinkingTo: Rcpp, BH
 SystemRequirements: C++11
 ByteCompile: yes

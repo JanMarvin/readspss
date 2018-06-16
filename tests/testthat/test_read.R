@@ -1,32 +1,10 @@
 
-# prepare functions #######################################################
-
-# remove additional information from data.frame
-strip <- function(df)data.frame(as.matrix(df), stringsAsFactors = F)
-
-# function for direct data comparison
-datacompare <- function(x, y) {
-
-  x <- strip(x)
-  y <- strip(y)
-
-  res <- unlist(Map(all.equal, c(x), c(y)))
-
-  # with all(unlist(res)) if not TRUE, a warning is thrown
-  res <- all(unlist(lapply(res, isTRUE)))
-
-  res
-}
-
-
-# prepare packages ########################################################
+# prepare packages #############################################################
 
 library(readspss)
 require(foreign)
-require(haven)
 
-
-# foreign test files ######################################################
+# foreign test files ###########################################################
 
 # electric
 
@@ -38,9 +16,9 @@ df_r <- read.sav(df, convert.factors = FALSE, use.missings = FALSE)
 df_f <- read.spss(df, to.data.frame = TRUE, use.value.labels = FALSE,
                   use.missings = FALSE, stringsAsFactors=FALSE)
 
-test_that( "first-test", {
-  expect_true(datacompare(df_r, df_f) )
-  })
+test_that( "electric", {
+  expect_true(all.equal(df_r, df_f, check.attributes = FALSE) )
+})
 
 
 # testdata
@@ -52,9 +30,9 @@ df_r <- read.sav(df, convert.factors = FALSE, use.missings = FALSE,
                  convert.dates = FALSE)
 
 suppressWarnings( # caused by foreign
-df_f <- read.spss(df, to.data.frame = TRUE, use.value.labels = FALSE,
-                  use.missings = FALSE, stringsAsFactors=FALSE,
-                  trim_values = TRUE, trim.factor.names = TRUE)
+  df_f <- read.spss(df, to.data.frame = TRUE, use.value.labels = FALSE,
+                    use.missings = FALSE, stringsAsFactors=FALSE,
+                    trim_values = TRUE, trim.factor.names = TRUE)
 )
 
 
@@ -71,12 +49,12 @@ for (char in chars) {
 }
 
 
-test_that( "second-test", {
-  expect_true(datacompare(df_r, df_f))
+test_that( "testdata", {
+  expect_true(all.equal(df_r, df_f, check.attributes = FALSE))
 })
 
 
-# pspp testfiles ##########################################################
+# pspp testfiles ###############################################################
 
 # v13
 
@@ -85,56 +63,103 @@ df <- system.file("extdata", "v13.sav", package="readspss")
 
 df_r <- read.sav(df, convert.factors = FALSE, use.missings = FALSE)
 
-# # foreign cannot read this file
-# df_f <- read.spss(df, to.data.frame = TRUE, use.value.labels = FALSE,
-#                   use.missings = FALSE, stringsAsFactors=FALSE)
-
-# haven does not return the full string
-df_h <- read_sav(df) %>% as.data.frame
+res <- data.frame(
+  N     = 1:2,
+  A255  = c(paste0("a1", paste(rep("A", 253), collapse = "")),
+            paste0("a2", paste(rep("X", 253), collapse = ""))),
+  A258  = c(paste0("b1", paste(rep("B", 256), collapse = "")),
+            paste0("b2", paste(rep("Y", 256), collapse = ""))),
+  A2000 = c(paste0("c1", paste(rep("C", 1998), collapse = "")),
+            paste0("c2", paste(rep("Z", 1998), collapse = ""))),
+  stringsAsFactors = FALSE
+)
 
 test_that( "third-test", {
-  expect_false (datacompare(df_r, df_h) )
+  expect_true(all.equal(df_r, res, check.attributes = FALSE) )
 })
 
 
 # v14
 
-df <- df_r <- df_h <- df_f <- NULL
+df <- df_r <- df_h <- df_f <- res <- NULL
 df <- system.file("extdata", "v14.sav", package="readspss")
 
 df_r <- read.sav(df, convert.factors = FALSE, use.missings = FALSE)
 
-# # foreign does handle long strings as different variables
-# df_f <- read.spss(df, to.data.frame = TRUE, use.value.labels = FALSE,
-#                   use.missings = FALSE, stringsAsFactors=FALSE,
-#                   trim_values = TRUE)
 
-df_h <- read_sav(df) %>% as.data.frame
-
+res <- data.frame(
+  vl255  = c(paste(rep("M", 255), collapse = "")),
+  vl256  = c(paste(rep("M", 256), collapse = "")),
+  vl1335 = c(paste(rep("M", 1335), collapse = "")),
+  vl2000 = c(paste(rep("M", 2000), collapse = "")),
+  stringsAsFactors = FALSE
+)
 
 test_that( "fourth-test", {
-  expect_false (datacompare(df_r, df_h) )
+  expect_true( all.equal(res, df_r, check.attributes = FALSE) )
 })
 
 
-# haven testfile ##########################################################
+# haven testfile ###############################################################
 
 # iris
 
 df <- df_r <- df_h <- df_f <- NULL
 df <- system.file("extdata", "iris.sav", package="readspss")
 
-df_r <- read.sav(df, convert.factors = FALSE, use.missings = FALSE)
+df_r <- read.sav(df, convert.factors = TRUE, use.missings = FALSE)
 
-# # foreign cannot read files with k = 0
-# df_f <- read.spss(df, to.data.frame = TRUE, use.value.labels = FALSE,
-#                   use.missings = FALSE, stringsAsFactors=FALSE,
-#                   trim_values = TRUE)
-
-df_h <- read_sav(df) %>% as.data.frame
+data(iris)
 
 
 test_that( "sixth-test", {
-  expect_true (datacompare(df_r, df_h))
+  expect_true (all.equal(df_r, iris, check.attributes = FALSE))
+})
+
+# factors ######################################################################
+
+# electric
+fl <- system.file("extdata", "electric.sav", package="readspss")
+
+df_r <- read.sav(fl)
+
+df_f <- foreign::read.spss(fl, to.data.frame = TRUE)
+
+test_that("factors", {
+  expect_true(all.equal(df_r, df_f, check.attributes = FALSE))
+})
+
+# hotel
+fl <- system.file("extdata", "hotel.sav", package="readspss")
+
+df_r <- read.sav(fl)
+
+df_f <- foreign::read.spss(fl, to.data.frame = TRUE)
+
+test_that("factors", {
+  expect_true(all.equal(df_r, df_f, check.attributes = FALSE))
+})
+
+
+# physiology
+fl <- system.file("extdata", "physiology.sav", package="readspss")
+
+df_r <- read.sav(fl)
+
+df_f <- foreign::read.spss(fl, to.data.frame = TRUE)
+
+test_that("factors", {
+  expect_true(all.equal(df_r, df_f, check.attributes = FALSE))
+})
+
+# repairs
+fl <- system.file("extdata", "repairs.sav", package="readspss")
+
+df_r <- read.sav(fl)
+
+df_f <- foreign::read.spss(fl, to.data.frame = TRUE)
+
+test_that("factors", {
+  expect_true(all.equal(df_r, df_f, check.attributes = FALSE))
 })
 

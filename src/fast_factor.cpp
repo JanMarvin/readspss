@@ -5,18 +5,7 @@ using namespace Rcpp;
 template <int RTYPE>
 IntegerVector fast_factor_template( const Vector<RTYPE>& x,
                                     const Vector<RTYPE>& y) {
-  Vector<RTYPE> levs = sort_unique(y);
-  IntegerVector out = match(x, levs);
-
-  // if (!anyNA)
-  //   out[is_na(x)] = NA_INTEGER;
-  // else{
-  //   // R cannot assing a lable to an NA factor. So we just pick the last value
-  //   // of the sort_unique values, which is the NA value. This will be replaced
-  //   // with its position in levs, which is identical to length(levs).
-  //   int lsize = levs.size();
-  //   out[is_na(x)] = lsize;
-  // }
+  IntegerVector out = match(x, y);
 
   out.attr("levels") = y.attr("names");
   out.attr("class") = "factor";
