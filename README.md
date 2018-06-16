@@ -1,20 +1,23 @@
 # Readspss [![Build Status](https://travis-ci.org/JanMarvin/readspss.svg?branch=master)](https://travis-ci.org/JanMarvin/readspss) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/JanMarvin/readspss?branch=master&svg=true)](https://ci.appveyor.com/project/JanMarvin/readspss)
 
 Experimental R package using Rcpp to parse a sav-file into a data.frame().
-It works. Testing is welcome though the package is still at a experimental
-stage and the package can crash. The current package imports everything into
-a data frame. Including long strings and labels.
+Currently `read.sav` is the main function and feature of this package.
 
-Because of the R code wrapped Rcpp-Function the package is pretty fast. Though
-since SPSS files can not be trustet (!) some tasks need to be handled in while()
-loops and vectors need to be increased on the fly (generally not the best idea).
-The R code for factor conversion slows things down a bit, changing encoding even
+It works. Testing is welcome though the package is still at an early no longer
+experimental stage stage. Its read function is extensively tested on 
+approximately 200 sav-files. It provides unit tests to make sure, that commits
+do not break previouly working things. The read.sav function imports everything
+into a data frame. Including long strings and labels.
+
+Because of the R code wrapped Rcpp-Function the package is pretty fast. The 
+R code for factor conversion slows things down a bit, changing encoding a bit
 more.
-In comparisson to `haven:read_sav` and `foreign:read.spss` this package reads a
-few more files and reads them correctly, but it is still in early stages and 
-only(tested with minimal examples).
-In addition readspss ships some additional informations like the datalabel,
-date- and timestamp.
+In comparisson to `haven::read_sav` and `foreign::read.spss` this package
+preforms pretty well. It reads a few more files than each of its predecessors.
+Focus was not so much on winning every benchmark, but reading all features of
+a sav-file provided and to be as exactly as possible. So we win some benchmarks
+and lose others. It is entirely up to the task. In addition readspss ships some
+additional informations like the datalabel, date- and timestamp.
 
 Reading of sav-files is feature complete.
 
@@ -35,21 +38,13 @@ dat <- read.sav(file)
 
 ## Test
 
-Another difference, some characters are returend as factors in foreign. 
-Currently I have no clue why. Nevertheless this appears to affect only variables
-with identical values (e.g. a variable containing the dataset name "Data" can be
-a factor in foreign and a character in readspss).
-As of today, I have no clue what this is supposed to mean, but I leave this here
-as a reminder.
-
-
 ```R
-dd <- read.sav(file, convert.factors = TRUE, use.missings = FALSE)
+fl <- system.file("extdata", "electric.sav", package="readspss")
 
-dx <- read.spss(file, to.data.frame = TRUE, use.missings = FALSE)
+df_r <- read.sav(fl)
 
-for (i in names(dd) ){
-  cat(i, ": ", all.equal(dd[i], dx[i]), "\n")
-}
+df_f <- foreign::read.spss(fl, to.data.frame = TRUE)
+
+all.equal(df_r, df_f, check.attributes = FALSE)
 ```
 
