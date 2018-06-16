@@ -463,10 +463,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
       }
 
 
-      // there can be two of this sections
-      // integer info
-      // floating point info
-      // vardispl paramenter
+      // additional information
       while (rtype==7) {
         Rcpp::checkUserInterrupt();
 
@@ -524,16 +521,15 @@ List sav(const char * filePath, const bool debug, std::string encStr,
           break;
         }
 
-        case 7:
+        case 7: // mrsets
         case 8: // my example shows some kind of program
         case 17: // variable view
         case 18:
-        case 24:// seems like xml? dataview table format
         {
           // sav.seekg(size*count);
 
           // ignore this
-          dataview = readstring(data, sav, data.size());
+          readstring(data, sav, data.size());
 
           break;
         }
@@ -590,6 +586,16 @@ List sav(const char * filePath, const bool debug, std::string encStr,
           encoding = readstring(data, sav, count);
 
           enc(0) = encoding;
+
+          break;
+        }
+
+        case 24:// seems like xml? dataview table format
+        {
+          // sav.seekg(size*count);
+
+          // ignore this
+          dataview = readstring(data, sav, data.size());
 
           break;
         }
