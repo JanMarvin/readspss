@@ -947,6 +947,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
           }
 
 
+
           // variable is read
           if (res_i == 0)
             ++kk;
@@ -966,6 +967,9 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
               break;
             }
+
+            // always check if eof is reached
+            eof = sav.eof();
 
             // reset k and res_kk
             kk = 0;
@@ -1044,9 +1048,6 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
     if (debug)
       Rprintf("-- End: Data Part \n");
-
-
-
 
     // close file
     sav.close();
