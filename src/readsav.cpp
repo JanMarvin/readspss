@@ -141,197 +141,33 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
     if(doenc) filelabel = Riconv(filelabel, encStr);
 
-    std::vector<string> varnames, vallabels;
-    std::vector<int32_t> vartype;
 
     int8_t lablen = 0;
     int32_t rtype = 0;
+
     std::string name (8, '\0');
 
     int32_t vtype=0, vlflag=0, nmiss=0, var4=0, var5 = 0, nolab = 0;
-
-
-    Rcpp::List missings = Rcpp::List();
-    Rcpp::List varlist = Rcpp::List();
-
-
-    rtype = readbin(rtype, sav, swapit);
-
-    while (rtype == 2) {
-
-      // skip 20 bytes or read 5 unks
-      vtype = readbin(vtype, sav, swapit);      // Variable type
-      vlflag = readbin(vlflag, sav, swapit);    // Label flag
-      nmiss = readbin(nmiss, sav, swapit);
-
-      // bits of int32_t define digits, width and type
-      var4 = readbin(var4, sav, swapit);
-
-      // print
-      int8_t var41, var42, var43, var44;
-
-      var41 = (int8_t)var4;
-      var42 = (var4 >> 8);
-      var43 = (var4 >> 16);
-      var44 = (var4 >> 24);
-
-      // 4 and 5 are most likely identical
-      var5 = readbin(var5, sav, swapit);
-
-      // write
-      int8_t var51, var52, var53, var54;
-
-      var51 = (int8_t)var5;
-      var52 = (var5 >> 8);
-      var53 = (var5 >> 16);
-      var54 = (var5 >> 24);
-
-
-      Rcpp::NumericMatrix varmat(1,11);
-
-      // Store vars in matrix export as attr varmat
-      varmat(0,0)  = vtype;
-      varmat(0,1)  = vlflag;
-      varmat(0,2)  = nmiss; // 1, 2, 3 or -1, -2, -3 (range)
-      varmat(0,3)  = var41; // digits print format?
-      varmat(0,4)  = var42; // field width
-      varmat(0,5)  = var43; // format type
-      varmat(0,6)  = var44; // not used
-      varmat(0,7)  = var51; // digits write format?
-      varmat(0,8)  = var52; // field width
-      varmat(0,9)  = var53; // format type
-      varmat(0,10) = var54; // not used
-
-      if (vtype > -1) // -1 is of no further useage
-        varlist.push_back(varmat);
-
-      vartype.push_back(vtype);
-
-
-      std::string nvarname (8, '\0');
-      // read variable name 8 bytes long upercase letters
-      nvarname = readstring(nvarname, sav, nvarname.size());
-
-      // trim additional whitespaces
-      nvarname = std::regex_replace(nvarname,
-                                    std::regex("^ +| +$"), "$1");
-
-      varnames.push_back(nvarname);
-
-      if(vlflag==1)
-      {
-        rtype = readbin(rtype, sav, swapit);
-
-        // Max laenge laut interwebz: 255.
-
-        int32_t origlen = rtype;
-
-        if (!(rtype%4==0))
-        {
-          for(int i=1; i<4; ++i)
-          {
-            if ((rtype+i)%4==0)
-              rtype = rtype+i;
-          }
-        }
-
-        // Rprintf("%d \n", rtype);
-        std::string vallabel (rtype, '\0');
-        vallabel = readstring(vallabel, sav, vallabel.size());
-
-
-        // trim additional whitespaces on the right
-        vallabel = std::regex_replace(vallabel,
-                                      std::regex("^ +| +$"), "$1");
-
-        vallabels.push_back(vallabel);
-
-        rtype = origlen;
-
-        // -----------------------------------------
-        //  missings
-        //
-
-        int8_t const nmisstype = std::abs(nmiss);
-
-        // SPSS knows 5 different missing types. -3, -2 are range types. 1, 2,
-        // 3 are discrete types. Range types have min range and max range. -3
-        // has an additional discrete value.
-
-
-        if (nmisstype > 0) {
-
-          // missing values
-          // Vector needs to be of size n+1, because the first value will be
-          // nmisstype followed by nmisstype values
-          Rcpp::NumericVector missing(nmisstype+1);
-          Rcpp::CharacterVector missingV(nmisstype+1);
-
-          double miss0 = 0;
-          bool noNum = false;
-
-          if (vtype != 0)
-            noNum = true;
-
-          for (int32_t i = 0; i < nmisstype; ++i) {
-
-            if (noNum) {
-              std::string mV (8, '\0');
-              mV = readstring(mV, sav, mV.size());
-
-
-              mV = std::regex_replace(mV, std::regex("^ +| +$"), "$1");
-
-              missingV(0) = nmiss;
-              missingV(i+1) = mV;
-
-            } else {
-
-              miss0 = readbin(miss0, sav, swapit);
-
-              missing(0) = nmiss;
-              missing(i+1) = miss0;
-            }
-
-          }
-
-          if (noNum)
-            missings.push_back(missingV);
-          else
-            missings.push_back(missing);
-
-        }
-      }
-
-      // while loop above ends with 999
-      // do not read another byte if 999 was already reached
-      if (rtype!=999)
-        rtype = readbin(rtype, sav, swapit);
-
-    }
-
-    if (debug)
-      Rcout << "-- end of header" << std::endl;
-
-
-    Rcpp::List Label_list, haslabel, doc;
-    Rcpp::CharacterVector enc(1);
-
-    std::vector<std::string> lvname;
-    std::vector<std::string> lstr;
-
-    std::string longstring;
-    std::string longvarname;
-    std::string encoding;
-
-
     int32_t subtyp = 0, size = 0, count = 0;
     int32_t major = 0, minor = 0, rev = 0, macode = 0;
     int32_t floatp = 0, compr = 0, endian = 0;
-    double sysmiss = 0, highest = 0, lowest = 0;
     int32_t measure = 0, width = 0, alignment = 0;
+    double sysmiss = 0, highest = 0, lowest = 0;
 
-    while((rtype!=999) & (rtype != 2))
+
+    Rcpp::List missings, varlist, Label_list, haslabel, doc;
+    Rcpp::CharacterVector enc(1);
+
+    std::vector<std::string> lvname, lstr, varnames, vallabels;
+    std::vector<int32_t> vartype;
+
+    std::string longstring, longvarname, encoding, totals, dataview;
+
+    rtype = readbin(rtype, sav, swapit);
+
+
+
+    while( rtype < 999 )
     {
       Rcpp::checkUserInterrupt();
 
@@ -345,6 +181,155 @@ List sav(const char * filePath, const bool debug, std::string encStr,
       // if second int >1 restart at double
 
       bool noNum = 0;
+
+      int32_t typeINT = 0, has_var_label = 0, n_missing_values = 0,
+        printINT = 0, writeINT = 0, lablen32 = 0;
+
+      while (rtype == 2) {
+
+        // skip 20 bytes or read 5 unks
+        vtype = readbin(vtype, sav, swapit);      // Variable type
+        vlflag = readbin(vlflag, sav, swapit);    // Label flag
+        nmiss = readbin(nmiss, sav, swapit);
+
+        // bits of int32_t define digits, width and type
+        var4 = readbin(var4, sav, swapit);
+
+        // print
+        int8_t var41, var42, var43, var44;
+
+        var41 = (int8_t)var4;
+        var42 = (var4 >> 8);
+        var43 = (var4 >> 16);
+        var44 = (var4 >> 24);
+
+        // 4 and 5 are most likely identical
+        var5 = readbin(var5, sav, swapit);
+
+        // write
+        int8_t var51, var52, var53, var54;
+
+        var51 = (int8_t)var5;
+        var52 = (var5 >> 8);
+        var53 = (var5 >> 16);
+        var54 = (var5 >> 24);
+
+
+        Rcpp::NumericMatrix varmat(1,11);
+
+        // Store vars in matrix export as attr varmat
+        varmat(0,0)  = vtype;
+        varmat(0,1)  = vlflag;
+        varmat(0,2)  = nmiss; // 1, 2, 3 or -1, -2, -3 (range)
+        varmat(0,3)  = var41; // digits print format?
+        varmat(0,4)  = var42; // field width
+        varmat(0,5)  = var43; // format type
+        varmat(0,6)  = var44; // not used
+        varmat(0,7)  = var51; // digits write format?
+        varmat(0,8)  = var52; // field width
+        varmat(0,9)  = var53; // format type
+        varmat(0,10) = var54; // not used
+
+        if (vtype > -1) // -1 is of no further useage
+          varlist.push_back(varmat);
+
+        vartype.push_back(vtype);
+
+
+        std::string nvarname (8, '\0');
+        // read variable name 8 bytes long upercase letters
+        nvarname = readstring(nvarname, sav, nvarname.size());
+
+        // trim additional whitespaces
+        nvarname = std::regex_replace(nvarname,
+                                      std::regex("^ +| +$"), "$1");
+
+        varnames.push_back(nvarname);
+
+        int32_t origlen = 0;
+        if(vlflag==1)
+        {
+          origlen = readbin(origlen, sav, swapit);
+
+          // Max laenge laut interwebz: 255.
+
+          if (!(origlen%4==0))
+          {
+            for(int i=1; i<4; ++i)
+            {
+              if ((origlen+i)%4==0)
+                origlen = origlen+i;
+            }
+          }
+
+          // Rprintf("%d \n", rtype);
+          std::string vallabel (origlen, '\0');
+          vallabel = readstring(vallabel, sav, vallabel.size());
+
+
+          // trim additional whitespaces on the right
+          vallabel = std::regex_replace(vallabel,
+                                        std::regex("^ +| +$"), "$1");
+
+          vallabels.push_back(vallabel);
+
+          // -----------------------------------------
+          //  missings
+          //
+
+          int8_t const nmisstype = std::abs(nmiss);
+
+          // SPSS knows 5 different missing types. -3, -2 are range types. 1, 2,
+          // 3 are discrete types. Range types have min range and max range. -3
+          // has an additional discrete value.
+
+
+          if (nmisstype > 0) {
+
+            // missing values
+            // Vector needs to be of size n+1, because the first value will be
+            // nmisstype followed by nmisstype values
+            Rcpp::NumericVector missing(nmisstype+1);
+            Rcpp::CharacterVector missingV(nmisstype+1);
+
+            double miss0 = 0;
+            bool noNum = false;
+
+            if (vtype != 0)
+              noNum = true;
+
+            for (int32_t i = 0; i < nmisstype; ++i) {
+
+              if (noNum) {
+                std::string mV (8, '\0');
+                mV = readstring(mV, sav, mV.size());
+
+
+                mV = std::regex_replace(mV, std::regex("^ +| +$"), "$1");
+
+                missingV(0) = nmiss;
+                missingV(i+1) = mV;
+
+              } else {
+
+                miss0 = readbin(miss0, sav, swapit);
+
+                missing(0) = nmiss;
+                missing(i+1) = miss0;
+              }
+
+            }
+
+            if (noNum)
+              missings.push_back(missingV);
+            else
+              missings.push_back(missing);
+
+          }
+        }
+
+        break;
+      }
 
       while (rtype == 3) {
 
@@ -415,7 +400,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
           Label_list.push_back(code);
         }
 
-        rtype = readbin(rtype, sav, swapit);
+        break;
       }
 
       // label 4:
@@ -440,7 +425,8 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
         }
         haslabel.push_back(haslab);
-        rtype = readbin(rtype, sav, swapit);
+
+        break;
       }
 
       while (rtype==6)
@@ -448,24 +434,32 @@ List sav(const char * filePath, const bool debug, std::string encStr,
         Rcpp::checkUserInterrupt();
 
         int32_t nlines = 0; // number of lines
+
+        nlines = readbin(nlines, sav, swapit);
+
+
         Rcpp::CharacterVector Document(nlines);
         std::string document (80, '\0');
 
         // Rcout << " --- Documentation --- " << std::endl;
         for (int i = 0; i < nlines; ++i)
         {
-          document = readstring(document, sav, document.size());
+          std::string docline = readstring(document, sav, document.size());
 
-          if(doenc) document = Riconv(document, encStr);
+          if(doenc) docline = Riconv(docline, encStr);
 
-          Document(i) = document;
+          // trim additional whitespaces to the right
+          docline = std::regex_replace(docline,
+                                        std::regex(" +$"), "$1");
+
+          Document(i) = docline;
 
         }
 
         doc.push_back( Document );
 
-        rtype = readbin(rtype, sav, swapit);
 
+        break;
       }
 
 
@@ -522,6 +516,14 @@ List sav(const char * filePath, const bool debug, std::string encStr,
           break;
         }
 
+        case 5:
+        {
+          // totals?
+          totals = readstring(data, sav, data.size());
+
+          break;
+        }
+
         case 7:
         case 8: // my example shows some kind of program
         case 17: // variable view
@@ -531,7 +533,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
           // sav.seekg(size*count);
 
           // ignore this
-          readstring(data, sav, data.size());
+          dataview = readstring(data, sav, data.size());
 
           break;
         }
@@ -605,12 +607,16 @@ List sav(const char * filePath, const bool debug, std::string encStr,
         }
         }
 
-
-        rtype = readbin(rtype, sav, swapit);
-
+        break;
       }
 
+      rtype = readbin(rtype, sav, swapit);
+
     }
+
+
+    if (debug)
+      Rcout << "-- end of header" << std::endl;
 
     // encStr should not be empty otherwise
     // the iconv call would be useless
@@ -769,140 +775,110 @@ List sav(const char * filePath, const bool debug, std::string encStr,
           {
 
           case 0:
-            {
-              break;
-              // ignored
-            }
+          {
+            break;
+            // ignored
+          }
 
           default: // (val_b >= 1 & val_b <= 251) {
-            {
+          {
 
-              switch(type)
-            {
+            switch(type)
+          {
 
-            case 0:
-            {
-              REAL(VECTOR_ELT(df,kk))[nn] = val_b - 100;
-              break;
+          case 0:
+          {
+            REAL(VECTOR_ELT(df,kk))[nn] = val_b - 100;
+            break;
+          }
+
+          default:
+          {
+
+            if (len==-1 || (len !=0 && len !=8) )
+              len = 8;
+
+            // beginning of a new string
+            std::string val_s (len, '\0');
+            val_s = readstring(val_s, sav, val_s.size());
+            start.append( val_s );
+
+            // if res_i == res_kk the full string was read and
+            // can be written else continue the string
+            if (res_i == res_kk-1) {
+
+              // trim additional whitespaces to the right
+              start = std::regex_replace(start,
+                                         std::regex(" +$"), "$1");
+
+
+              if(doenc) start = Riconv(start, encStr);
+              as<CharacterVector>(df[kk])[nn] = start;
+
+              // string completly written, reset start and res_i
+              // and switch to next cell
+              start = "";
+              res_i = 0;
+            } else {
+              // string will be continued
+              ++res_i;
             }
 
-            default:
-            {
+            break;
+          }
 
-              if (len==-1 || (len !=0 && len !=8) )
-                len = 8;
+          }
 
-              // beginning of a new string
-              std::string val_s (len, '\0');
-              val_s = readstring(val_s, sav, val_s.size());
-              start.append( val_s );
-
-              // if res_i == res_kk the full string was read and
-              // can be written else continue the string
-              if (res_i == res_kk-1) {
-
-                // trim additional whitespaces to the right
-                start = std::regex_replace(start,
-                                           std::regex(" +$"), "$1");
-
-
-                if(doenc) start = Riconv(start, encStr);
-                as<CharacterVector>(df[kk])[nn] = start;
-
-                // string completly written, reset start and res_i
-                // and switch to next cell
-                start = "";
-                res_i = 0;
-              } else {
-                // string will be continued
-                ++res_i;
-              }
-
-              break;
-            }
-
-            }
-
-              break;
-            }
+            break;
+          }
 
           case 252:
-            {
-              // 252 should be end of file, but as many things
-              // it is not required to be inside the file
-              eof = true;
-              break;
-            }
+          {
+            // 252 should be end of file, but as many things
+            // it is not required to be inside the file
+            eof = true;
+            break;
+          }
 
           case  253:
-            {
-              //           Rcpp::Rcout << "## Debug ... 253" << std::endl;
-              //           Rprintf("nn %d & kk %d \n", nn, kk);
-              switch(type)
-            {
+          {
+            //           Rcpp::Rcout << "## Debug ... 253" << std::endl;
+            //           Rprintf("nn %d & kk %d \n", nn, kk);
+            switch(type)
+          {
 
-            case 0:
-            {
-              val_d = readbin(val_d, sav, swapit);
-              REAL(VECTOR_ELT(df,kk))[nn] = val_d;
-              // Rprintf("%f \n", val_d);
-              break;
-            }
+          case 0:
+          {
+            val_d = readbin(val_d, sav, swapit);
+            REAL(VECTOR_ELT(df,kk))[nn] = val_d;
+            // Rprintf("%f \n", val_d);
+            break;
+          }
 
-            default:
-            {
+          default:
+          {
 
-              // spss length 1:251 indicate a string. the value is the string
-              // size. obvious spss uses the size to determine the size of the
-              // string. there are two possible problems.
-              // 1. len can be 1:7 in this case we know the max string size of the
-              // variable is less than 8 bit long. still the field to read is 8 bit
-              // long.
-              // 2. the string is spread across different internal strings. in this
-              // case we know the max size, still have to read each 8bit field.
-              // maybe the max size can be used to have a second opinion wheather
-              // or not a field contains a numeric or character. Following fields
-              // have len -1.
+            // spss length 1:251 indicate a string. the value is the string
+            // size. obvious spss uses the size to determine the size of the
+            // string. there are two possible problems.
+            // 1. len can be 1:7 in this case we know the max string size of the
+            // variable is less than 8 bit long. still the field to read is 8 bit
+            // long.
+            // 2. the string is spread across different internal strings. in this
+            // case we know the max size, still have to read each 8bit field.
+            // maybe the max size can be used to have a second opinion wheather
+            // or not a field contains a numeric or character. Following fields
+            // have len -1.
 
-              if (len==-1 || (len !=0 && len !=8) )
-                len = 8;
+            if (len==-1 || (len !=0 && len !=8) )
+              len = 8;
 
-              std::string val_s (len, '\0');
-              val_s = readstring(val_s, sav, val_s.size());
-              start.append( val_s );
-
-
-              if (res_i == res_kk-1) {
-
-                // trim additional whitespaces to the right
-                start = std::regex_replace(start,
-                                           std::regex(" +$"), "$1");
-
-                if(doenc) start = Riconv(start, encStr);
-                as<CharacterVector>(df[kk])[nn] = start;
-
-                // reset
-                start = "";
-                res_i = 0;
-              } else {
-                ++res_i;
-              }
+            std::string val_s (len, '\0');
+            val_s = readstring(val_s, sav, val_s.size());
+            start.append( val_s );
 
 
-              break;
-            }
-
-            }
-
-              break;
-            }
-
-          case 254:
-            {
-              // 254 indicates that string chunks read before should be
-              // interpreted as a single string.
-
-              if (res_i == res_kk-1) {
+            if (res_i == res_kk-1) {
 
               // trim additional whitespaces to the right
               start = std::regex_replace(start,
@@ -911,39 +887,69 @@ List sav(const char * filePath, const bool debug, std::string encStr,
               if(doenc) start = Riconv(start, encStr);
               as<CharacterVector>(df[kk])[nn] = start;
 
-              // reset start
+              // reset
               start = "";
               res_i = 0;
             } else {
-              start.append("        ");
               ++res_i;
             }
 
+
             break;
-            }
+          }
+
+          }
+
+            break;
+          }
+
+          case 254:
+          {
+            // 254 indicates that string chunks read before should be
+            // interpreted as a single string.
+
+            if (res_i == res_kk-1) {
+
+            // trim additional whitespaces to the right
+            start = std::regex_replace(start,
+                                       std::regex(" +$"), "$1");
+
+            if(doenc) start = Riconv(start, encStr);
+            as<CharacterVector>(df[kk])[nn] = start;
+
+            // reset start
+            start = "";
+            res_i = 0;
+          } else {
+            start.append("        ");
+            ++res_i;
+          }
+
+          break;
+          }
 
           case 255:
-            {
-              // 255 is a missing value in spss files.
-              //
-              switch(type)
-            {
+          {
+            // 255 is a missing value in spss files.
+            //
+            switch(type)
+          {
 
-            case 0:
-            {
-              // Rcout << NA_REAL << std::endl;
-              REAL(VECTOR_ELT(df,kk))[nn] = NA_REAL;
-              break;
-            }
-            default:
-            {
-              as<CharacterVector>(df[kk])[nn] = NA_STRING;
-              break;
-            }
-              break;
-            }
+          case 0:
+          {
+            // Rcout << NA_REAL << std::endl;
+            REAL(VECTOR_ELT(df,kk))[nn] = NA_REAL;
+            break;
+          }
+          default:
+          {
+            as<CharacterVector>(df[kk])[nn] = NA_STRING;
+            break;
+          }
+            break;
+          }
 
-            }
+          }
           }
 
 
@@ -1079,6 +1085,8 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     df.attr("doenc") = doenc;
     df.attr("autoenc") = autoenc;
     df.attr("swapit") = swapit;
+    df.attr("totals") = totals;
+    df.attr("dataview") = dataview;
 
 
 
