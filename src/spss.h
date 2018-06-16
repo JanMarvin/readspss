@@ -5,6 +5,7 @@
 #include <Rcpp.h>
 #include <fstream>
 #include <string>
+#include "swap_endian.h"
 
 template <typename T>
 T readbin( T t , std::istream& sav, bool swapit)
@@ -14,7 +15,7 @@ T readbin( T t , std::istream& sav, bool swapit)
   if (swapit==0)
     return(t);
   else
-    return(t);
+    return(swap_endian(t));
 }
 
 

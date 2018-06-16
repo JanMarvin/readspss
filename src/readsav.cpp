@@ -49,7 +49,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     bool is_spss = false, swapit = false, autoenc = false;
 
     int32_t n = 0, k = 0;
-    int32_t charcode = 0;
+    int32_t charcode = 0, arch = 0;
 
     std::string na = "NA", empty = "";
 
@@ -89,10 +89,10 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     if (debug)
       Rcout << "Datalabel:" << datalabel << std::endl;
 
-    int arch=0; // file format? should be 2
+    // file format? should be 2 or 3
     arch = readbin(arch, sav, swapit);
 
-    if (arch != 2 || arch != 3)
+    if ((arch <2) & (arch > 3))
       swapit = true;
 
     k = readbin(k, sav, swapit);
@@ -1078,6 +1078,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     df.attr("ownEnc") = ownEnc;
     df.attr("doenc") = doenc;
     df.attr("autoenc") = autoenc;
+    df.attr("swapit") = swapit;
 
 
 
