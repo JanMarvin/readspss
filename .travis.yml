@@ -5,6 +5,8 @@ language: r
 
 matrix:
   include:
+    - os: linux
+      r: devel
       addons:
         apt:
           sources:
@@ -13,11 +15,26 @@ matrix:
             - g++-7
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
-
-r:
-  - oldrel
-  - release
-  - devel
+    - os: linux
+      r: release
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+    - os: linux
+      r: oldrel
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 
 sudo: false
 cache: packages
