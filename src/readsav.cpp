@@ -158,10 +158,12 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     double sysmiss = 0, highest = 0, lowest = 0;
 
 
-    Rcpp::List missings, varlist, Label_list, haslabel, doc, longmlist;
+    Rcpp::List missings, varlist, Label_list, haslabel, doc,
+    longmlist, longllist;
     Rcpp::CharacterVector enc(1), longmissing;
 
-    std::vector<std::string> lvname, lstr, varnames, vallabels, longmissvn;
+    std::vector<std::string> lvname, lstr, varnames, vallabels,
+    longmissvn, longlabvn;
     std::vector<int32_t> vartype;
 
     std::string longstring, longvarname, encoding, totals, dataview;
@@ -608,6 +610,52 @@ List sav(const char * filePath, const bool debug, std::string encStr,
           encoding = readstring(data, sav, count);
 
           enc(0) = encoding;
+
+          break;
+        }
+
+        case 21:
+        {
+          len = readbin(len, sav, swapit);
+          std::string vn (len, '\0');
+
+          vn = readstring(vn, sav, len);
+
+          int32_t varw = 0, nvars = 0;
+          varw = readbin(varw, sav, swapit);
+          nvars = readbin(nvars, sav, swapit);
+
+          // set size
+          CharacterVector longv(nvars);
+          CharacterVector longl(nvars);
+
+          for (int8_t i = 0; i<nvars; ++i){
+
+            int32_t len1 = 0, len2 = 0;
+
+            len1 = readbin(len1, sav, swapit);
+            std::string val (len1, '\0');
+            val = readstring(val, sav, len1);
+
+            val = std::regex_replace(val, std::regex(" +$"), "$1");
+
+
+            len2 = readbin(len2, sav, swapit);
+            std::string lab (len2, '\0');
+            lab = readstring(lab, sav, len2);
+
+            // Rcout << val << " : "<< lab << std::endl;
+
+            longv(i) = val;
+            longl(i) = lab;
+          }
+
+          longv.attr("names") = longl;
+
+          longlabvn.push_back(vn);
+          longllist.push_back(longv);
+
+          longllist.attr("names") = longlabvn;
 
           break;
         }
@@ -1137,6 +1185,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     df.attr("longstring") = lstr;
     df.attr("longvarname") = lvname;
     df.attr("longmissing") = longmlist;
+    df.attr("longlabel") = longllist;
     df.attr("cflag") = cflag;
     df.attr("res") = res;
     df.attr("endian") = endian;

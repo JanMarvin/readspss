@@ -239,9 +239,9 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
         # get unique values / omit NA unless NA already in labtable
         if (anyNA) {
-          varunique <- unique(data[,varname])
+          varunique <- unique(data[[varname]])
         } else {
-          varunique <- na.omit(unique(data[,varname]))
+          varunique <- na.omit(unique(data[[varname]]))
         }
 
         if (isNum & all(is.na(labtable))) {
@@ -252,7 +252,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
         # assign label if label set is complete
         if (all(varunique %in% labtable)) {
-          data[, varname] <- fast_factor(data[, varname], y=labtable)
+          data[[varname]] <- fast_factor(data[[varname]], y=labtable)
 
           # else generate labels from codes
         } else {
@@ -270,7 +270,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
               names(gen.lab) <- nam
             }
 
-            data[, varname] <- fast_factor(data[, varname], y = gen.lab)
+            data[[varname]] <- fast_factor(data[[varname]], y = gen.lab)
           } else {
             warning(
               paste(
@@ -292,12 +292,12 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
     if (any(isdate)) {
       for (nam in nams[isdate]) {
-        data[,nam] <- as.Date(as.POSIXct(data[,nam], origin="1582-10-14"))
+        data[[nam]] <- as.Date(as.POSIXct(data[[nam]], origin="1582-10-14"))
       }
     }
     if (any(istime)) {
       for (nam in nams[istime]) {
-        data[,nam] <- as.POSIXct(data[,nam], origin="1582-10-14")
+        data[[nam]] <- as.POSIXct(data[[nam]], origin="1582-10-14")
       }
     }
 
@@ -419,6 +419,53 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   }
 
+  longlabel <- attribs$longlabel
+
+  if (convert.factors & !identical(longlabel, list())) {
+
+    longlabnames  <- names(longlabel)
+
+    for (i in seq_along(longlabel)) {
+
+      longlabname <- longlabnames[[i]]
+      labtable    <- longlabel[[longlabname]]
+
+      anyNA   <- any(is.na(labtable))
+
+      # get unique values / omit NA unless NA already in labtable
+      if (anyNA) {
+        varunique <- unique(data[[longlabname]])
+      } else {
+        varunique <- na.omit(unique(data[[longlabname]]))
+      }
+
+      # assign label if label set is complete
+      if (all(varunique %in% labtable)) {
+        data[[longlabname]] <- fast_factor(data[[longlabname]], y=labtable)
+
+        # else generate labels from codes
+      } else {
+        if (generate.factors) {
+
+          names(varunique) <- as.character(varunique)
+
+          gen.lab  <-
+            sort(c(varunique[!varunique %in% labtable], labtable),
+                 na.last = TRUE)
+
+          data[[longlabname]] <- fast_factor(data[[longlabname]], y = gen.lab)
+        } else {
+          warning(
+            paste(
+              names(data)[i], "Missing factor labels - no labels assigned.
+              Set option generate.factors=T to generate labels."
+            )
+            )
+        }
+        }
+      }
+    }
+
   # prepare for return
   attr(data, "datalabel") <- attribs$datalabel
   attr(data, "datestamp") <- attribs$datestamp
@@ -427,6 +474,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   attr(data, "varmatrix") <- varmat
   attr(data, "var.label") <- val.labels
+  attr(data, "longlabel") <- attribs$longlabel
   attr(data, "missings")  <- attribs$missings
   attr(data, "lmissing")  <- attribs$longmissing
   attr(data, "endian")    <- attribs$endian
