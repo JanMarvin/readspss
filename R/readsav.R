@@ -291,18 +291,18 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
     nams   <- names(data)
     isdate <- varmat[,6] %in% c(20,23,24,38,39)
-    istime <- varmat[,6] %in% c(21,22,25)
+    # istime <- varmat[,6] %in% c(21,22,25)
 
     if (any(isdate)) {
       for (nam in nams[isdate]) {
         data[[nam]] <- as.Date(as.POSIXct(data[[nam]], origin="1582-10-14"))
       }
     }
-    if (any(istime)) {
-      for (nam in nams[istime]) {
-        data[[nam]] <- as.POSIXct(data[[nam]], origin="1582-10-14")
-      }
-    }
+    # if (any(istime)) {
+    #   for (nam in nams[istime]) {
+    #     data[[nam]] <- as.POSIXlt(data[[nam]], origin="1582-10-14")
+    #   }
+    # }
 
   }
 
