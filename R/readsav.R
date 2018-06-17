@@ -134,7 +134,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   vartypes   <- attribs$vartypes
   varmat     <- do.call("rbind", attribs$varmat)
   disppar    <- attribs$disppar
-  if (!is.null(disppar))
+  if (!identical(disppar, integer(0)))
     disppar    <- matrix(disppar, nrow = ncol(data), byrow = TRUE)
 
 
