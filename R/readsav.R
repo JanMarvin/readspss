@@ -293,7 +293,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
       }
     }
     if (any(istime)) {
-      for (nam in nams[isdate]) {
+      for (nam in nams[istime]) {
         data[,nam] <- as.POSIXct(data[,nam], origin="1582-10-14")
       }
     }
