@@ -154,7 +154,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     int32_t subtyp = 0, size = 0, count = 0;
     int32_t major = 0, minor = 0, rev = 0, macode = 0;
     int32_t floatp = 0, compr = 0, endian = 0;
-    int32_t measure = 0, width = 0, alignment = 0;
+    int32_t measure = 0;
     double sysmiss = 0, highest = 0, lowest = 0;
 
 
@@ -570,15 +570,6 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
         case 11:
         {
-
-          // pspp tells this is the default
-          div = 2;
-
-          // calculate kkv later called kv number of cases
-          int32_t kkv = count_if(vartype.begin(),vartype.end(), IsGreaterZero);
-
-          if( count == kkv * 3 )
-            div = 3;
 
           for (int32_t i = 0; i < count; ++i) {
             measure = readbin(measure, sav, swapit);
@@ -1221,7 +1212,6 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     df.attr("totals") = totals;
     df.attr("dataview") = dataview;
     df.attr("extraproduct") = extraproduct;
-
 
 
     return(df);
