@@ -84,7 +84,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     datalabel = std::regex_replace(datalabel,
                                    std::regex("^ +| +$"), "$1");
 
-    if(doenc) datalabel = Riconv(datalabel, encStr);
+    if (doenc) datalabel = Riconv(datalabel, encStr);
 
     if (debug)
       Rcout << "Datalabel:" << datalabel << std::endl;
@@ -142,7 +142,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     filelabel = std::regex_replace(filelabel,
                                    std::regex("^ +| +$"), "$1");
 
-    if(doenc) filelabel = Riconv(filelabel, encStr);
+    if (doenc) filelabel = Riconv(filelabel, encStr);
 
 
     int8_t lablen = 0, div = 0;
@@ -160,7 +160,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
     Rcpp::List missings, varlist, Label_list, haslabel, doc,
     longmlist, longllist;
-    Rcpp::CharacterVector enc(1), longmissing;
+    Rcpp::CharacterVector longmissing;
 
     std::vector<std::string> lvname, lstr, varnames, vallabels,
     longmissvn, longlabvn;
@@ -255,31 +255,13 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
         varnames.push_back(nvarname);
 
-        if (debug) {
-          Rcout << nvarname << std::endl;
-          Rprintf("vflag %d\n", vlflag);
-          Rprintf("nmiss %d\n", nmiss);
-          Rprintf("var41 %d\n", var41);
-          Rprintf("var42 %d\n", var42);
-          Rprintf("var43 %d\n", var43);
-          Rprintf("var44 %d\n", var44);
-        }
-
         int32_t origlen = 0;
-        if(vlflag==1)
+        if (vlflag==1)
         {
           origlen = readbin(origlen, sav, swapit);
 
           // Max laenge laut interwebz: 255.
-
-          if (!(origlen%4==0))
-          {
-            for(int i=1; i<4; ++i)
-            {
-              if ((origlen+i)%4==0)
-                origlen = origlen + i;
-            }
-          }
+          origlen = ceil((double)origlen/4) * 4;
 
           std::string vallabel (origlen, '\0');
           vallabel = readstring(vallabel, sav, vallabel.size());
@@ -378,12 +360,12 @@ List sav(const char * filePath, const bool debug, std::string encStr,
             !std::regex_search(cV, std::regex("@$"));
 
             // if its a double, do a memcpy, else trim whitespaces
-            if( noNum ) {
-              if(doenc) cV = Riconv(cV, encStr);
+            if ( noNum ) {
+              if (doenc) cV = Riconv(cV, encStr);
               cV = std::regex_replace(cV, std::regex("^ +| +$"), "$1");
 
               // return something so that we can later create a factor
-              if(cV.compare(empty) != 0)
+              if (cV.compare(empty) != 0)
                 codeV(i) = cV;
 
             } else {
@@ -409,7 +391,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
             lab = readstring(lab, sav, lab.size());
             lab = std::regex_replace(lab, std::regex("^ +| +$"), "$1");
 
-            if(doenc) lab = Riconv(lab, encStr);
+            if (doenc) lab = Riconv(lab, encStr);
 
             label(i) = lab;
         }
@@ -470,7 +452,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
         {
           std::string docline = readstring(document, sav, document.size());
 
-          if(doenc) docline = Riconv(docline, encStr);
+          if (doenc) docline = Riconv(docline, encStr);
 
           // trim additional whitespaces to the right
           docline = std::regex_replace(docline,
@@ -546,10 +528,12 @@ List sav(const char * filePath, const bool debug, std::string encStr,
           break;
         }
 
-        case 7: // mrsets
+        // case 6: // date info
+        case 7: // PSPP : mrsets
         case 8: // my example shows some kind of program
-        case 17: // variable view
-        case 18:
+        // case 12: // PSPP : UUID spotted twice only
+        case 17: // PSPP : data file attribute
+        case 18: // PSPP : variable attribute
         {
           // sav.seekg(size*count);
 
@@ -618,8 +602,6 @@ List sav(const char * filePath, const bool debug, std::string encStr,
         case 20:
         {
           encoding = readstring(data, sav, count);
-
-          enc(0) = encoding;
 
           break;
         }
@@ -762,7 +744,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
     // Data Part -------------------------------------------------------------//
 
-    if(rtype != 999)
+    if (rtype != 999)
       Rcpp::stop("Expected data part. Somethings wrong in this file.");
 
     // c++ vector to Rcpp Vector
@@ -933,7 +915,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
                                          std::regex(" +$"), "$1");
 
 
-              if(doenc) start = Riconv(start, encStr);
+              if (doenc) start = Riconv(start, encStr);
               as<CharacterVector>(df[kk])[nn] = start;
 
               // string completly written, reset start and res_i
@@ -1005,7 +987,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
               start = std::regex_replace(start,
                                          std::regex(" +$"), "$1");
 
-              if(doenc) start = Riconv(start, encStr);
+              if (doenc) start = Riconv(start, encStr);
               as<CharacterVector>(df[kk])[nn] = start;
 
               // reset
@@ -1035,7 +1017,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
             start = std::regex_replace(start,
                                        std::regex(" +$"), "$1");
 
-            if(doenc) start = Riconv(start, encStr);
+            if (doenc) start = Riconv(start, encStr);
             as<CharacterVector>(df[kk])[nn] = start;
 
             // reset start
@@ -1145,7 +1127,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
           val_s = std::regex_replace(val_s,
                                      std::regex("^ +| +$"), "$1");
 
-          if(doenc) val_s = Riconv(val_s, encStr);
+          if (doenc) val_s = Riconv(val_s, encStr);
 
           // Rcpp::Rcout << val_s << std::endl;
           as<CharacterVector>(df[kk])[nn] = val_s;
@@ -1203,7 +1185,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     df.attr("compression") = compr;
     df.attr("doc") = doc;
     df.attr("charcode") = charcode;
-    df.attr("encoding") = enc;
+    df.attr("encoding") = encoding;
     df.attr("encStr") = encStr;
     df.attr("ownEnc") = ownEnc;
     df.attr("doenc") = doenc;
