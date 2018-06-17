@@ -158,10 +158,10 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     double sysmiss = 0, highest = 0, lowest = 0;
 
 
-    Rcpp::List missings, varlist, Label_list, haslabel, doc;
-    Rcpp::CharacterVector enc(1);
+    Rcpp::List missings, varlist, Label_list, haslabel, doc, longmlist;
+    Rcpp::CharacterVector enc(1), longmissing;
 
-    std::vector<std::string> lvname, lstr, varnames, vallabels;
+    std::vector<std::string> lvname, lstr, varnames, vallabels, longmissvn;
     std::vector<int32_t> vartype;
 
     std::string longstring, longvarname, encoding, totals, dataview;
@@ -188,7 +188,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
       bool noNum = 0;
 
       int32_t typeINT = 0, has_var_label = 0, n_missing_values = 0,
-        printINT = 0, writeINT = 0, lablen32 = 0;
+        printINT = 0, writeINT = 0, lablen32 = 0, len = 0;
 
       while (rtype == 2)
       {
@@ -608,6 +608,38 @@ List sav(const char * filePath, const bool debug, std::string encStr,
           encoding = readstring(data, sav, count);
 
           enc(0) = encoding;
+
+          break;
+        }
+
+        case 22:
+        {
+          len = readbin(len, sav, swapit);
+          std::string vn (len, '\0');
+
+          vn = readstring(vn, sav, len);
+
+          int8_t mv = 0;
+          mv = readbin(mv, sav, swapit);
+          len = readbin(len, sav, swapit);
+
+          // set size
+          CharacterVector longmissing(mv);
+
+          for (int8_t i = 0; i<mv; ++i){
+            std::string mnV (len, '\0');
+
+            mnV = readstring(mnV, sav, len);
+            mnV = std::regex_replace(mnV, std::regex(" +$"), "$1");
+
+            longmissing(i) = mnV;
+          }
+
+          longmissvn.push_back(vn);
+          longmlist.push_back(longmissing);
+
+          longmlist.attr("names") = longmissvn;
+
 
           break;
         }
@@ -1104,6 +1136,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     df.attr("haslabel") = haslabel;
     df.attr("longstring") = lstr;
     df.attr("longvarname") = lvname;
+    df.attr("longmissing") = longmlist;
     df.attr("cflag") = cflag;
     df.attr("res") = res;
     df.attr("endian") = endian;

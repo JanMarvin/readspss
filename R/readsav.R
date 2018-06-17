@@ -137,64 +137,67 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   # convert NAs by missing information provided by SPSS.
   # these are just different missing values in Stata and NA in R.
-  if (use.missings & !identical(attribs$missings, list())) {
-    mvtab <- attribs$missings
-    missinfo <- varmat[,3]
-    missinfo <- which(missinfo %in% missinfo[missinfo != 0])
+  if (use.missings) {
+    if (!identical(attribs$missings, list())) {
+
+      mvtab <- attribs$missings
+      missinfo <- varmat[,3]
+      missinfo <- which(missinfo %in% missinfo[missinfo != 0])
 
 
-    for (i in seq_along(mvtab)) {
-      mvtabi <- mvtab[[i]]
-      missinf <- missinfo[i]
+      for (i in seq_along(mvtab)) {
+        mvtabi <- mvtab[[i]]
+        missinf <- missinfo[i]
 
-      if (mvtabi[1] == 1) {
-        naval <- mvtabi[2]
-        # print(naval)
+        if (mvtabi[1] == 1) {
+          naval <- mvtabi[2]
+          # print(naval)
 
-        data[missinf][data[missinf] == naval] <- NA
-      }
+          data[missinf][data[missinf] == naval] <- NA
+        }
 
-      if (mvtabi[1] == 2) {
-        naval1 <- mvtabi[2]
-        naval2 <- mvtabi[3]
-        # print(naval)
+        if (mvtabi[1] == 2) {
+          naval1 <- mvtabi[2]
+          naval2 <- mvtabi[3]
+          # print(naval)
 
-        data[missinf][data[missinf] == naval1 |
-                        data[missinf] == naval2] <- NA
-      }
+          data[missinf][data[missinf] == naval1 |
+                          data[missinf] == naval2] <- NA
+        }
 
-      if (mvtabi[1] == 3) {
-        naval1 <- mvtabi[2]
-        naval2 <- mvtabi[3]
-        naval3 <- mvtabi[4]
-        # print(naval)
+        if (mvtabi[1] == 3) {
+          naval1 <- mvtabi[2]
+          naval2 <- mvtabi[3]
+          naval3 <- mvtabi[4]
+          # print(naval)
 
-        data[missinf][data[missinf] == naval1 |
-                        data[missinf] == naval2 | data[missinf] == naval3] <- NA
-      }
+          data[missinf][data[missinf] == naval1 |
+                          data[missinf] == naval2 | data[missinf] == naval3] <- NA
+        }
 
 
-      if (mvtabi[1] == -2) {
-        # range
+        if (mvtabi[1] == -2) {
+          # range
 
-        minval <- mvtabi[2]
-        maxval <- mvtabi[3]
+          minval <- mvtabi[2]
+          maxval <- mvtabi[3]
 
-        data[missinf][data[missinf] >= minval &
-                        data[missinf] <= maxval] <- NA
+          data[missinf][data[missinf] >= minval &
+                          data[missinf] <= maxval] <- NA
 
-      }
+        }
 
-      if (mvtabi[1] == -3) {
-        # range + descrete
+        if (mvtabi[1] == -3) {
+          # range + descrete
 
-        minval <- mvtabi[2]
-        maxval <- mvtabi[3]
-        naval  <- mvtabi[4]
+          minval <- mvtabi[2]
+          maxval <- mvtabi[3]
+          naval  <- mvtabi[4]
 
-        data[missinf][(data[missinf] >= minval &
-                         data[missinf] <= maxval) | data[missinf] == naval] <- NA
+          data[missinf][(data[missinf] >= minval &
+                           data[missinf] <= maxval) | data[missinf] == naval] <- NA
 
+        }
       }
     }
 
@@ -279,7 +282,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
           }
         }
       }
-  }
+    }
 
   if (convert.dates) {
 
@@ -395,22 +398,43 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   }
 
+  # again here, because longvarnames has been set and longmissing refers to
+  # longvarnames. previous use.missings refered to varmat using default
+  # varnames
+  if (use.missings) {
+
+    longmiss <- attribs$longmissing
+
+    if ( !identical(longmiss, list()) ) {
+
+      mvars <- names(longmiss)
+
+      for (mvar in mvars) {
+
+        ismiss <- data[[mvar]] %in% longmiss[[mvar]]
+
+        data[[mvar]][ismiss] <- NA
+      }
+    }
+
+  }
 
   # prepare for return
   attr(data, "datalabel") <- attribs$datalabel
   attr(data, "datestamp") <- attribs$datestamp
   attr(data, "timestamp") <- attribs$timestamp
-  attr(data, "label") <- label
+  attr(data, "label")     <- label
 
   attr(data, "varmatrix") <- varmat
-  attr(data, "variable.label") <- val.labels
+  attr(data, "var.label") <- val.labels
   attr(data, "missings")  <- attribs$missings
-  attr(data, "endian") <- attribs$endian
-  attr(data, "cflag") <- attribs$cflag
-  attr(data, "encStr") <- attribs$encStr
-  attr(data, "ownEnc") <- attribs$ownEnc
-  attr(data, "autoenc") <- attribs$autoenc
-  attr(data, "doenc") <- attribs$doenc
+  attr(data, "lmissing")  <- attribs$longmissing
+  attr(data, "endian")    <- attribs$endian
+  attr(data, "cflag")     <- attribs$cflag
+  attr(data, "encStr")    <- attribs$encStr
+  attr(data, "ownEnc")    <- attribs$ownEnc
+  attr(data, "autoenc")   <- attribs$autoenc
+  attr(data, "doenc")     <- attribs$doenc
 
 
   # return
