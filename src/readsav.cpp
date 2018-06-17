@@ -145,7 +145,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     if(doenc) filelabel = Riconv(filelabel, encStr);
 
 
-    int8_t lablen = 0;
+    int8_t lablen = 0, div = 0;
     int32_t rtype = 0;
 
     std::string name (8, '\0');
@@ -164,9 +164,10 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
     std::vector<std::string> lvname, lstr, varnames, vallabels,
     longmissvn, longlabvn;
-    std::vector<int32_t> vartype;
+    std::vector<int32_t> vartype, disppar;
 
-    std::string longstring, longvarname, encoding, totals, dataview;
+    std::string longstring, longvarname, encoding, totals,
+    dataview, extraproduct;
 
     rtype = readbin(rtype, sav, swapit);
 
@@ -558,14 +559,32 @@ List sav(const char * filePath, const bool debug, std::string encStr,
           break;
         }
 
+        case 10:
+        {
+
+          extraproduct = readstring(data, sav, count);
+
+          break;
+        }
+
+
         case 11:
         {
 
-          for (int i=0; i < count/3; ++i) {
-          measure = readbin(measure, sav, swapit);     // 1/nom 2/Ord 3/Metr
-          width = readbin(width, sav, swapit);         // width
-          alignment = readbin(alignment, sav, swapit); // alignment
-        }
+          // pspp tells this is the default
+          div = 2;
+
+          // calculate kkv later called kv number of cases
+          int32_t kkv = count_if(vartype.begin(),vartype.end(), IsGreaterZero);
+
+          if( count == kkv * 3 )
+            div = 3;
+
+          for (int32_t i = 0; i < count; ++i) {
+            measure = readbin(measure, sav, swapit);
+
+            disppar.push_back(measure);
+          }
 
           break;
         }
@@ -1179,6 +1198,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     df.attr("vartypes") = Vartype;
     df.attr("vtype") = vtyp;
     df.attr("varmat") = varlist;
+    df.attr("disppar") = disppar;
     df.attr("missings") = missings;
     df.attr("label") = Label_list;
     df.attr("haslabel") = haslabel;
@@ -1200,6 +1220,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     df.attr("swapit") = swapit;
     df.attr("totals") = totals;
     df.attr("dataview") = dataview;
+    df.attr("extraproduct") = extraproduct;
 
 
 

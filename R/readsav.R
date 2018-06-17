@@ -133,6 +133,9 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   val.labels <- attribs$vallabels
   vartypes   <- attribs$vartypes
   varmat     <- do.call("rbind", attribs$varmat)
+  disppar    <- attribs$disppar
+  if (!is.null(disppar))
+    disppar    <- matrix(disppar, nrow = ncol(data), byrow = TRUE)
 
 
   # convert NAs by missing information provided by SPSS.
@@ -368,8 +371,16 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
           if (all(sapply(sel, is.character))) {
             pp <- pat[-1]; p1 <- pat[1]
 
+            remove <- !names(data) %in% pp
+
             # remove columns pat[2:n]
-            data <- data[,!names(data) %in% pp]
+            data <- data[,remove]
+
+            # resize varmat and disppar as well
+            varmat  <- varmat[remove,]
+
+            if (!is.null(disppar))
+              disppar <- disppar[remove,]
 
             data[p1] <- do.call(paste0, sel)
 
@@ -473,6 +484,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   attr(data, "label")     <- label
 
   attr(data, "varmatrix") <- varmat
+  attr(data, "disppar")   <- disppar
   attr(data, "var.label") <- val.labels
   attr(data, "longlabel") <- attribs$longlabel
   attr(data, "missings")  <- attribs$missings

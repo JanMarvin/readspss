@@ -152,4 +152,7 @@ static void debug(std::istream& sav, int size) {
   delete[] memblock;
 }
 
+
+static bool IsGreaterZero (int32_t i) { return (i >= 0); };
+
 #endif
