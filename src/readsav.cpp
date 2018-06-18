@@ -879,6 +879,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
           case 0:
           {
+            --kk;
             break;
             // ignored
           }
