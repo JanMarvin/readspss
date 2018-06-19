@@ -30,6 +30,7 @@ using namespace std;
 
 #include "spss.h"
 #include "read_sav_known_n.h"
+#include "read_sav_unknown_n.h"
 
 //' Reads the binary SPSS file
 //'
@@ -779,9 +780,14 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     //   n = 1;
 
 
+    List df;
 
-    List df = read_sav_known_n(sav,  swapit, cflag, debug, doenc,
-                               n, kv, vtyp, res, vartype, encStr );
+  // if (n > 0)
+  //     df = read_sav_known_n(sav,  swapit, cflag, debug, doenc,
+  //                                n, kv, vtyp, res, vartype, encStr );
+  // else
+    df = read_sav_unknown_n(sav,  swapit, cflag, debug, doenc,
+                                 kv, vtyp, res, vartype, encStr );
 
 
     // 3. Create a data.frame
