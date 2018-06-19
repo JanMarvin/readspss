@@ -342,11 +342,6 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
         if (kk == kv) {
           ++nn;
 
-          Rprintf("nn %d\n", nn);
-
-          // always check if eof is reached
-          eof = sav.eof();
-
           // reset k and res_kk
           kk = 0;
           kk_i = 0;
@@ -373,7 +368,7 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
 
       int32_t const type = vtyp[kk];
 
-      Rprintf("eof %d\n", eof);
+      // Rprintf("eof %d\n", eof);
 
       switch(type)
       {
@@ -381,8 +376,6 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
       {
         val_d = NA_REAL;
         val_d = readbin(val_d, sav, swapit);
-
-        Rcpp::Rcout << val_d << std::endl;
 
         Rcpp::NumericVector tmp = df[kk];
         tmp.push_back(val_d);
