@@ -782,10 +782,10 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
     List df;
 
-  // if (n > 0)
-  //     df = read_sav_known_n(sav,  swapit, cflag, debug, doenc,
-  //                                n, kv, vtyp, res, vartype, encStr );
-  // else
+  if (n > 0)
+      df = read_sav_known_n(sav,  swapit, cflag, debug, doenc,
+                                 n, kv, vtyp, res, vartype, encStr );
+  else
     df = read_sav_unknown_n(sav,  swapit, cflag, debug, doenc,
                                  kv, vtyp, res, vartype, encStr );
 
