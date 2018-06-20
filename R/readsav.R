@@ -80,9 +80,8 @@
 #' @importFrom utils download.file localeToCharset
 #' @export
 read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
-                     encoding = TRUE, fromEncoding = NULL, toEncoding = NULL,
-                     use.missings = TRUE, debug = FALSE, override = FALSE,
-                     convert.dates = TRUE) {
+                     encoding = TRUE, fromEncoding = NULL, use.missings = TRUE,
+                     debug = FALSE, override = FALSE, convert.dates = TRUE) {
 
   # Check if path is a url
   if (length(grep("^(http|ftp|https)://", file))) {
@@ -203,23 +202,6 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
         }
       }
     }
-
-  }
-
-  encStr <- attribs$encStr
-
-  if (is.null(toEncoding))
-    toEncoding <- ""
-
-  # Encoding // no encoding if fromEncoding == 2
-  # avoid encoding of already encoded strings
-  if (isTRUE(encoding) & (encStr != "") & (encStr != ownEnc)) {
-
-    # label
-    for (i in seq_along(label))
-      names(label[[i]]) <- read.encoding(names(label[[i]]),
-                                         fromEncoding = encStr,
-                                         encoding = toEncoding)
 
   }
 
