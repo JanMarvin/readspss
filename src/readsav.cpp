@@ -196,7 +196,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
         printINT = 0, writeINT = 0, lablen32 = 0, len = 0;
 
 
-      while (rtype == 2)
+      if (rtype == 2)
       {
 
         // skip 20 bytes or read 5 unks
@@ -335,10 +335,9 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
         }
 
-        break;
       }
 
-      while (rtype == 3) {
+      if (rtype == 3) {
 
         nolab = readbin(nolab, sav, swapit);
 
@@ -409,7 +408,6 @@ List sav(const char * filePath, const bool debug, std::string encStr,
           Label_list.push_back(code);
         }
 
-        break;
       }
 
       // label 4:
@@ -418,7 +416,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
       // second int: number of combined labels
       // (second int) ints: unk
       int32_t nolabels = 0, lab_id = 0;
-      while (rtype==4)
+      if (rtype==4)
       {
         Rcpp::checkUserInterrupt();
 
@@ -433,12 +431,11 @@ List sav(const char * filePath, const bool debug, std::string encStr,
           haslab(i) = lab_id;
 
         }
-        haslabel.push_back(haslab);
 
-        break;
+        haslabel.push_back(haslab);
       }
 
-      while (rtype==6)
+      if (rtype==6)
       {
         Rcpp::checkUserInterrupt();
 
@@ -467,13 +464,11 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
         doc.push_back( Document );
 
-
-        break;
       }
 
 
       // additional information
-      while (rtype==7)
+      if (rtype==7)
       {
         Rcpp::checkUserInterrupt();
 
@@ -708,7 +703,6 @@ List sav(const char * filePath, const bool debug, std::string encStr,
         }
         }
 
-        break;
       }
 
       rtype = readbin(rtype, sav, swapit);
