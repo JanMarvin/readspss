@@ -766,9 +766,6 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     if (bign > n)
       n = bign;
 
-    // test
-    n = -1;
-
     List df;
 
     if (n <= 0)
