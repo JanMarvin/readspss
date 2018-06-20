@@ -73,7 +73,6 @@
 #'\code{\link[haven]{read_sav}}.
 
 #' @useDynLib readspss, .registration=TRUE
-#' @importFrom magrittr "%>%"
 #' @importFrom tools file_ext
 #' @importFrom stats na.omit
 #' @importFrom utils download.file localeToCharset
@@ -297,7 +296,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
     # contains long varname (e.g. when longer varnames are provided or if the
     # dataset contains long strings)
-    longname <- longvarname %>%  strsplit("=")
+    longname <- strsplit(longvarname, "=")
 
     # contains varname and absolute length eg
     # A258=00258
@@ -309,7 +308,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     # only applicable, if dataset contains longstrings
     if ( haslongstring ) {
 
-      longstring <- longstring[!longstring==""] %>% strsplit("=")
+      longstring <- strsplit(longstring[!longstring==""], "=")
 
       # If the imported data contains strings longer than nchar(255) the data is
       # scrambled at this point. SPSS separates longer strings in different
