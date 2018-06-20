@@ -766,15 +766,18 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     if (bign > n)
       n = bign;
 
+    // test
+    n = -1;
 
     List df;
 
-    if (n > 0)
-      df = read_sav_known_n(sav, swapit, cflag, debug,
-                            n, kv, vtyp, res, vartype);
-    else
-      df = read_sav_unknown_n(sav, swapit, cflag, debug,
+    if (n <= 0)
+      n = read_sav_unknown_n(sav, swapit, cflag, debug,
                               kv, vtyp, res, vartype);
+
+
+    df = read_sav_known_n(sav, swapit, cflag, debug,
+                            n, kv, vtyp, res, vartype);
 
     // encode full Character vector
     if (doenc) {

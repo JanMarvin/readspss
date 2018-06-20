@@ -22,7 +22,7 @@
 
 #include "spss.h"
 
-Rcpp::List read_sav_unknown_n (std::istream& sav,
+int64_t read_sav_unknown_n (std::istream& sav,
                              bool swapit, int32_t cflag, bool debug,
                              int32_t kv,
                              Rcpp::IntegerVector vtyp,
@@ -36,24 +36,6 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
   sav.seekg(curpos);
 
   int32_t n = 0;
-
-  // 1. Create Rcpp::List
-  Rcpp::List df(kv);
-  for (int32_t i=0; i<kv; ++i)
-  {
-    int const type = vtyp[i];
-    switch(type)
-    {
-    case 0:
-      SET_VECTOR_ELT(df, i, Rcpp::NumericVector(Rcpp::no_init(n)));
-      break;
-
-    default:
-      SET_VECTOR_ELT(df, i, Rcpp::CharacterVector(Rcpp::no_init(n)));
-    break;
-    }
-  }
-
   int32_t unk8=0;
   unk8 = readbin(unk8, sav, swapit); // 0
 
@@ -71,14 +53,14 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
   }
 
 
+
   // cflag 1 = compression int8_t - bias
   if (cflag) {
 
     std::string start = "";
     int32_t res_i = 0, res_kk = 0, kk_i = 0;
 
-
-    while(!(sav.tellg() == endoffile)) {
+    while (!(sav.tellg() == endoffile) | !eof) { // data import until nn = n
 
       Rcpp::checkUserInterrupt();
 
@@ -122,14 +104,6 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
         ++kk_i;
 
 
-        if (debug) {
-          Rprintf("val_b: %d - type: %d - kk: %d - nn: %d\n",
-                  val_b, type, kk+1, nn+1);
-
-          Rprintf("res_i: %d\n", res_i);
-        }
-
-
         // res_kk is the amount of chunks required to read until the
         // string is completely read
         res_kk = res[kk];
@@ -152,9 +126,6 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
 
         case 0:
         {
-          Rcpp::NumericVector tmp = df[kk];
-          tmp.push_back(val_b - 100);
-          SET_VECTOR_ELT(df, kk, tmp);
           break;
         }
 
@@ -166,21 +137,11 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
 
           // beginning of a new string
           std::string val_s (len, '\0');
-          val_s = readstring(val_s, sav, val_s.size());
-          start.append( val_s );
+          readstring(val_s, sav, val_s.size());
 
           // if res_i == res_kk the full string was read and
           // can be written else continue the string
           if (res_i == res_kk-1) {
-
-            // trim additional whitespaces to the right
-            start = std::regex_replace(start,
-                                       std::regex(" +$"), "$1");
-
-            Rcpp::CharacterVector tmp = df[kk];
-            tmp.push_back(start);
-            SET_VECTOR_ELT(df, kk, tmp);
-
             // string completly written, reset start and res_i
             // and switch to next cell
             start = "";
@@ -215,11 +176,7 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
 
         case 0:
         {
-          val_d = readbin(val_d, sav, swapit);
-
-          Rcpp::NumericVector tmp = df[kk];
-          tmp.push_back(val_d);
-          SET_VECTOR_ELT(df, kk, tmp);
+          readbin(val_d, sav, swapit);
           break;
         }
 
@@ -247,15 +204,6 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
 
 
           if (res_i == res_kk-1) {
-
-            // trim additional whitespaces to the right
-            start = std::regex_replace(start,
-                                       std::regex(" +$"), "$1");
-
-            Rcpp::CharacterVector tmp = df[kk];
-            tmp.push_back(start);
-            SET_VECTOR_ELT(df, kk, tmp);
-
             // reset
             start = "";
             res_i = 0;
@@ -278,15 +226,6 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
           // interpreted as a single string.
 
           if (res_i == res_kk-1) {
-
-          // trim additional whitespaces to the right
-          start = std::regex_replace(start,
-                                     std::regex(" +$"), "$1");
-
-          Rcpp::CharacterVector tmp = df[kk];
-          tmp.push_back(start);
-          SET_VECTOR_ELT(df, kk, tmp);
-
           // reset start
           start = "";
           res_i = 0;
@@ -307,17 +246,10 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
 
         case 0:
         {
-          // Rcout << NA_REAL << std::endl;
-          Rcpp::NumericVector tmp = df[kk];
-          tmp.push_back(NA_REAL);
-          SET_VECTOR_ELT(df, kk, tmp);
           break;
         }
         default:
         {
-          Rcpp::CharacterVector tmp = df[kk];
-          tmp.push_back(NA_STRING);
-          SET_VECTOR_ELT(df, kk, tmp);
           break;
         }
           break;
@@ -336,6 +268,21 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
         if (kk == kv) {
           ++nn;
 
+          // Rprintf("nn: %d", nn);
+          // some files are not ended with 252, ensure that no out of bounds
+          // error occures.
+          if (nn == n) {
+            eof = true;
+
+            if (debug)
+              Rcpp::Rcout << "stop: eof" << std::endl;
+
+            break;
+          }
+
+          // always check if eof is reached
+          eof = sav.eof();
+
           // reset k and res_kk
           kk = 0;
           kk_i = 0;
@@ -351,29 +298,16 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
 
     std::string val_s = "";
 
-    while(!(sav.tellg() == endoffile)) {
-
-
-      // if (debug) {
-      //   Rprintf("type: %d - kk: %d - nn: %d\n",
-      //           vtyp[kk], kk+1, nn+1);
-      // }
-
+    while(!(sav.tellg()== endoffile)) {
 
       int32_t const type = vtyp[kk];
 
-      // Rprintf("eof %d\n", eof);
-
       switch(type)
       {
+
       case 0:
       {
-        val_d = NA_REAL;
-        val_d = readbin(val_d, sav, swapit);
-
-        Rcpp::NumericVector tmp = df[kk];
-        tmp.push_back(val_d);
-        SET_VECTOR_ELT(df, kk, tmp);
+        readbin(val_d, sav, swapit);
         break;
       }
 
@@ -385,22 +319,14 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
         len = ceil(len/8) * 8;
 
         std::string val_s ((int32_t)len, '\0');
-        val_s = readstring(val_s, sav, val_s.size());
+        readstring(val_s, sav, val_s.size());
 
         // shorten the string to the actual size reported by SPSS
         val_s.erase(type, std::string::npos);
 
-        // trim additional whitespaces
-        val_s = std::regex_replace(val_s,
-                                   std::regex("^ +| +$"), "$1");
-
-        // Rcpp::Rcout << val_s << std::endl;
-        Rcpp::CharacterVector tmp = df[kk];
-        tmp.push_back(val_s);
-        SET_VECTOR_ELT(df, kk, tmp);
-
         break;
       }
+
       }
 
       ++kk;
@@ -413,5 +339,8 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
     }
   }
 
-  return(df);
+  sav.seekg(curpos);
+
+  return(nn);
+
 }

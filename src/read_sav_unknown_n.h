@@ -19,7 +19,7 @@
 #define READ_SAV_UNKNOWN_N_H
 
 
-Rcpp::List read_sav_unknown_n (std::istream& sav,
+int64_t read_sav_unknown_n (std::istream& sav,
                              const bool swapit, const int32_t cflag,
                              const bool debug,
                              const int32_t kv,
