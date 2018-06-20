@@ -193,11 +193,11 @@ List sav(const char * filePath, const bool debug, std::string encStr,
       bool noNum = 0;
 
       int32_t typeINT = 0, has_var_label = 0, n_missing_values = 0,
-        printINT = 0, writeINT = 0, lablen32 = 0, len = 0;
+        printINT = 0, writeINT = 0, lablen32 = 0, len = 0, nolabels = 0,
+        lab_id = 0;
 
 
-      if (rtype == 2)
-      {
+      if (rtype == 2) {
 
         // skip 20 bytes or read 5 unks
         vtype  = readbin(vtype, sav, swapit);     // Variable type
@@ -415,9 +415,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
       // first int: 4
       // second int: number of combined labels
       // (second int) ints: unk
-      int32_t nolabels = 0, lab_id = 0;
-      if (rtype==4)
-      {
+      if (rtype==4) {
         Rcpp::checkUserInterrupt();
 
         nolabels = readbin(nolabels, sav, swapit); // number of labels
@@ -435,8 +433,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
         haslabel.push_back(haslab);
       }
 
-      if (rtype==6)
-      {
+      if (rtype==6) {
         Rcpp::checkUserInterrupt();
 
         int32_t nlines = 0; // number of lines
@@ -466,10 +463,8 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
       }
 
-
       // additional information
-      if (rtype==7)
-      {
+      if (rtype==7) {
         Rcpp::checkUserInterrupt();
 
         // subtype integer: 3 / floating: 4 / varsyst: 11
