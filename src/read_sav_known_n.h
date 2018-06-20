@@ -22,7 +22,7 @@
 Rcpp::List read_sav_known_n (std::istream& sav,
                const bool swapit, const bool cflag,
                const bool debug,
-               const int32_t n, const int32_t kv,
+               const int64_t n, const int32_t kv,
                Rcpp::IntegerVector vtyp,
                Rcpp::NumericVector res,
                std::vector<int> vartype);

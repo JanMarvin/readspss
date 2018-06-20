@@ -24,14 +24,20 @@
 
 Rcpp::List read_sav_known_n (std::istream& sav,
                bool swapit, bool cflag, bool debug,
-               int32_t n, int32_t kv,
+               int64_t n, int32_t kv,
                Rcpp::IntegerVector vtyp,
                Rcpp::NumericVector res,
                std::vector<int> vartype) {
 
+  // final position
+  size_t curpos = sav.tellg();
+  sav.seekg(0, sav.end);
+  size_t endoffile = sav.tellg();
+  sav.seekg(curpos);
+
   // 1. Create Rcpp::List
   Rcpp::List df(kv);
-  for (uint16_t i=0; i<kv; ++i)
+  for (int32_t i=0; i<kv; ++i)
   {
     int const type = vtyp[i];
     switch(type)
@@ -52,7 +58,8 @@ Rcpp::List read_sav_known_n (std::istream& sav,
 
   bool eof = 0;
   uint8_t val_b = 0;
-  int32_t nn = 0, kk = 0;
+  int32_t kk = 0;
+  int64_t nn = 0;
 
   // data is read in 8 byte chunks. k*n/8 (data remains)
   double chunk = 0, val_d = 0;
@@ -69,7 +76,7 @@ Rcpp::List read_sav_known_n (std::istream& sav,
     std::string start = "";
     int32_t res_i = 0, res_kk = 0, kk_i = 0;
 
-    while (!eof) { // start data import until nn = n
+    while (!(sav.tellg() == endoffile) | !eof) { // data import until nn = n
 
       Rcpp::checkUserInterrupt();
 

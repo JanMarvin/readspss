@@ -39,7 +39,7 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
 
   // 1. Create Rcpp::List
   Rcpp::List df(kv);
-  for (uint16_t i=0; i<kv; ++i)
+  for (int32_t i=0; i<kv; ++i)
   {
     int const type = vtyp[i];
     switch(type)
@@ -60,7 +60,7 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
 
   bool eof = 0;
   uint8_t val_b = 0;
-  int32_t nn = 0, kk = 0;
+  int64_t nn = 0, kk = 0;
 
   // data is read in 8 byte chunks. k*n/8 (data remains)
   double chunk = 0, val_d = 0;

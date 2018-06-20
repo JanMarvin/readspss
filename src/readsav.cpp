@@ -50,7 +50,9 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
     bool is_spss = false, swapit = false, autoenc = false;
 
-    int32_t n = 0, k = 0;
+    int64_t n = 0;
+    int32_t k = 0;
+
     int32_t charcode = 0, arch = 0;
 
     std::string na = "NA", empty = "";
@@ -116,7 +118,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     cflag = readbin(cflag, sav, swapit); // cflag compression
     cwvariables = readbin(cwvariables, sav, swapit); // case weight variables
 
-    n = readbin(n, sav, swapit);
+    n = readbin((int32_t)n, sav, swapit);
 
     if (debug)
       Rprintf("N: %d \n", n);
@@ -154,6 +156,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     int32_t major = 0, minor = 0, rev = 0, macode = 0;
     int32_t floatp = 0, compr = 0, endian = 0;
     int32_t measure = 0;
+    int64_t unk = 0, bign = 0;
     double sysmiss = 0, highest = 0, lowest = 0;
 
 
@@ -191,6 +194,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
       int32_t typeINT = 0, has_var_label = 0, n_missing_values = 0,
         printINT = 0, writeINT = 0, lablen32 = 0, len = 0;
+
 
       while (rtype == 2)
       {
@@ -585,15 +589,10 @@ List sav(const char * filePath, const bool debug, std::string encStr,
           // for count 2 unk appears to be N-obs: Did SPSS allow n > int32 at
           // some point of time and coud not adjust it in the header for back-
           // ward compatibilty?
-          int64_t unk = 0;
 
-          for (int i = 0; i<count; ++i) {
+          unk = readbin(unk, sav, swapit);
+          bign = readbin(bign, sav, swapit);
 
-            unk = readbin(unk, sav, swapit);
-
-            if (debug) Rprintf("sub 16: unk1 %d\n", unk);
-
-          }
 
           break;
         }
@@ -773,8 +772,10 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     if (debug)
       Rprintf("-- Start: Data Part \n");
 
-    // if (debug)
-    //   n = 1;
+    // since SPSS already provides an int64 presumably there are files where
+    // an int32 is not enough so assume that bign is a valid number
+    if (bign > n)
+      n = bign;
 
 
     List df;
@@ -788,7 +789,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
   // encode full vector
   if (doenc) {
-    for (uint16_t i=0; i<kv; ++i)
+    for (int32_t i=0; i<kv; ++i)
     {
       int const type = vtyp[i];
 
