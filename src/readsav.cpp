@@ -531,10 +531,10 @@ List sav(const char * filePath, const bool debug, std::string encStr,
           break;
         }
 
-        // case 6: // date info
+          // case 6: // date info
         case 7: // PSPP : mrsets
         case 8: // my example shows some kind of program
-        // case 12: // PSPP : UUID spotted twice only
+          // case 12: // PSPP : UUID spotted twice only
         case 17: // PSPP : data file attribute
         case 18: // PSPP : variable attribute
         {
@@ -559,10 +559,10 @@ List sav(const char * filePath, const bool debug, std::string encStr,
         {
 
           for (int32_t i = 0; i < count; ++i) {
-            measure = readbin(measure, sav, swapit);
+          measure = readbin(measure, sav, swapit);
 
-            disppar.push_back(measure);
-          }
+          disppar.push_back(measure);
+        }
 
           break;
         }
@@ -780,32 +780,32 @@ List sav(const char * filePath, const bool debug, std::string encStr,
 
     List df;
 
-  if (n > 0)
+    if (n > 0)
       df = read_sav_known_n(sav, swapit, cflag, debug,
-                                 n, kv, vtyp, res, vartype);
-  else
-    df = read_sav_unknown_n(sav, swapit, cflag, debug,
-                                 kv, vtyp, res, vartype);
+                            n, kv, vtyp, res, vartype);
+    else
+      df = read_sav_unknown_n(sav, swapit, cflag, debug,
+                              kv, vtyp, res, vartype);
 
-  // encode full vector
-  if (doenc) {
-    for (int32_t i=0; i<kv; ++i)
-    {
-      int const type = vtyp[i];
+    // encode full vector
+    if (doenc) {
+      for (int32_t i=0; i<kv; ++i)
+      {
+        int const type = vtyp[i];
 
-      // read and convert
-      if (type > 0) {
-        Rcpp::Environment base("package:base");
-        Rcpp::Function iconv = base["iconv"];
+        // read and convert
+        if (type > 0) {
+          Rcpp::Environment base("package:base");
+          Rcpp::Function iconv = base["iconv"];
 
-        CharacterVector tmp = df[i];
-        tmp = iconv(tmp, Rcpp::Named("from", encStr), Rcpp::Named("to",""));
+          CharacterVector tmp = df[i];
+          tmp = iconv(tmp, Rcpp::Named("from", encStr), Rcpp::Named("to",""));
 
-        SET_VECTOR_ELT(df, i, tmp);
+          SET_VECTOR_ELT(df, i, tmp);
+        }
+
       }
-
     }
-  }
 
 
     // 3. Create a data.frame
