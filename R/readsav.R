@@ -30,7 +30,6 @@
 #' @param encoding \emph{logical} shall values be converted? If true, read.sav
 #' will try the charcode stored inside the sav-file. If this value is 2 or not
 #' available, fromEncoding can be used to change encoding.
-#' @param toEncoding \emph{string} locale to convert to.
 #' @param fromEncoding \emph{character.} encoding of the imported file. This
 #' information is stored inside the sav-file, but is currently unused. Still
 #' this option can be used to define the inital encoding by hand.

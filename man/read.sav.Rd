@@ -5,9 +5,8 @@
 \title{read.sav}
 \usage{
 read.sav(file, convert.factors = TRUE, generate.factors = TRUE,
-  encoding = TRUE, fromEncoding = NULL, toEncoding = NULL,
-  use.missings = TRUE, debug = FALSE, override = FALSE,
-  convert.dates = TRUE)
+  encoding = TRUE, fromEncoding = NULL, use.missings = TRUE,
+  debug = FALSE, override = FALSE, convert.dates = TRUE)
 }
 \arguments{
 \item{file}{\emph{string} a sav-file to import. can be a file on a computer
@@ -29,8 +28,6 @@ available, fromEncoding can be used to change encoding.}
 \item{fromEncoding}{\emph{character.} encoding of the imported file. This
 information is stored inside the sav-file, but is currently unused. Still
 this option can be used to define the inital encoding by hand.}
-
-\item{toEncoding}{\emph{string} locale to convert to.}
 
 \item{use.missings}{\emph{logical} should missing values be converted.
 Defaults to TRUE.}
