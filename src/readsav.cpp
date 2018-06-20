@@ -787,7 +787,7 @@ List sav(const char * filePath, const bool debug, std::string encStr,
       df = read_sav_unknown_n(sav, swapit, cflag, debug,
                               kv, vtyp, res, vartype);
 
-    // encode full vector
+    // encode full Character vector
     if (doenc) {
       for (int32_t i=0; i<kv; ++i)
       {
