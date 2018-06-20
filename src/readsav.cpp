@@ -121,9 +121,6 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     if (debug)
       Rprintf("N: %d \n", n);
 
-    if (n <= 0)
-      stop("Get out! File does not know how many observations there are.");
-
     double bias = 0; // 100: compression bias
     bias = readbin(bias, sav, swapit);
 
