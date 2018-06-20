@@ -23,12 +23,11 @@
 #include "spss.h"
 
 Rcpp::List read_sav_known_n (std::istream& sav,
-               bool swapit, bool cflag, bool debug, bool doenc,
+               bool swapit, bool cflag, bool debug,
                int32_t n, int32_t kv,
                Rcpp::IntegerVector vtyp,
                Rcpp::NumericVector res,
-               std::vector<int> vartype,
-               std::string encStr) {
+               std::vector<int> vartype) {
 
   // 1. Create Rcpp::List
   Rcpp::List df(kv);
@@ -167,8 +166,6 @@ Rcpp::List read_sav_known_n (std::istream& sav,
             start = std::regex_replace(start,
                                        std::regex(" +$"), "$1");
 
-
-            if (doenc) start = Riconv(start, encStr);
             Rcpp::as<Rcpp::CharacterVector>(df[kk])[nn] = start;
 
             // string completly written, reset start and res_i
@@ -240,7 +237,6 @@ Rcpp::List read_sav_known_n (std::istream& sav,
             start = std::regex_replace(start,
                                        std::regex(" +$"), "$1");
 
-            if (doenc) start = Riconv(start, encStr);
             Rcpp::as<Rcpp::CharacterVector>(df[kk])[nn] = start;
 
             // reset
@@ -270,7 +266,6 @@ Rcpp::List read_sav_known_n (std::istream& sav,
           start = std::regex_replace(start,
                                      std::regex(" +$"), "$1");
 
-          if (doenc) start = Riconv(start, encStr);
           Rcpp::as<Rcpp::CharacterVector>(df[kk])[nn] = start;
 
           // reset start
@@ -379,8 +374,6 @@ Rcpp::List read_sav_known_n (std::istream& sav,
         // trim additional whitespaces
         val_s = std::regex_replace(val_s,
                                    std::regex("^ +| +$"), "$1");
-
-        if (doenc) val_s = Riconv(val_s, encStr);
 
         // Rcpp::Rcout << val_s << std::endl;
         Rcpp::as<Rcpp::CharacterVector>(df[kk])[nn] = val_s;

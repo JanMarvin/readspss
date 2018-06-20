@@ -23,12 +23,11 @@
 #include "spss.h"
 
 Rcpp::List read_sav_unknown_n (std::istream& sav,
-                             bool swapit, int32_t cflag, bool debug, bool doenc,
+                             bool swapit, int32_t cflag, bool debug,
                              int32_t kv,
                              Rcpp::IntegerVector vtyp,
                              Rcpp::NumericVector res,
-                             std::vector<int> vartype,
-                             std::string encStr) {
+                             std::vector<int> vartype) {
 
   size_t curpos = sav.tellg();
 
@@ -178,9 +177,6 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
             start = std::regex_replace(start,
                                        std::regex(" +$"), "$1");
 
-
-            if (doenc) start = Riconv(start, encStr);
-
             Rcpp::CharacterVector tmp = df[kk];
             tmp.push_back(start);
             SET_VECTOR_ELT(df, kk, tmp);
@@ -256,7 +252,6 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
             start = std::regex_replace(start,
                                        std::regex(" +$"), "$1");
 
-            if (doenc) start = Riconv(start, encStr);
             Rcpp::CharacterVector tmp = df[kk];
             tmp.push_back(start);
             SET_VECTOR_ELT(df, kk, tmp);
@@ -288,7 +283,6 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
           start = std::regex_replace(start,
                                      std::regex(" +$"), "$1");
 
-          if (doenc) start = Riconv(start, encStr);
           Rcpp::CharacterVector tmp = df[kk];
           tmp.push_back(start);
           SET_VECTOR_ELT(df, kk, tmp);
@@ -399,8 +393,6 @@ Rcpp::List read_sav_unknown_n (std::istream& sav,
         // trim additional whitespaces
         val_s = std::regex_replace(val_s,
                                    std::regex("^ +| +$"), "$1");
-
-        if (doenc) val_s = Riconv(val_s, encStr);
 
         // Rcpp::Rcout << val_s << std::endl;
         Rcpp::CharacterVector tmp = df[kk];

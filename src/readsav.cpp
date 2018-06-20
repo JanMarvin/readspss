@@ -783,11 +783,31 @@ List sav(const char * filePath, const bool debug, std::string encStr,
     List df;
 
   if (n > 0)
-      df = read_sav_known_n(sav,  swapit, cflag, debug, doenc,
-                                 n, kv, vtyp, res, vartype, encStr );
+      df = read_sav_known_n(sav, swapit, cflag, debug,
+                                 n, kv, vtyp, res, vartype);
   else
-    df = read_sav_unknown_n(sav,  swapit, cflag, debug, doenc,
-                                 kv, vtyp, res, vartype, encStr );
+    df = read_sav_unknown_n(sav, swapit, cflag, debug,
+                                 kv, vtyp, res, vartype);
+
+  // encode full vector
+  if (doenc) {
+    for (uint16_t i=0; i<kv; ++i)
+    {
+      int const type = vtyp[i];
+
+      // read and convert
+      if (type > 0) {
+        Rcpp::Environment base("package:base");
+        Rcpp::Function iconv = base["iconv"];
+
+        CharacterVector tmp = df[i];
+        tmp = iconv(tmp, Rcpp::Named("from", encStr), Rcpp::Named("to",""));
+
+        SET_VECTOR_ELT(df, i, tmp);
+      }
+
+    }
+  }
 
 
     // 3. Create a data.frame

@@ -21,11 +21,10 @@
 
 Rcpp::List read_sav_unknown_n (std::istream& sav,
                              const bool swapit, const int32_t cflag,
-                             const bool debug, const bool doenc,
+                             const bool debug,
                              const int32_t kv,
                              Rcpp::IntegerVector vtyp,
                              Rcpp::NumericVector res,
-                             std::vector<int> vartype,
-                             const std::string encStr);
+                             std::vector<int> vartype);
 
 #endif
