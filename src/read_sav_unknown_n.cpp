@@ -36,8 +36,6 @@ int64_t read_sav_unknown_n (std::istream& sav,
   sav.seekg(curpos);
 
   int32_t n = 0;
-  int32_t unk8=0;
-  unk8 = readbin(unk8, sav, swapit); // 0
 
 
   bool eof = 0;

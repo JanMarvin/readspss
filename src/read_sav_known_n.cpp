@@ -52,9 +52,6 @@ Rcpp::List read_sav_known_n (std::istream& sav,
     }
   }
 
-  int32_t unk8=0;
-  unk8 = readbin(unk8, sav, swapit); // 0
-
 
   bool eof = 0;
   uint8_t val_b = 0;
@@ -350,10 +347,9 @@ Rcpp::List read_sav_known_n (std::istream& sav,
 
     std::string val_s = "";
 
-    for (int ii = 0; ii < n*kv; ++ii) {
+    for (int64_t ii = 0; ii < n*kv; ++ii) {
 
       int32_t const type = vtyp[kk];
-
       switch(type)
       {
 

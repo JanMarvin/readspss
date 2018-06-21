@@ -734,6 +734,9 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     if (rtype != 999)
       Rcpp::stop("Expected data part. Somethings wrong in this file.");
 
+    int32_t unk8=0;
+    unk8 = readbin(unk8, sav, swapit); // 0
+
     // c++ vector to Rcpp Vector
     IntegerVector Vartype = wrap(vartype);
     CharacterVector Varnames = wrap(varnames);
