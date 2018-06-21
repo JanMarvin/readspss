@@ -9,7 +9,7 @@
 #' @import Rcpp
 #' @export
 fast_factor <- function(x, y) {
-    .Call(`_readspss_fast_factor`, x, y)
+    .Call('_readspss_fast_factor', PACKAGE = 'readspss', x, y)
 }
 
 #' Reads the binary SPSS file
@@ -20,7 +20,7 @@ fast_factor <- function(x, y) {
 #' @import Rcpp
 #' @export
 por <- function(filePath, debug, encStr) {
-    .Call(`_readspss_por`, filePath, debug, encStr)
+    .Call('_readspss_por', PACKAGE = 'readspss', filePath, debug, encStr)
 }
 
 #' Reads the binary SPSS file
@@ -32,7 +32,7 @@ por <- function(filePath, debug, encStr) {
 #' @import Rcpp
 #' @export
 readsav <- function(filePath, debug, encStr, ownEnc) {
-    .Call(`_readspss_readsav`, filePath, debug, encStr, ownEnc)
+    .Call('_readspss_readsav', PACKAGE = 'readspss', filePath, debug, encStr, ownEnc)
 }
 
 #' writes the binary SPSS file
@@ -42,6 +42,6 @@ readsav <- function(filePath, debug, encStr, ownEnc) {
 #' @import Rcpp
 #' @export
 writesav <- function(filePath, dat) {
-    invisible(.Call(`_readspss_writesav`, filePath, dat))
+    invisible(.Call('_readspss_writesav', PACKAGE = 'readspss', filePath, dat))
 }
 
