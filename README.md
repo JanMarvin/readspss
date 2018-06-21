@@ -16,8 +16,9 @@ In comparisson to `haven::read_sav` and `foreign::read.spss` this package
 preforms pretty well. It reads a few more files than each of its predecessors.
 Focus was not so much on winning every benchmark, but reading all features of
 a sav-file provided and to be as exactly as possible. So we win some benchmarks
-and lose others. It is entirely up to the task. In addition readspss ships some
-additional informations like the datalabel, date- and timestamp.
+and lose others. It is entirely up to the task. Due to the new implementation
+readspss ships some additional information provided in the sav-file like the
+datalabel, date- and timestamp.
 
 Reading of sav-files is feature complete.
 

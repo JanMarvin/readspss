@@ -141,6 +141,31 @@ static T Riconv(T &mystring, std::string &encStr) {
 
 }
 
+template <typename T>
+static void writebin(T t, std::fstream& dta, bool swapit)
+{
+  if (swapit==1){
+    T t_s = swap_endian(t);
+    dta.write((char*)&t_s, sizeof(t_s));
+  } else {
+    dta.write((char*)&t, sizeof(t));
+  }
+}
+
+
+
+template <typename T>
+static void writestr(std::string val_s, T len, std::fstream& dta)
+{
+
+  std::stringstream val_stream;
+  val_stream << std::left << std::setw(len) << std::setfill(' ') << val_s;
+  std::string val_strl = val_stream.str();
+
+  dta.write(val_strl.c_str(),val_strl.length());
+
+}
+
 static void debug(std::istream& sav, int size) {
   char * memblock;
 

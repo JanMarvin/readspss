@@ -31,7 +31,17 @@ por <- function(filePath, debug, encStr) {
 #' @param ownEnc encoding provided by localeToCharset
 #' @import Rcpp
 #' @export
-sav <- function(filePath, debug, encStr, ownEnc) {
-    .Call(`_readspss_sav`, filePath, debug, encStr, ownEnc)
+readsav <- function(filePath, debug, encStr, ownEnc) {
+    .Call(`_readspss_readsav`, filePath, debug, encStr, ownEnc)
+}
+
+#' writes the binary SPSS file
+#'
+#' @param filePath The full systempath to the dta file you want to import.
+#' @param dat the data frame
+#' @import Rcpp
+#' @export
+writesav <- function(filePath, dat) {
+    invisible(.Call(`_readspss_writesav`, filePath, dat))
 }
 
