@@ -30,9 +30,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// sav
-List sav(const char * filePath, const bool debug, std::string encStr, std::string const ownEnc);
-RcppExport SEXP _readspss_sav(SEXP filePathSEXP, SEXP debugSEXP, SEXP encStrSEXP, SEXP ownEncSEXP) {
+// readsav
+List readsav(const char * filePath, const bool debug, std::string encStr, std::string const ownEnc);
+RcppExport SEXP _readspss_readsav(SEXP filePathSEXP, SEXP debugSEXP, SEXP encStrSEXP, SEXP ownEncSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -40,7 +40,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const bool >::type debug(debugSEXP);
     Rcpp::traits::input_parameter< std::string >::type encStr(encStrSEXP);
     Rcpp::traits::input_parameter< std::string const >::type ownEnc(ownEncSEXP);
-    rcpp_result_gen = Rcpp::wrap(sav(filePath, debug, encStr, ownEnc));
+    rcpp_result_gen = Rcpp::wrap(readsav(filePath, debug, encStr, ownEnc));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -48,7 +48,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_readspss_fast_factor", (DL_FUNC) &_readspss_fast_factor, 2},
     {"_readspss_por", (DL_FUNC) &_readspss_por, 3},
-    {"_readspss_sav", (DL_FUNC) &_readspss_sav, 4},
+    {"_readspss_readsav", (DL_FUNC) &_readspss_readsav, 4},
     {NULL, NULL, 0}
 };
 

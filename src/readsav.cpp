@@ -41,7 +41,7 @@ using namespace std;
 //' @import Rcpp
 //' @export
 // [[Rcpp::export]]
-List sav(const char * filePath, const bool debug, std::string encStr,
+List readsav(const char * filePath, const bool debug, std::string encStr,
          std::string const ownEnc)
 {
 

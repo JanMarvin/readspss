@@ -115,7 +115,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     encStr <- "NA"
 
   # import data using an rcpp routine
-  data <- sav(filePath = filepath, debug, encStr, ownEnc)
+  data <- readsav(filePath = filepath, debug, encStr, ownEnc)
 
   attribs <- attributes(data)
 

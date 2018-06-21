@@ -31,7 +31,7 @@ por <- function(filePath, debug, encStr) {
 #' @param ownEnc encoding provided by localeToCharset
 #' @import Rcpp
 #' @export
-sav <- function(filePath, debug, encStr, ownEnc) {
-    .Call(`_readspss_sav`, filePath, debug, encStr, ownEnc)
+readsav <- function(filePath, debug, encStr, ownEnc) {
+    .Call(`_readspss_readsav`, filePath, debug, encStr, ownEnc)
 }
 
