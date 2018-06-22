@@ -136,9 +136,9 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
 
           int32_t const type = vtyp[j];
 
-          Rprintf("k: %d; n: %d\n", j, i);
-
-          Rprintf("vtyp: %d\n", type);
+          // Rprintf("k: %d; n: %d\n", j, i);
+          //
+          // Rprintf("vtyp: %d\n", type);
 
 
           switch(type)
