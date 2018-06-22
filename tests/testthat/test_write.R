@@ -7,7 +7,7 @@ write.sav(cars, filepath = "data/cars.sav")
 
 dd <- read.sav("data/,cars.sav")
 
-test_that("write test" {
+test_that("write test", {
     expext_true(all.equal(cars, dd, check.attributes = FALSE)
     })
     
