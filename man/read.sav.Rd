@@ -44,19 +44,40 @@ This option can be used to override this behavior.}
 \value{
 \code{readspss} returns a data.frame with additional objects
 \describe{
-\item{names}{colnames}
 \item{row.names}{rownames}
-\item{class}{data.frame}
-\item{val.label}{value labels}
+\item{names}{colnames}
 \item{datalabel}{datalabel}
 \item{datestamp}{datestamp}
 \item{timestamp}{timestamp}
-\item{varmatrix}{a matrix with information how the data is stored}
-\item{labnames}{list containing the information which variable uses which
-label}
+\item{filelabel}{filelabel}
+\item{class}{data.frame}
+\item{vtype}{SPSS type 0 is usually a numeric/integer}
+\item{val.label}{value labels}
+\item{disppar}{matrix of display parameters if available}
 \item{missings}{a list containg information about the missing variables. if
 \code{use.missings=TRUE} this Information will be used to generate missings.}
-\item{vartype}{informations about a variable. is it numeric or string.}
+\item{haslabel}{list of variables that contain labels}
+\item{longstring}{character vector of long strings if any in file}
+\item{longmissing}{character vector of missings in longstrings if any}
+\item{longlabel}{character vector of long labels}
+\item{cflag}{0 if uncompressed, 1 if compressed}
+\item{endian}{2 or 3 if little endian else 0}
+\item{compression}{compression similar to cflag, somehow stored twice in the
+sav file}
+\item{doc}{list containing documentation information if any}
+\item{charcode}{encoding string most likely 2 is CP1252}
+\item{encoding}{sometimes sav-file contain encoding as a extra string}
+\item{ownEnc}{encoding of the R-session}
+\item{doenc}{was the file supposed to be encoded?}
+\item{autoenc}{was encoding applied to the file?}
+\item{swapit}{were the bytes swapped?}
+\item{totals}{character string of totals if any}
+\item{dataview}{xml file how the data should be printed}
+\item{extraproduct}{additional string provided}
+\item{label}{list containing label value information}
+\item{varmatrix}{a matrix with information how the data is stored}
+\item{var.label}{variable labels}
+\item{lmissings}{missings table if any in longstrings}
 }
 }
 \description{
@@ -67,11 +88,18 @@ SPSS files are widely available, though for R long time only foreign
 and memisc provided functions to import sav-files. Lately haven joined.
 This package is an approach to offer another alternative, to document the
 sav-format and provide additional options to import the data.
+sav-files are stored most exclusively as numerics only in compression mode
+are some integers stored as integers. Still they are returned as numerics.
 }
 \note{
-information to decrypt the sav-format was provided by tda
+Information to decrypt the sav-format was provided by tda
 \url{http://www.stat.ruhr-uni-bochum.de/tda.html} and pspp
  \url{http://www.gnu.org/software/pspp/}
+}
+\examples{
+fl <- system.file("extdata", "electric.sav", package = "readspss")
+dd <- read.sav(fl)
+
 }
 \seealso{
 \code{\link[foreign]{read.spss}}, \code{memisc} and
