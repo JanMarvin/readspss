@@ -43,7 +43,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
   if (sav.is_open())
   {
 
-    bool swapit = 1;
+    bool swapit = 0;
 
     int32_t rtype = 0;
 
@@ -62,16 +62,16 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
     int32_t arch = 2;
     writebin(arch, sav, swapit);
 
-    int32_t kk = -1;
-    writebin(kk, sav, swapit);
+    // int32_t kk = -1;
+    writebin(k, sav, swapit);
 
     int32_t cflag=0, cwvariables = 0;
 
     writebin(cflag, sav, swapit);
     writebin(cwvariables, sav, swapit);
 
-    int64_t nn = -1;
-    writebin((int32_t)nn, sav, swapit);
+    // int64_t nn = -1;
+    writebin((int32_t)n, sav, swapit);
 
     double bias = 100;
     writebin(bias, sav, swapit);
@@ -99,20 +99,38 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
 
       int32_t var4;
       char tmp1[4];
-      tmp1[0] = 0;
-      tmp1[1] = 0;
-      tmp1[2] = 0;
-      tmp1[3] = 0;
-      memcpy(&tmp1[0], &var4, sizeof(var4));
+      if (subtyp == 0) {
+        tmp1[0] = 2;
+        tmp1[1] = 8;
+        tmp1[2] = 5;
+        tmp1[3] = 0;
+      } else {
+        tmp1[0] = 0;
+        tmp1[1] = subtyp;
+        tmp1[2] = 1;
+        tmp1[3] = 0;
+      }
+
+      var4 = ((int8_t)tmp1[3] << 24) | ((int8_t)tmp1[2] << 16) |
+        ((int8_t)tmp1[1] << 8) | (int8_t)tmp1[0];
       writebin(var4, sav, 0);
 
       int32_t var5;
       char tmp2[4];
-      tmp2[0] = 0;
-      tmp2[1] = 0;
-      tmp2[2] = 0;
-      tmp2[3] = 0;
-      memcpy(&tmp2[0], &var5, sizeof(var5));
+      if (subtyp == 0) {
+        tmp2[0] = 2;
+        tmp2[1] = 8;
+        tmp2[2] = 5;
+        tmp2[3] = 0;
+      } else {
+        tmp2[0] = 0;
+        tmp2[1] = subtyp;
+        tmp2[2] = 1;
+        tmp2[3] = 0;
+      }
+
+      var5 = ((int8_t)tmp2[3] << 24) | ((int8_t)tmp2[2] << 16) |
+        ((int8_t)tmp2[1] << 8) | (int8_t)tmp2[0];
       writebin(var5, sav, 0);
 
       std::string nvarname = Rcpp::as<std::string>(nvarnames[i]);
@@ -153,17 +171,8 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
 
           default:
           {
-
-            // double len = type;
-            //
-            // len = ceil(len/8) * 8;
-            //
-            // std::string val_s ((int32_t)len, '\0');
-            // readstring(val_s, sav, val_s.size());
-            //
-            // // shorten the string to the actual size reported by SPSS
-            // val_s.erase(type, std::string::npos);
-
+            string val_s = as<string>(as<CharacterVector>(dat[j])[i]);
+            writestr(val_s, type, sav);
             break;
           }
 

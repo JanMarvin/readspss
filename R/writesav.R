@@ -29,6 +29,8 @@
 #' @export
 write.sav <- function(dat, filepath) {
 
+  filepath <- path.expand(filepath)
+
   if (missing(filepath))
     stop("need a path")
 
@@ -37,6 +39,12 @@ write.sav <- function(dat, filepath) {
   nvarnames <- substr(nams, 0, 8)
 
   vtyp <- as.integer(sapply(dat, is.character))
+  vtyp[vtyp != 0] <- as.integer(sapply(dat[vtyp!=0], function(x) max(nchar(x))))
+
+  vtyp <- ceiling(vtyp/8)*8;
+
+  if (any(vtyp>8))
+    stop("not yet implemented")
 
   systime <- Sys.time()
   timestamp <- substr(systime, 12, 19)
