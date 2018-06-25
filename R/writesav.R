@@ -76,6 +76,7 @@ write.sav <- function(dat, filepath) {
 
   nvarnames <- nams
 
+  longvarnames <- ""
   if ((length(nvarnames) > length(names(dat))) | LONGVAR)
     longvarnames <- paste(
       paste0(nvarnames[nvarnames!=""], "=", names(dat)),

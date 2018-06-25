@@ -46,6 +46,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
     bool swapit = 0;
 
     int32_t rtype = 0, subtyp = 0, size = 0, count = 0;
+    std::string empty = "";
 
     Rcpp::IntegerVector vtyp = dat.attr("vtyp");
     Rcpp::IntegerVector vartypes = dat.attr("vartypes");
@@ -150,21 +151,23 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
 
     }
 
-    // beign longvarnames
-    rtype = 7;
-    writebin(rtype, sav, swapit);
+    if (longvarname.compare(empty) != 0) {
+      // beign longvarnames
+      rtype = 7;
+      writebin(rtype, sav, swapit);
 
-    subtyp = 13;
-    writebin(subtyp, sav, swapit);
+      subtyp = 13;
+      writebin(subtyp, sav, swapit);
 
-    size = 1;
-    writebin(size, sav, swapit);
+      size = 1;
+      writebin(size, sav, swapit);
 
-    count = longvarname.size();
-    writebin(count, sav, swapit);
+      count = longvarname.size();
+      writebin(count, sav, swapit);
 
-    writestr(longvarname, longvarname.size(), sav);
-    // end longvarnames
+      writestr(longvarname, longvarname.size(), sav);
+      // end longvarnames
+    }
 
     rtype = 999;
 
