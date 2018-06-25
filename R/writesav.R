@@ -35,23 +35,60 @@ write.sav <- function(dat, filepath) {
     stop("need a path")
 
   nams <- names(dat)
-  nams <- toupper(nams)
-  nvarnames <- substr(nams, 0, 8)
+
+  LONGVAR <- FALSE
+
+  if (all(nchar(nams)<=8)) {
+    nams <- toupper(nams)
+    nvarnames <- substr(nams, 0, 8)
+  } else {
+    nvarnames <- paste0("VAR", seq_along(nams))
+    LONGVAR <- TRUE
+  }
 
   vtyp <- as.integer(sapply(dat, is.character))
   vtyp[vtyp != 0] <- as.integer(sapply(dat[vtyp!=0], function(x) max(nchar(x))))
 
-  vtyp <- ceiling(vtyp/8)*8;
+  vtyp <- ceiling(vtyp/8) * 8;
 
-  if (any(vtyp>8))
-    stop("not yet implemented")
+  fun <- function(vec) {
+
+    vartypes <- NULL
+    for (i in seq_along(vec)) {
+
+      val <- vtyp[i]
+
+      if (val <= 8) {
+        vartypes <- c(vartypes, val)
+      } else {
+        vartypes <- c(vartypes, c(val, rep(-1, (val/8 - 1)) ) )
+      }
+    }
+
+    vartypes
+
+  }
+
+  vartypes <- fun(vtyp)
+
+  nams <- vector("character", length(vartypes))
+  nams[vartypes > -1] <- nvarnames
+
+  nvarnames <- nams
+
+  if ((length(nvarnames) > length(names(dat))) | LONGVAR)
+    longvarnames <- paste(
+      paste0(nvarnames[nvarnames!=""], "=", names(dat)),
+      collapse = "\t")
 
   systime <- Sys.time()
   timestamp <- substr(systime, 12, 19)
   datestamp <- format(Sys.Date(), "%d %b %y")
 
   attr(dat, "vtyp") <- vtyp
+  attr(dat, "vartypes") <- vartypes
   attr(dat, "nvarnames") <- nvarnames
+  attr(dat, "longvarnames") <- longvarnames
   attr(dat, "timestamp") <- timestamp
   attr(dat, "datestamp") <- datestamp
 

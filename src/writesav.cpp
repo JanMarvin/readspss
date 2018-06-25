@@ -45,12 +45,14 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
 
     bool swapit = 0;
 
-    int32_t rtype = 0;
+    int32_t rtype = 0, subtyp = 0, size = 0, count = 0;
 
     Rcpp::IntegerVector vtyp = dat.attr("vtyp");
+    Rcpp::IntegerVector vartypes = dat.attr("vartypes");
     Rcpp::CharacterVector nvarnames = dat.attr("nvarnames");
     std::string timestamp = Rcpp::as<std::string>(dat.attr("timestamp"));
     std::string datestamp = Rcpp::as<std::string>(dat.attr("datestamp"));
+    std::string longvarname = Rcpp::as<std::string>(dat.attr("longvarnames"));
 
 
     std::string spss = "$FL2@(#)";
@@ -84,11 +86,11 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
     writestr(filelabel, filelabel.size(), sav);
 
     // start variable part
-    for (int i = 0; i < k; ++i) {
+    for (int i = 0; i < vartypes.size(); ++i) {
       rtype = 2;
       writebin(rtype, sav, swapit);
 
-      int32_t subtyp = vtyp[i];
+      int32_t subtyp = vartypes[i];
       writebin(subtyp, sav, swapit);
 
       int32_t vlflag = 0;
@@ -104,10 +106,15 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
         tmp1[1] = 8;
         tmp1[2] = 5;
         tmp1[3] = 0;
-      } else {
+      } else if (subtyp > 0) {
         tmp1[0] = 0;
         tmp1[1] = subtyp;
         tmp1[2] = 1;
+        tmp1[3] = 0;
+      } else if (subtyp == -1) {
+        tmp1[0] = 0;
+        tmp1[1] = 0;
+        tmp1[2] = 0;
         tmp1[3] = 0;
       }
 
@@ -122,10 +129,15 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
         tmp2[1] = 8;
         tmp2[2] = 5;
         tmp2[3] = 0;
-      } else {
+      } else if (subtyp > 0) {
         tmp2[0] = 0;
         tmp2[1] = subtyp;
         tmp2[2] = 1;
+        tmp2[3] = 0;
+      } else if (subtyp == -1) {
+        tmp2[0] = 0;
+        tmp2[1] = 0;
+        tmp2[2] = 0;
         tmp2[3] = 0;
       }
 
@@ -137,6 +149,22 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
       writestr(nvarname, 8, sav);
 
     }
+
+    // beign longvarnames
+    rtype = 7;
+    writebin(rtype, sav, swapit);
+
+    subtyp = 13;
+    writebin(subtyp, sav, swapit);
+
+    size = 1;
+    writebin(size, sav, swapit);
+
+    count = longvarname.size();
+    writebin(count, sav, swapit);
+
+    writestr(longvarname, longvarname.size(), sav);
+    // end longvarnames
 
     rtype = 999;
 
