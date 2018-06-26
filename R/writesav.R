@@ -21,6 +21,7 @@
 #' @param dat \emph{data.frame} a dat.aframe to strore as sav-file.
 #' @param filepath \emph{string} full path where and how this file should be
 #'  stored
+#' @param label \emph{character} vector of labels. must be of size `ncol(dat)`
 #' @details For now stores data.frames containing numerics only. Nothing else
 #'  aside varnames and numerics are stored.
 #'

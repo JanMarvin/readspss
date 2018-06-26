@@ -4,13 +4,15 @@
 \alias{write.sav}
 \title{read.sav}
 \usage{
-write.sav(dat, filepath)
+write.sav(dat, filepath, label)
 }
 \arguments{
 \item{dat}{\emph{data.frame} a dat.aframe to strore as sav-file.}
 
 \item{filepath}{\emph{string} full path where and how this file should be
 stored}
+
+\item{label}{\emph{character} vector of labels. must be of size `ncol(dat)`}
 }
 \value{
 \code{readspss} returns nothing
