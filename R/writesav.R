@@ -49,6 +49,10 @@ write.sav <- function(dat, filepath) {
   vtyp <- as.integer(sapply(dat, is.character))
   vtyp[vtyp != 0] <- as.integer(sapply(dat[vtyp!=0], function(x) max(nchar(x))))
 
+  if (any(vtyp>255)) {
+    stop("Strings longer than 255 characters not yet implemented")
+  }
+
   vtyp <- ceiling(vtyp/8) * 8;
 
   fun <- function(vec) {
