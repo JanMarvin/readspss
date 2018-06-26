@@ -27,12 +27,27 @@
 #' @return \code{readspss} returns nothing
 #'
 #' @export
-write.sav <- function(dat, filepath) {
+write.sav <- function(dat, filepath, label) {
 
   filepath <- path.expand(filepath)
 
   if (missing(filepath))
     stop("need a path")
+
+  attrlab <- attr(dat, "var.label")
+
+  if (identical(attrlab, character(0)))
+    attrlab <- NULL
+
+
+  if (missing(label) & is.null(attrlab))
+    label <- ""
+
+  if (missing(label) & !is.null(attrlab))
+    label <- attrlab
+
+  if ((length(label) != ncol(dat)) | ((length(label)==1) & (label[1] == "")))
+    stop("label and ncols differ. each col needs a label")
 
   nams <- names(dat)
 
@@ -96,6 +111,7 @@ write.sav <- function(dat, filepath) {
   attr(dat, "longvarnames") <- longvarnames
   attr(dat, "timestamp") <- timestamp
   attr(dat, "datestamp") <- datestamp
+  attr(dat, "label") <- label
 
   writesav(filepath, dat)
 }

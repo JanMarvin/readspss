@@ -50,10 +50,14 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
 
     Rcpp::IntegerVector vtyp = dat.attr("vtyp");
     Rcpp::IntegerVector vartypes = dat.attr("vartypes");
+
     Rcpp::CharacterVector nvarnames = dat.attr("nvarnames");
+    Rcpp::CharacterVector label = dat.attr("label");
+
     std::string timestamp = Rcpp::as<std::string>(dat.attr("timestamp"));
     std::string datestamp = Rcpp::as<std::string>(dat.attr("datestamp"));
     std::string longvarname = Rcpp::as<std::string>(dat.attr("longvarnames"));
+
 
 
     std::string spss = "$FL2@(#)";
@@ -95,6 +99,10 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
       writebin(subtyp, sav, swapit);
 
       int32_t vlflag = 0;
+
+      if (dat.size() == label.size())
+        vlflag = 1;
+
       writebin(vlflag, sav, swapit);    // Label flag
 
       int32_t nmiss = 0;
@@ -148,6 +156,18 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
 
       std::string nvarname = Rcpp::as<std::string>(nvarnames[i]);
       writestr(nvarname, 8, sav);
+
+      if (vlflag == 1) {
+
+        std::string lab = Rcpp::as<std::string>(label[i]);
+
+        int32_t origlen = 0;
+        origlen = lab.size();
+        origlen = ceil((double)origlen/4) * 4;
+
+        writebin(origlen, sav, swapit);
+        writestr(lab, origlen, sav);
+      }
 
     }
 
