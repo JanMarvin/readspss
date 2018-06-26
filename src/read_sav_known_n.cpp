@@ -194,6 +194,10 @@ Rcpp::List read_sav_known_n (std::istream& sav,
           // 252 should be end of file, but as many things
           // it is not required to be inside the file
           eof = true;
+
+          if (debug)
+            Rcpp::Rcout << "eof: found" << std::endl;
+
           break;
         }
 
@@ -325,17 +329,15 @@ Rcpp::List read_sav_known_n (std::istream& sav,
 
             if (debug)
               Rcpp::Rcout << "stop: eof" << std::endl;
-
-            break;
           }
-
-          // always check if eof is reached
-          eof = sav.eof();
 
           // reset k and res_kk
           kk = 0;
           kk_i = 0;
         }
+
+        if (eof)
+          break;
 
       }
 
