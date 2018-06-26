@@ -46,8 +46,11 @@ write.sav <- function(dat, filepath, label) {
   if (missing(label) & !is.null(attrlab))
     label <- attrlab
 
-  if ((length(label) != ncol(dat)) | ((length(label)==1) & (label[1] == "")))
+  if ( !identical(label, "") & (length(label) != ncol(dat)) )
     stop("label and ncols differ. each col needs a label")
+
+  if (any(nchar(label))>255)
+    stop("longlabels not yet implemented")
 
   nams <- names(dat)
 
