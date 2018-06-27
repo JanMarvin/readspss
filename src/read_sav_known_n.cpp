@@ -22,7 +22,7 @@
 
 #include "spss.h"
 
-Rcpp::List read_sav_known_n (std::istream& sav,
+Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
                bool swapit, bool cflag, bool debug,
                int64_t n, int32_t kv,
                Rcpp::IntegerVector vtyp,
@@ -34,24 +34,6 @@ Rcpp::List read_sav_known_n (std::istream& sav,
   sav.seekg(0, sav.end);
   size_t endoffile = sav.tellg();
   sav.seekg(curpos);
-
-  // 1. Create Rcpp::List
-  Rcpp::List df(kv);
-  for (int32_t i=0; i<kv; ++i)
-  {
-    int const type = vtyp[i];
-    switch(type)
-    {
-    case 0:
-      SET_VECTOR_ELT(df, i, Rcpp::NumericVector(Rcpp::no_init(n)));
-      break;
-
-    default:
-      SET_VECTOR_ELT(df, i, Rcpp::CharacterVector(Rcpp::no_init(n)));
-    break;
-    }
-  }
-
 
   bool eof = 0;
   uint8_t val_b = 0;

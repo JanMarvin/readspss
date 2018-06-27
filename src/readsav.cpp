@@ -775,6 +775,11 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     // size_t endoffile = sav.tellg();
     // sav.seekg(curpos);
 
+
+    if (n < 0)
+      n = read_sav_unknown_n(sav, swapit, cflag, debug,
+                             kv, vtyp, res, vartype);
+
     // 1. Create Rcpp::List
     Rcpp::List df(kv);
     for (int32_t i=0; i<kv; ++i)
@@ -792,16 +797,12 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
       }
     }
 
-    if (n < 0)
-      n = read_sav_unknown_n(sav, swapit, cflag, debug,
-                              kv, vtyp, res, vartype);
-
-    if (n != 0)
-    df = read_sav_known_n(sav, swapit, cflag, debug,
+    if (n > 0)
+      df = read_sav_known_n(df, sav, swapit, cflag, debug,
                             n, kv, vtyp, res, vartype);
 
     // encode full Character vector
-    if (doenc & (n != 0)) {
+    if (doenc & (n > 0)) {
       for (int32_t i=0; i<kv; ++i)
       {
         int const type = vtyp[i];
