@@ -42,7 +42,7 @@ using namespace std;
 //' @export
 // [[Rcpp::export]]
 List readsav(const char * filePath, const bool debug, std::string encStr,
-         std::string const ownEnc)
+             std::string const ownEnc)
 {
 
   std::ifstream sav(filePath, std::ios::in | std::ios::binary);
@@ -590,6 +590,12 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         case 20:
         {
           encoding = readstring(data, sav, count);
+
+          if (encoding.compare("windows-1252") == 0) {
+            encStr = "CP1252";
+            autoenc = true;
+            doenc = true;
+          }
 
           break;
         }
