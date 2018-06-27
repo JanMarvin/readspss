@@ -159,8 +159,10 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   varmat     <- do.call("rbind", attribs$varmat)
   disppar    <- attribs$disppar
   if (!identical(disppar, integer(0)))
-    disppar    <- matrix(disppar, nrow = ncol(data), byrow = TRUE)
+    disppar    <- t(matrix(disppar, ncol = NCOL(data)))
 
+  if (NROW(data) == 0)
+    use.missings <- FALSE
 
   # convert NAs by missing information provided by SPSS.
   # these are just different missing values in Stata and NA in R.
