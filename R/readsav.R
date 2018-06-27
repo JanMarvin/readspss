@@ -365,34 +365,37 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
           len <- ceiling(len/255) - 1
 
           p <- which(nams %in% nam)
-          nams[p : (p + len)]
+          if (!identical(p, integer(0)))
+            nams[p : (p + len)]
         })
 
       for (i in length(replvec):1) {
 
         pat <- replvec[[i]]
 
+        if (!is.null(pat)) {
 
-        # any variables to combine?
-        if (length(pat) > 1 & grepl("0", pat[2])) {
-          sel <- data[,names(data) %in% pat]
+          # any variables to combine?
+          if (length(pat) > 1 & grepl("0", pat[2])) {
+            sel <- data[,names(data) %in% pat]
 
-          if (all(sapply(sel, is.character))) {
-            pp <- pat[-1]; p1 <- pat[1]
+            if (all(sapply(sel, is.character))) {
+              pp <- pat[-1]; p1 <- pat[1]
 
-            remove <- !names(data) %in% pp
+              remove <- !names(data) %in% pp
 
-            # remove columns pat[2:n]
-            data <- data[,remove]
+              # remove columns pat[2:n]
+              data <- data[,remove]
 
-            # resize varmat and disppar as well
-            varmat  <- varmat[remove,]
+              # resize varmat and disppar as well
+              varmat  <- varmat[remove,]
 
-            if (!is.null(disppar))
-              disppar <- disppar[remove,]
+              if (!is.null(disppar))
+                disppar <- disppar[remove,]
 
-            data[p1] <- do.call(paste0, sel)
+              data[p1] <- do.call(paste0, sel)
 
+            }
           }
         }
       }
