@@ -243,7 +243,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     for (i in seq_along(label))
       names(label[[i]]) <- read.encoding(names(label[[i]]),
                                          fromEncoding = encStr,
-                                         encoding = "")
+                                         encoding = ownEnc)
   }
 
   if (convert.factors) {
