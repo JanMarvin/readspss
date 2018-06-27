@@ -472,6 +472,10 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         size   = readbin(size, sav, swapit);
         count  = readbin(count, sav, swapit);
 
+        if (debug)
+          Rprintf("rtype %d; subtyp %d; size %d; count %d\n",
+                  rtype, subtyp, size, count);
+
         std::string data (size*count, '\0');
 
         switch(subtyp)
@@ -649,31 +653,42 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
         case 22:
         {
-          len = readbin(len, sav, swapit);
-          std::string vn (len, '\0');
+          // size = 1
+          // count = 430
 
-          vn = readstring(vn, sav, len);
+          auto endt22 = sav.tellg();
+          endt22 += size * count;
 
-          int8_t mv = 0;
-          mv = readbin(mv, sav, swapit);
-          len = readbin(len, sav, swapit);
+          while (sav.tellg() < endt22) {
 
-          // set size
-          CharacterVector longmissing(mv);
+            len = readbin(len, sav, swapit);
+            std::string vn (len, '\0');
+            vn = readstring(vn, sav, len);
 
-          for (int8_t i = 0; i<mv; ++i){
-            std::string mnV (len, '\0');
+            int8_t mv = 0;
+            mv = readbin(mv, sav, swapit);
 
-            mnV = readstring(mnV, sav, len);
-            mnV = std::regex_replace(mnV, std::regex(" +$"), "$1");
+            // set size
+            CharacterVector longmissing(mv);
+            len = readbin(len, sav, swapit); // should be 8
 
-            longmissing(i) = mnV;
+            if (debug)
+              Rprintf("mv %d; len %d\n", mv, len);
+
+            for (int32_t mm = 0; mm < mv; ++mm) {
+
+              std::string val (len, '\0');
+              val = readstring(val, sav, val.size());
+
+              val = std::regex_replace(val, std::regex(" +$"), "$1");
+
+              longmissing(mm) = val;
+            }
+
+            longmissvn.push_back(vn);
+            longmlist.push_back(longmissing);
+            longmlist.attr("names") = longmissvn;
           }
-
-          longmissvn.push_back(vn);
-          longmlist.push_back(longmissing);
-
-          longmlist.attr("names") = longmissvn;
 
 
           break;
