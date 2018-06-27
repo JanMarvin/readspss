@@ -42,7 +42,7 @@ using namespace std;
 //' @export
 // [[Rcpp::export]]
 List readsav(const char * filePath, const bool debug, std::string encStr,
-         std::string const ownEnc)
+             std::string const ownEnc)
 {
 
   std::ifstream sav(filePath, std::ios::in | std::ios::binary);
@@ -449,7 +449,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         {
           std::string docline = readstring(document, sav, document.size());
 
-          if (doenc) docline = Riconv(docline, encStr);
+          // if (doenc) docline = Riconv(docline, encStr);
 
           // trim additional whitespaces to the right
           docline = std::regex_replace(docline,
@@ -590,6 +590,13 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         case 20:
         {
           encoding = readstring(data, sav, count);
+
+          if ((!noenc) & (charcode == 2) &
+              (encoding.compare("windows-1252") == 0)) {
+            encStr = "CP1252";
+            autoenc = true;
+            doenc = true;
+          }
 
           break;
         }
@@ -769,18 +776,40 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     if (bign > n)
       n = bign;
 
-    List df;
+    // // final position
+    // size_t curpos = sav.tellg();
+    // sav.seekg(0, sav.end);
+    // size_t endoffile = sav.tellg();
+    // sav.seekg(curpos);
 
-    if (n <= 0)
+
+    if (n < 0)
       n = read_sav_unknown_n(sav, swapit, cflag, debug,
-                              kv, vtyp, res, vartype);
+                             kv, vtyp, res, vartype);
 
+    // 1. Create Rcpp::List
+    Rcpp::List df(kv);
+    for (int32_t i=0; i<kv; ++i)
+    {
+      int const type = vtyp[i];
+      switch(type)
+      {
+      case 0:
+        SET_VECTOR_ELT(df, i, Rcpp::NumericVector(Rcpp::no_init(n)));
+        break;
 
-    df = read_sav_known_n(sav, swapit, cflag, debug,
+      default:
+        SET_VECTOR_ELT(df, i, Rcpp::CharacterVector(Rcpp::no_init(n)));
+      break;
+      }
+    }
+
+    if (n > 0)
+      df = read_sav_known_n(df, sav, swapit, cflag, debug,
                             n, kv, vtyp, res, vartype);
 
     // encode full Character vector
-    if (doenc) {
+    if (doenc & (n > 0)) {
       for (int32_t i=0; i<kv; ++i)
       {
         int const type = vtyp[i];

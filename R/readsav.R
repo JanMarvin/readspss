@@ -18,56 +18,83 @@
 #' read.sav
 #'
 #' Function to read a SPSS sav file into a data.frame().
-#' @param file \emph{string} a sav-file to import. can be a file on a computer
+#'@param file \emph{string} a sav-file to import. can be a file on a computer
 #' or an url. in this case the file will be downloaded and read befor it is
 #' used.
-#' @param convert.factors \emph{logical} if true numeric or character variables
+#'@param convert.factors \emph{logical} if true numeric or character variables
 #' will be converted into a factor in R.
-#' @param generate.factors \emph{logical} function to convert variables with
+#'@param generate.factors \emph{logical} function to convert variables with
 #' partial labels into factors. e.g. 1 - low and 5 - high are provided, labels
 #' 2, 3 and 4 will be created. especially useful in combination with
 #' \code{use.missings=TRUE}.
-#' @param encoding \emph{logical} shall values be converted? If true, read.sav
+#'@param encoding \emph{logical} shall values be converted? If true, read.sav
 #' will try the charcode stored inside the sav-file. If this value is 2 or not
 #' available, fromEncoding can be used to change encoding.
-#' @param fromEncoding \emph{character.} encoding of the imported file. This
+#'@param fromEncoding \emph{character.} encoding of the imported file. This
 #' information is stored inside the sav-file, but is currently unused. Still
 #' this option can be used to define the inital encoding by hand.
-#' @param use.missings \emph{logical} should missing values be converted.
+#'@param use.missings \emph{logical} should missing values be converted.
 #' Defaults to TRUE.
 #' @param debug \emph{logical} provides additional debug information. Most
 #' likely not usefull to any user.
-#' @param override \emph{logical}. The filename provided in \code{file} is
+#'@param override \emph{logical}. The filename provided in \code{file} is
 #' checked for the ending sav. If the fileending is different, nothing is read.
 #' This option can be used to override this behavior.
-#' @param convert.dates \emph{logical}. Should dates be converted on the fly?
+#'@param convert.dates \emph{logical}. Should dates be converted on the fly?
 #'
-#' @details SPSS files are widely available, though for R long time only foreign
+#'@details SPSS files are widely available, though for R long time only foreign
 #' and memisc provided functions to import sav-files. Lately haven joined.
 #' This package is an approach to offer another alternative, to document the
 #' sav-format and provide additional options to import the data.
+#' sav-files are stored most exclusively as numerics only in compression mode
+#' are some integers stored as integers. Still they are returned as numerics.
+#'
+#'@examples
+#' fl <- system.file("extdata", "electric.sav", package = "readspss")
+#' dd <- read.sav(fl)
 #'
 #'@return \code{readspss} returns a data.frame with additional objects
 #'\describe{
-#'\item{names}{colnames}
 #'\item{row.names}{rownames}
-#'\item{class}{data.frame}
-#'\item{val.label}{value labels}
+#'\item{names}{colnames}
 #'\item{datalabel}{datalabel}
 #'\item{datestamp}{datestamp}
 #'\item{timestamp}{timestamp}
-#'\item{varmatrix}{a matrix with information how the data is stored}
-#'\item{labnames}{list containing the information which variable uses which
-#' label}
+#'\item{filelabel}{filelabel}
+#'\item{class}{data.frame}
+#'\item{vtype}{SPSS type 0 is usually a numeric/integer}
+#'\item{val.label}{value labels}
+#'\item{disppar}{matrix of display parameters if available}
 #'\item{missings}{a list containg information about the missing variables. if
-#'\code{use.missings=TRUE} this Information will be used to generate missings.}
-#'\item{vartype}{informations about a variable. is it numeric or string.}
+#' \code{use.missings=TRUE} this Information will be used to generate missings.}
+#'\item{haslabel}{list of variables that contain labels}
+#'\item{longstring}{character vector of long strings if any in file}
+#'\item{longmissing}{character vector of missings in longstrings if any}
+#'\item{longlabel}{character vector of long labels}
+#'\item{cflag}{0 if uncompressed, 1 if compressed}
+#'\item{endian}{2 or 3 if little endian else 0}
+#'\item{compression}{compression similar to cflag, somehow stored twice in the
+#' sav file}
+#'\item{doc}{list containing documentation information if any}
+#'\item{charcode}{encoding string most likely 2 is CP1252}
+#'\item{encoding}{sometimes sav-file contain encoding as a extra string}
+#'\item{ownEnc}{encoding of the R-session}
+#'\item{doenc}{was the file supposed to be encoded?}
+#'\item{autoenc}{was encoding applied to the file?}
+#'\item{swapit}{were the bytes swapped?}
+#'\item{totals}{character string of totals if any}
+#'\item{dataview}{xml file how the data should be printed}
+#'\item{extraproduct}{additional string provided}
+#'\item{label}{list containing label value information}
+#'\item{varmatrix}{a matrix with information how the data is stored}
+#'\item{var.label}{variable labels}
+#'\item{lmissings}{missings table if any in longstrings}
 #'}
 #'
-#'@note information to decrypt the sav-format was provided by tda
+#'@note Information to decrypt the sav-format was provided by tda
 #' \url{http://www.stat.ruhr-uni-bochum.de/tda.html} and pspp
 #'  \url{http://www.gnu.org/software/pspp/}
-#' @author Jan Marvin Garbuszus \email{jan.garbuszus@@ruhr-uni-bochum.de}
+#'@author Jan Marvin Garbuszus \email{jan.garbuszus@@ruhr-uni-bochum.de}
 #'
 #'@seealso \code{\link[foreign]{read.spss}}, \code{memisc} and
 #'\code{\link[haven]{read_sav}}.
@@ -126,14 +153,18 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   attr(data, "label") <- NULL
   attr(data, "res") <- NULL
 
+  encStr     <- attribs$encStr
+  autoenc    <- attribs$autoenc
   label      <- attribs$label
   val.labels <- attribs$vallabels
   vartypes   <- attribs$vartypes
   varmat     <- do.call("rbind", attribs$varmat)
   disppar    <- attribs$disppar
   if (!identical(disppar, integer(0)))
-    disppar    <- matrix(disppar, nrow = ncol(data), byrow = TRUE)
+    disppar    <- t(matrix(disppar, ncol = NCOL(data)))
 
+  if (NROW(data) == 0)
+    use.missings <- FALSE
 
   # convert NAs by missing information provided by SPSS.
   # these are just different missing values in Stata and NA in R.
@@ -205,6 +236,16 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   labnames <- attribs$haslabel
   varnames <- attribs$varnames
+
+  # if autoenc labels were not encoded during readsav() so encode now
+  if (encoding & autoenc) {
+
+    # label
+    for (i in seq_along(label))
+      names(label[[i]]) <- read.encoding(names(label[[i]]),
+                                         fromEncoding = encStr,
+                                         encoding = ownEnc)
+  }
 
   if (convert.factors) {
     # vnames <- names(data)
@@ -336,34 +377,37 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
           len <- ceiling(len/255) - 1
 
           p <- which(nams %in% nam)
-          nams[p : (p + len)]
+          if (!identical(p, integer(0)))
+            nams[p : (p + len)]
         })
 
       for (i in length(replvec):1) {
 
         pat <- replvec[[i]]
 
+        if (!is.null(pat)) {
 
-        # any variables to combine?
-        if (length(pat) > 1 & grepl("0", pat[2])) {
-          sel <- data[,names(data) %in% pat]
+          # any variables to combine?
+          if (length(pat) > 1 & grepl("0", pat[2])) {
+            sel <- data[,names(data) %in% pat]
 
-          if (all(sapply(sel, is.character))) {
-            pp <- pat[-1]; p1 <- pat[1]
+            if (all(sapply(sel, is.character))) {
+              pp <- pat[-1]; p1 <- pat[1]
 
-            remove <- !names(data) %in% pp
+              remove <- !names(data) %in% pp
 
-            # remove columns pat[2:n]
-            data <- data[,remove]
+              # remove columns pat[2:n]
+              data <- data[,remove]
 
-            # resize varmat and disppar as well
-            varmat  <- varmat[remove,]
+              # resize varmat and disppar as well
+              varmat  <- varmat[remove,]
 
-            if (!is.null(disppar))
-              disppar <- disppar[remove,]
+              if (!is.null(disppar))
+                disppar <- disppar[remove,]
 
-            data[p1] <- do.call(paste0, sel)
+              data[p1] <- do.call(paste0, sel)
 
+            }
           }
         }
       }
