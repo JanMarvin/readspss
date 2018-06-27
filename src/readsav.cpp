@@ -449,7 +449,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         {
           std::string docline = readstring(document, sav, document.size());
 
-          if (doenc) docline = Riconv(docline, encStr);
+          // if (doenc) docline = Riconv(docline, encStr);
 
           // trim additional whitespaces to the right
           docline = std::regex_replace(docline,
@@ -595,6 +595,9 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
             encStr = "CP1252";
             autoenc = true;
             doenc = true;
+
+            Rcpp::Rcout << "encoding type windows-1252 found. You should" <<
+                      " call fromEncoding = 'CP1252'" << std::endl;
           }
 
           break;
