@@ -237,6 +237,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   labnames <- attribs$haslabel
   varnames <- attribs$varnames
 
+  # if autoenc labels were not encoded during readsav() so encode now
   if (encoding & autoenc) {
 
     # label
