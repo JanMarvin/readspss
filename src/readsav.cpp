@@ -591,13 +591,11 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         {
           encoding = readstring(data, sav, count);
 
-          if (encoding.compare("windows-1252") == 0) {
+          if ((!noenc) & (charcode == 2) &
+              (encoding.compare("windows-1252") == 0)) {
             encStr = "CP1252";
             autoenc = true;
             doenc = true;
-
-            Rcpp::Rcout << "encoding type windows-1252 found. You should" <<
-                      " call fromEncoding = 'CP1252'" << std::endl;
           }
 
           break;

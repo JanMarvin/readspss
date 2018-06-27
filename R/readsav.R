@@ -153,6 +153,8 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   attr(data, "label") <- NULL
   attr(data, "res") <- NULL
 
+  encStr     <- attribs$encStr
+  autoenc    <- attribs$autoenc
   label      <- attribs$label
   val.labels <- attribs$vallabels
   vartypes   <- attribs$vartypes
@@ -234,6 +236,15 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   labnames <- attribs$haslabel
   varnames <- attribs$varnames
+
+  if (encoding & autoenc) {
+
+    # label
+    for (i in seq_along(label))
+      names(label[[i]]) <- read.encoding(names(label[[i]]),
+                                         fromEncoding = encStr,
+                                         encoding = "")
+  }
 
   if (convert.factors) {
     # vnames <- names(data)
