@@ -786,17 +786,6 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     if (debug)
       Rprintf("-- Start: Data Part \n");
 
-    // since SPSS already provides an int64 presumably there are files where
-    // an int32 is not enough so assume that bign is a valid number
-    if (bign > n)
-      n = bign;
-
-    // // final position
-    // size_t curpos = sav.tellg();
-    // sav.seekg(0, sav.end);
-    // size_t endoffile = sav.tellg();
-    // sav.seekg(curpos);
-
 
     if (n < 0)
       n = read_sav_unknown_n(sav, swapit, cflag, debug,

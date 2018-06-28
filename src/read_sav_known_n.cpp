@@ -30,9 +30,9 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
                std::vector<int> vartype) {
 
   // final position
-  size_t curpos = sav.tellg();
+  auto curpos = sav.tellg();
   sav.seekg(0, sav.end);
-  size_t endoffile = sav.tellg();
+  auto endoffile = sav.tellg();
   sav.seekg(curpos);
 
   bool eof = 0;
@@ -299,9 +299,15 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
         if (res_i == 0)
           ++kk;
 
+        // Rprintf("kk : %d\n", kk);
+
+
         // Update kk iterator. If kk is k, update nn to start in next row.
         if (kk == kv) {
           ++nn;
+
+          // if (debug)
+          //   Rprintf("nn : %d - n: %d\n", nn, n);
 
           // Rprintf("nn: %d", nn);
           // some files are not ended with 252, ensure that no out of bounds
