@@ -5,6 +5,17 @@
 
 using namespace Rcpp;
 
+// boost_split
+Rcpp::CharacterVector boost_split(std::string val_s);
+RcppExport SEXP _readspss_boost_split(SEXP val_sSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type val_s(val_sSEXP);
+    rcpp_result_gen = Rcpp::wrap(boost_split(val_s));
+    return rcpp_result_gen;
+END_RCPP
+}
 // fast_factor
 SEXP fast_factor(SEXP x, SEXP y);
 RcppExport SEXP _readspss_fast_factor(SEXP xSEXP, SEXP ySEXP) {
@@ -46,6 +57,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_readspss_boost_split", (DL_FUNC) &_readspss_boost_split, 1},
     {"_readspss_fast_factor", (DL_FUNC) &_readspss_fast_factor, 2},
     {"_readspss_por", (DL_FUNC) &_readspss_por, 3},
     {"_readspss_readsav", (DL_FUNC) &_readspss_readsav, 4},

@@ -337,7 +337,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
     # contains long varname (e.g. when longer varnames are provided or if the
     # dataset contains long strings)
-    longname <- strsplit(longvarname, "=")
+    longname <- lapply(longvarname, boost_split)
 
     # contains varname and absolute length eg
     # A258=00258
