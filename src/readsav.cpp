@@ -197,6 +197,8 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         printINT = 0, writeINT = 0, lablen32 = 0, len = 0, nolabels = 0,
         lab_id = 0;
 
+      if (debug)
+        Rprintf("rtype %d ", rtype);
 
       if (rtype == 2) {
 
@@ -289,8 +291,11 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         // has an additional discrete value.
 
 
-        if (debug)
+        if (debug) {
+          Rcout << nvarname << " ";
+          Rprintf("nmistype %d ", nmisstype);
           Rprintf("vflag %d\n", vlflag);
+        }
 
         // PSPP states that long strings are handled differently
         if (nmisstype > 0) {
@@ -342,6 +347,8 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
         nolab = readbin(nolab, sav, swapit);
 
+        Rprintf("%d", nolab);
+
         Rcpp::CharacterVector label(nolab), codeV(nolab);
         Rcpp::NumericVector code(nolab);
 
@@ -380,6 +387,14 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
 
             lablen = readbin(lablen, sav, swapit);
+
+            // if (debug) {
+            //   Rprintf("%d %d %d ", i, noNum, lablen);
+            //   if (noNum)
+            //     std::cout << cV << std::endl;
+            //   else
+            //     Rprintf("%f\n", coden);
+            // }
 
             if (!((lablen+1)%8==0))
             {
