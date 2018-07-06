@@ -146,7 +146,8 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     if (doenc) filelabel = Riconv(filelabel, encStr);
 
 
-    int8_t lablen = 0, div = 0;
+    uint8_t lablen = 0;
+    int8_t div = 0;
     int32_t rtype = 0;
 
     std::string name (8, '\0');
