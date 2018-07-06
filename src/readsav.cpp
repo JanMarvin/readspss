@@ -347,7 +347,8 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
         nolab = readbin(nolab, sav, swapit);
 
-        Rprintf("%d", nolab);
+        // if (debug)
+        //   Rprintf("%d", nolab);
 
         Rcpp::CharacterVector label(nolab), codeV(nolab);
         Rcpp::NumericVector code(nolab);
