@@ -160,9 +160,11 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   vartypes   <- attribs$vartypes
   varmat     <- do.call("rbind", attribs$varmat)
   disppar    <- attribs$disppar
-  if (!identical(disppar, integer(0)))
+  if (!identical(disppar, integer(0))) {
     disppar    <- t(matrix(disppar, ncol = NCOL(data)))
-
+  } else{
+    disppar <- NULL
+  }
   if (NROW(data) == 0)
     use.missings <- FALSE
 
