@@ -20,6 +20,7 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
+#include <regex>
 
 using namespace Rcpp;
 using namespace std;
@@ -34,10 +35,32 @@ using namespace std;
 //' @import Rcpp
 //' @export
 // [[Rcpp::export]]
-List por(const char * filePath, const bool debug, std::string encStr)
+List readpor(const char * filePath, const bool debug, std::string encStr)
 {
 
-  std::ifstream por(filePath, std::ios::in | std::ios::binary);
+  std::string input;
+  std::string file;
+  stringstream por;
+
+  std::ifstream por_file(filePath, std::ios::in | std::ios::binary);
+  if (por_file) {
+    while (getline(por_file, input))
+      file += input;
+  } else {
+    stop ("woops");
+  }
+
+  // std::regex e("([^\r\n]|^)\r\n([^\r\n]|$)");
+  // std::cout << std::regex_replace(file, e, "$1$2") << std::endl;
+
+  // remove all newline characters \r and \n
+  file.erase( std::remove(file.begin(), file.end(), '\r'), file.end() );
+  file.erase( std::remove(file.begin(), file.end(), '\n'), file.end() );
+
+
+  por << file;
+
+
   if (por) {
 
     // int32_t n = 0;
@@ -73,7 +96,7 @@ List por(const char * filePath, const bool debug, std::string encStr)
 
 
     // Controll characters
-    por.seekg(67, std::ios::cur);
+    por.seekg(61, std::ios::cur);
 
     // Reserved
     por.seekg(3, std::ios::cur);
@@ -101,7 +124,7 @@ List por(const char * filePath, const bool debug, std::string encStr)
       // Rprintf("lower: %s \n", lower.c_str());
 
     // random
-    std::string random (62, '\0');
+    std::string random (61, '\0');
     random = readstring(random, por, random.size());
 
     if (debug)
@@ -109,9 +132,72 @@ List por(const char * filePath, const bool debug, std::string encStr)
 
 
     // Reserved
-    por.seekg(66, std::ios::cur);
+    std::string reserved (69, '\0');
+    reserved = readstring(reserved, por, reserved.size());
+
+    // tag
+    std::string tag (8, '\0');
+    tag = readstring(tag, por, tag.size());
+
+    if (debug)
+      Rcout << "tag: " << tag << std::endl;
 
     Rcout << "Pos: " << por.tellg() << std::endl;
+    // end of header -----------------------------------------------------------
+
+
+    // version and date record
+    std::string vers (1, '\0');
+    vers = readstring(vers, por, vers.size());
+
+    std::string filedatelen = string(1, '\0');
+    filedatelen = readstring(filedatelen, por, filedatelen.size());
+
+    std::string slash = string(1, '\0');
+    readstring(slash, por, slash.size());
+
+    std::string filedate (std::stoi(filedatelen), '\0');
+    filedate = readstring(filedate, por, filedate.size());
+
+
+    std::string filetimelen = string(1, '\0');
+    filetimelen = readstring(filetimelen, por, filetimelen.size());
+
+    readstring(slash, por, slash.size());
+
+    std::string filetime (std::stoi(filetimelen), '\0');
+    filetime = readstring(filetime, por, filetime.size());
+
+
+
+    Rcout << vers << " " << filedate << " " << filetime << std::endl;
+
+    // identification record
+    std::string prodrec (1, '\0');
+    prodrec = readstring(prodrec, por, prodrec.size());
+
+    std::string prodlen (2, '\0');
+    prodlen = readstring(prodlen, por, prodlen.size());
+
+    readstring(slash, por, slash.size());
+
+    // std::string prod (std::stoi(prodlen), '\0');
+    std::string prod (39, '\0');
+    prod = readstring(prod, por, prod.size());
+
+
+    std::string rtype (1, '\0');
+    rtype = readstring(rtype, por, rtype.size());
+
+    // if (rtype == 4) {
+      std::string varcount (1, '\0');
+      varcount = readstring(varcount, por, rtype.size());
+    // }
+
+
+
+    Rcout << prod << std::endl;
+
 
     return 0;
 

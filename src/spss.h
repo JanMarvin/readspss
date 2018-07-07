@@ -110,8 +110,8 @@ static const std::string codepage(int cp) {
 }
 
 
-
-static std::string readstring(std::string mystring, std::istream& sav,
+template <typename T>
+static std::string readstring(std::string mystring, T& sav,
                               int nchar)
 {
 

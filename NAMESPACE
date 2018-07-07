@@ -2,8 +2,8 @@
 
 export(boost_split)
 export(fast_factor)
-export(por)
 export(read.sav)
+export(readpor)
 export(readsav)
 import(Rcpp)
 importFrom(stats,na.omit)

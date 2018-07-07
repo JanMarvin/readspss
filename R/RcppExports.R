@@ -28,8 +28,8 @@ fast_factor <- function(x, y) {
 #' @param encStr encoding string
 #' @import Rcpp
 #' @export
-por <- function(filePath, debug, encStr) {
-    .Call(`_readspss_por`, filePath, debug, encStr)
+readpor <- function(filePath, debug, encStr) {
+    .Call(`_readspss_readpor`, filePath, debug, encStr)
 }
 
 #' Reads the binary SPSS file
