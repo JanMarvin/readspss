@@ -435,7 +435,8 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     # in such cases, which is why this approach is selected
     sel <- which(names(new_nams) %in% nams)
 
-    nams[names(new_nams[sel])] <- new_nams[sel]
+    if (!identical(integer(0), sel))
+      nams[names(new_nams[sel])] <- new_nams[sel]
 
     names(data) <- nams
 
