@@ -429,7 +429,13 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
       z
     })
 
-    nams <- replace(nams, which(nams %in% names(new_nams)), values = new_nams)
+
+    # for this replace was used, but in the world of sav-files everything is
+    # possible even files where nams and new_nams differ. replace got confused
+    # in such cases, which is why this approach is selected
+    sel <- which(names(new_nams) %in% nams)
+
+    nams[names(new_nams[sel])] <- new_nams[sel]
 
     names(data) <- nams
 
