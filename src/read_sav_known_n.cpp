@@ -23,7 +23,8 @@
 #include "spss.h"
 
 Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
-               bool swapit, bool cflag, bool debug,
+               const bool swapit, const uint8_t cflag,
+               const bool debug,
                int64_t n, int32_t kv,
                Rcpp::IntegerVector vtyp,
                Rcpp::NumericVector res,
