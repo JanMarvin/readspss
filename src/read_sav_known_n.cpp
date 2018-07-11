@@ -332,7 +332,9 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
 
     }
 
-  } else {
+  }
+
+  if (cflag == 0) {
 
     kk = 0;
 
