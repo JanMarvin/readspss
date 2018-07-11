@@ -118,6 +118,7 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
 
         case 0:
         {
+          --kk_i;
           --kk;
           break;
           // ignored
@@ -249,10 +250,25 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
 
         case 254:
         {
+          switch(type)
+        {
+
+          case 0:
+          {
+            // --kk_i;
+            res_i = 0;
+            break;
+          }
+
+        default:
+        {
           // 254 indicates that string chunks read before should be
           // interpreted as a single string.
 
           if (res_i == res_kk-1) {
+
+
+          Rcpp::Rcout << start << std::endl;
 
           // trim additional whitespaces to the right
           start = std::regex_replace(start,
@@ -269,6 +285,9 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
         }
 
         break;
+        }
+        }
+          break;
         }
 
         case 255:

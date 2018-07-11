@@ -123,7 +123,8 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   file <- file_ext(basename(filepath))
 
-  if ((file != "sav" & file != "SAV") & !isTRUE(override) ){
+  if ((file != "sav" & file != "SAV" & file != "zsav" & file != "ZSAV") &
+      !isTRUE(override) ){
     warning ("Filending is not sav.
              Use Override if this check should be ignored.")
     return( NULL )
