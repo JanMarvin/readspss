@@ -18,9 +18,8 @@
 #ifndef READ_SAV_KNOWN_N_H
 #define READ_SAV_KNOWN_N_H
 
-
 Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
-               const bool swapit, const bool cflag,
+               const bool swapit, const uint8_t cflag,
                const bool debug,
                const int64_t n, const int32_t kv,
                Rcpp::IntegerVector vtyp,
