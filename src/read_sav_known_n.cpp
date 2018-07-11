@@ -267,9 +267,6 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
 
           if (res_i == res_kk-1) {
 
-
-          Rcpp::Rcout << start << std::endl;
-
           // trim additional whitespaces to the right
           start = std::regex_replace(start,
                                      std::regex(" +$"), "$1");
