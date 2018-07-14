@@ -7,6 +7,7 @@ Authors@R: c(
     email = "jan.garbuszus@ruhr-uni-bochum.de", role = c("aut", "cre")),
     person("Ben", "Pfaff", role = c("aut", "cph"),
     comment = "author of encryption part"),
+    person("Jeroen", "Ooms", role ="ctr",
     person("readstata13", role="cph"),
     person("R Core Team", role="cph")
     )
