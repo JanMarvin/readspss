@@ -1,6 +1,6 @@
 VERSION=1.1.0f
 PKG_CPPFLAGS= -I../windows/openssl-$(VERSION)/include
-PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` -L../windows/openssl-$(VERSION)/lib${R_ARCH} -lz -lcrypto -lcrypt32
+PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` -L../windows/openssl-$(VERSION)/lib${R_ARCH} -lz -lcrypto -lws2_32 -lcrypt32
 
 all: clean winlibs
 
