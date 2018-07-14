@@ -5,6 +5,8 @@ Version: 0.4
 Authors@R: c(
     person("Jan Marvin", "Garbuszus",
     email = "jan.garbuszus@ruhr-uni-bochum.de", role = c("aut", "cre")),
+    person("Ben", "Pfaff", role = c("aut", "cph"),
+    comment = "author of encryption part"),
     person("readstata13", role="cph"),
     person("R Core Team", role="cph")
     )
@@ -15,7 +17,7 @@ LazyData: TRUE
 Imports:
     Rcpp (>= 0.11.2)
 Suggests: testthat, foreign, datasets
-LinkingTo: Rcpp, BH
+LinkingTo: Rcpp, BH, openssl
 SystemRequirements: C++11
 ByteCompile: yes
 RoxygenNote: 6.0.1
