@@ -171,7 +171,9 @@ static int
       if (x & (1u << i))
         return i;
 
-      abort ();
+    // hopefully never reachead. was abort(), but
+    // check() does not like that
+    return 0;
   }
 
 /* Attempts to decode a pair of encoded password characters A and B into a

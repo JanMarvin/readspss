@@ -17,7 +17,7 @@ LazyData: TRUE
 Imports:
     Rcpp (>= 0.11.2)
 Suggests: testthat, foreign, datasets
-LinkingTo: Rcpp, BH, openssl
-SystemRequirements: C++11
+LinkingTo: Rcpp, BH
+SystemRequirements: C++11, OpenSSL >= 1.0.1
 ByteCompile: yes
 RoxygenNote: 6.0.1
