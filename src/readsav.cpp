@@ -31,6 +31,7 @@ using namespace std;
 #include "spss.h"
 #include "read_sav_known_n.h"
 #include "read_sav_unknown_n.h"
+#include "read_sav_uncompress.h"
 
 //' Reads the binary SPSS file
 //'
@@ -48,7 +49,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
   std::ifstream sav(filePath, std::ios::in | std::ios::binary);
   if (sav) {
 
-    bool is_spss = false, swapit = false, autoenc = false;
+    bool is_spss = false, is_sav = false, is_zsav = false, swapit = false, autoenc = false;
 
     int64_t n = 0;
     int32_t k = 0;
@@ -72,7 +73,11 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
     std::string spss (8, '\0');
     spss = readstring(spss, sav, spss.size());
-    is_spss = std::regex_match(spss, std::regex("^\\$FL2@\\(#\\)$"));
+
+    is_sav = std::regex_match(spss, std::regex("^\\$FL2@\\(#\\)$"));
+    is_zsav = std::regex_match(spss, std::regex("^\\$FL3@\\(#\\)$"));
+    is_spss = (is_sav == true) || (is_zsav == true);
+
 
     if (!is_spss)
       throw std::range_error("Can not read this file. Is it no SPSS sav file?");
@@ -146,7 +151,8 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     if (doenc) filelabel = Riconv(filelabel, encStr);
 
 
-    int8_t lablen = 0, div = 0;
+    uint8_t lablen = 0;
+    int8_t div = 0;
     int32_t rtype = 0;
 
     std::string name (8, '\0');
@@ -196,6 +202,8 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         printINT = 0, writeINT = 0, lablen32 = 0, len = 0, nolabels = 0,
         lab_id = 0;
 
+      if (debug)
+        Rprintf("rtype %d ", rtype);
 
       if (rtype == 2) {
 
@@ -288,8 +296,11 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         // has an additional discrete value.
 
 
-        if (debug)
+        if (debug) {
+          Rcout << nvarname << " ";
+          Rprintf("nmistype %d ", nmisstype);
           Rprintf("vflag %d\n", vlflag);
+        }
 
         // PSPP states that long strings are handled differently
         if (nmisstype > 0) {
@@ -341,6 +352,9 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
         nolab = readbin(nolab, sav, swapit);
 
+        // if (debug)
+        //   Rprintf("%d", nolab);
+
         Rcpp::CharacterVector label(nolab), codeV(nolab);
         Rcpp::NumericVector code(nolab);
 
@@ -379,6 +393,14 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
 
             lablen = readbin(lablen, sav, swapit);
+
+            // if (debug) {
+            //   Rprintf("%d %d %d ", i, noNum, lablen);
+            //   if (noNum)
+            //     std::cout << cV << std::endl;
+            //   else
+            //     Rprintf("%f\n", coden);
+            // }
 
             if (!((lablen+1)%8==0))
             {
@@ -786,17 +808,20 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     if (debug)
       Rprintf("-- Start: Data Part \n");
 
-    // since SPSS already provides an int64 presumably there are files where
-    // an int32 is not enough so assume that bign is a valid number
-    if (bign > n)
-      n = bign;
+    // prepare if zsav
+    std::string sav_unc;
 
-    // // final position
-    // size_t curpos = sav.tellg();
-    // sav.seekg(0, sav.end);
-    // size_t endoffile = sav.tellg();
-    // sav.seekg(curpos);
+    if (is_zsav) {
 
+      // uncompress to tempfile and close open uncompressed zsav file
+      sav_unc = read_sav_uncompress(sav, swapit, cflag, debug);
+      sav.close();
+
+      // reopen zsav uncompressed data part as sav file
+      // std::ifstream sav(sav_unc, std::ios::in | std::ios::binary);
+
+      sav.open(sav_unc);
+    }
 
     if (n < 0)
       n = read_sav_unknown_n(sav, swapit, cflag, debug,
@@ -822,6 +847,15 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     if (n > 0)
       df = read_sav_known_n(df, sav, swapit, cflag, debug,
                             n, kv, vtyp, res, vartype);
+
+
+    // close file
+    sav.close();
+
+    if (is_zsav) {
+      // remove tempfile
+      std::remove(sav_unc.c_str());
+    }
 
     // encode full Character vector
     if (doenc & (n > 0)) {

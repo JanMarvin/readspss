@@ -15,15 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef READ_SAV_KNOWN_N_H
-#define READ_SAV_KNOWN_N_H
+#ifndef READ_SAV_UNCOMPRESS_H
+#define READ_SAV_UNCOMPRESS_H
 
-Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
-               const bool swapit, const uint8_t cflag,
-               const bool debug,
-               const int64_t n, const int32_t kv,
-               Rcpp::IntegerVector vtyp,
-               Rcpp::NumericVector res,
-               std::vector<int> vartype);
+std::string read_sav_uncompress (std::istream& sav,
+                                       const bool swapit, const uint8_t cflag,
+                                       bool debug);
+
 
 #endif

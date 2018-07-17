@@ -15,15 +15,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef READ_SAV_KNOWN_N_H
-#define READ_SAV_KNOWN_N_H
+#include <Rcpp.h>
+#include <string>
 
-Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
-               const bool swapit, const uint8_t cflag,
-               const bool debug,
-               const int64_t n, const int32_t kv,
-               Rcpp::IntegerVector vtyp,
-               Rcpp::NumericVector res,
-               std::vector<int> vartype);
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
 
-#endif
+using namespace std;
+
+//' split character vector at "="
+//'
+//' @param val_s CharacterVector
+//' @import Rcpp
+//' @export
+// [[Rcpp::export]]
+Rcpp::CharacterVector boost_split(std::string val_s) {
+
+  std::vector<std::string> vec_r;
+
+  boost::split(vec_r, val_s,
+               boost::is_any_of("="), boost::token_compress_on);
+
+  return(Rcpp::wrap(vec_r));
+}

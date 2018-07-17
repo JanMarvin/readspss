@@ -163,3 +163,13 @@ test_that("factors", {
   expect_true(all.equal(df_r, df_f, check.attributes = FALSE))
 })
 
+
+#### zsav test #####
+
+fl <- system.file("extdata", "cars.zsav", package="readspss")
+
+df_r <- read.sav(fl)
+
+test_that("zsav", {
+  expect_true(all.equal(df_r, cars, check.attributes = FALSE))
+})

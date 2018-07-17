@@ -23,16 +23,17 @@
 #include "spss.h"
 
 Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
-               bool swapit, bool cflag, bool debug,
+               const bool swapit, const uint8_t cflag,
+               const bool debug,
                int64_t n, int32_t kv,
                Rcpp::IntegerVector vtyp,
                Rcpp::NumericVector res,
                std::vector<int> vartype) {
 
   // final position
-  size_t curpos = sav.tellg();
+  auto curpos = sav.tellg();
   sav.seekg(0, sav.end);
-  size_t endoffile = sav.tellg();
+  auto endoffile = sav.tellg();
   sav.seekg(curpos);
 
   bool eof = 0;
@@ -46,12 +47,13 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
 
   if (debug) {
     Rprintf("cflag: %d\n", cflag);
+    Rprintf("curpos: %d\n", curpos);
+    Rprintf("endpos: %d\n", endoffile);
   }
 
 
   // cflag 1 = compression int8_t - bias
-  if (cflag) {
-
+  if ((cflag == 1) | (cflag == 2)) {
     std::string start = "";
     int32_t res_i = 0, res_kk = 0, kk_i = 0;
 
@@ -116,6 +118,7 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
 
         case 0:
         {
+          --kk_i;
           --kk;
           break;
           // ignored
@@ -247,6 +250,18 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
 
         case 254:
         {
+          switch(type)
+        {
+
+          case 0:
+          {
+            // --kk_i;
+            res_i = 0;
+            break;
+          }
+
+        default:
+        {
           // 254 indicates that string chunks read before should be
           // interpreted as a single string.
 
@@ -267,6 +282,9 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
         }
 
         break;
+        }
+        }
+          break;
         }
 
         case 255:
@@ -299,9 +317,15 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
         if (res_i == 0)
           ++kk;
 
+        // Rprintf("kk : %d\n", kk);
+
+
         // Update kk iterator. If kk is k, update nn to start in next row.
         if (kk == kv) {
           ++nn;
+
+          // if (debug)
+          //   Rprintf("nn : %d - n: %d\n", nn, n);
 
           // Rprintf("nn: %d", nn);
           // some files are not ended with 252, ensure that no out of bounds
@@ -325,7 +349,9 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
 
     }
 
-  } else {
+  }
+
+  if (cflag == 0) {
 
     kk = 0;
 

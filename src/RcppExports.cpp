@@ -5,6 +5,17 @@
 
 using namespace Rcpp;
 
+// boost_split
+Rcpp::CharacterVector boost_split(std::string val_s);
+RcppExport SEXP _readspss_boost_split(SEXP val_sSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type val_s(val_sSEXP);
+    rcpp_result_gen = Rcpp::wrap(boost_split(val_s));
+    return rcpp_result_gen;
+END_RCPP
+}
 // fast_factor
 SEXP fast_factor(SEXP x, SEXP y);
 RcppExport SEXP _readspss_fast_factor(SEXP xSEXP, SEXP ySEXP) {
@@ -17,16 +28,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// por
-List por(const char * filePath, const bool debug, std::string encStr);
-RcppExport SEXP _readspss_por(SEXP filePathSEXP, SEXP debugSEXP, SEXP encStrSEXP) {
+// readpor
+List readpor(const char * filePath, const bool debug, std::string encStr);
+RcppExport SEXP _readspss_readpor(SEXP filePathSEXP, SEXP debugSEXP, SEXP encStrSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const char * >::type filePath(filePathSEXP);
     Rcpp::traits::input_parameter< const bool >::type debug(debugSEXP);
     Rcpp::traits::input_parameter< std::string >::type encStr(encStrSEXP);
-    rcpp_result_gen = Rcpp::wrap(por(filePath, debug, encStr));
+    rcpp_result_gen = Rcpp::wrap(readpor(filePath, debug, encStr));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -57,8 +68,9 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_readspss_boost_split", (DL_FUNC) &_readspss_boost_split, 1},
     {"_readspss_fast_factor", (DL_FUNC) &_readspss_fast_factor, 2},
-    {"_readspss_por", (DL_FUNC) &_readspss_por, 3},
+    {"_readspss_readpor", (DL_FUNC) &_readspss_readpor, 3},
     {"_readspss_readsav", (DL_FUNC) &_readspss_readsav, 4},
     {"_readspss_writesav", (DL_FUNC) &_readspss_writesav, 2},
     {NULL, NULL, 0}

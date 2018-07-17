@@ -123,7 +123,8 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   file <- file_ext(basename(filepath))
 
-  if ((file != "sav" & file != "SAV") & !isTRUE(override) ){
+  if ((file != "sav" & file != "SAV" & file != "zsav" & file != "ZSAV") &
+      !isTRUE(override) ){
     warning ("Filending is not sav.
              Use Override if this check should be ignored.")
     return( NULL )
@@ -160,9 +161,11 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   vartypes   <- attribs$vartypes
   varmat     <- do.call("rbind", attribs$varmat)
   disppar    <- attribs$disppar
-  if (!identical(disppar, integer(0)))
+  if (!identical(disppar, integer(0))) {
     disppar    <- t(matrix(disppar, ncol = NCOL(data)))
-
+  } else{
+    disppar <- NULL
+  }
   if (NROW(data) == 0)
     use.missings <- FALSE
 
@@ -337,7 +340,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
     # contains long varname (e.g. when longer varnames are provided or if the
     # dataset contains long strings)
-    longname <- strsplit(longvarname, "=")
+    longname <- lapply(longvarname, boost_split)
 
     # contains varname and absolute length eg
     # A258=00258
@@ -427,7 +430,14 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
       z
     })
 
-    nams <- replace(nams, which(nams %in% names(new_nams)), values = new_nams)
+
+    # for this replace was used, but in the world of sav-files everything is
+    # possible even files where nams and new_nams differ. replace got confused
+    # in such cases, which is why this approach is selected
+    sel <- which(names(new_nams) %in% nams)
+
+    if (!identical(integer(0), sel))
+      nams[names(new_nams[sel])] <- new_nams[sel]
 
     names(data) <- nams
 
