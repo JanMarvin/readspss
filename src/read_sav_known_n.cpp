@@ -28,7 +28,9 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
                int64_t n, int32_t kv,
                Rcpp::IntegerVector vtyp,
                Rcpp::NumericVector res,
-               std::vector<int> vartype) {
+               std::vector<int> vartype,
+               double lowest,
+               double highest) {
 
   // final position
   auto curpos = sav.tellg();
@@ -132,7 +134,14 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
 
         case 0:
         {
-          REAL(VECTOR_ELT(df,kk))[nn] = val_b - 100;
+          // SPSS compression
+          val_b = val_b - 100;
+
+          if (val_b< lowest || val_b > highest)
+            val_b = NA_REAL;
+
+          REAL(VECTOR_ELT(df,kk))[nn] = val_b;
+
           break;
         }
 
@@ -196,6 +205,10 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
         case 0:
         {
           val_d = readbin(val_d, sav, swapit);
+
+          if (val_d< lowest || val_d > highest)
+            val_d = NA_REAL;
+
           REAL(VECTOR_ELT(df,kk))[nn] = val_d;
           // Rprintf("%f \n", val_d);
           break;
@@ -365,8 +378,11 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
 
       case 0:
       {
-        val_d = NA_REAL;
         val_d = readbin(val_d, sav, swapit);
+
+        if (val_d< lowest || val_d > highest)
+          val_d = NA_REAL;
+
         REAL(VECTOR_ELT(df,kk))[nn] = val_d;
         break;
       }

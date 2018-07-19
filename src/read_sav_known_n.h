@@ -24,6 +24,8 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
                const int64_t n, const int32_t kv,
                Rcpp::IntegerVector vtyp,
                Rcpp::NumericVector res,
-               std::vector<int> vartype);
+               std::vector<int> vartype,
+               double lowest,
+               double highest);
 
 #endif

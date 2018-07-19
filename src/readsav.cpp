@@ -163,7 +163,9 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     int32_t floatp = 0, compr = 0, endian = 0;
     int32_t measure = 0;
     int64_t unk = 0, bign = 0;
-    double sysmiss = 0, highest = 0, lowest = 0;
+
+    double sysmiss = 0;
+    double highest = INFINITY, lowest = -INFINITY;
 
 
     Rcpp::List missings, varlist, Label_list, haslabel, doc,
@@ -846,7 +848,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
     if (n > 0)
       df = read_sav_known_n(df, sav, swapit, cflag, debug,
-                            n, kv, vtyp, res, vartype);
+                            n, kv, vtyp, res, vartype, lowest, highest);
 
 
     // close file
