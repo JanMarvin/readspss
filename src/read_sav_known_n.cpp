@@ -59,7 +59,7 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
     std::string start = "";
     int32_t res_i = 0, res_kk = 0, kk_i = 0;
 
-    while (!(sav.tellg() == endoffile) | !eof) { // data import until nn = n
+    while (!(sav.tellg() == endoffile) && !eof) { // data import until nn = n
 
       Rcpp::checkUserInterrupt();
 

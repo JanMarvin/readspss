@@ -173,3 +173,15 @@ df_r <- read.sav(fl)
 test_that("zsav", {
   expect_true(all.equal(df_r, cars, check.attributes = FALSE))
 })
+
+#### encryption test #####
+
+flu <- system.file("extdata", "hotel.sav", package="readspss")
+fle <- system.file("extdata", "hotel-encrypted.sav", package="readspss")
+
+df_u <- read.sav(flu)
+df_e <- read.sav(fle, pass = "pspp")
+
+test_that("encrypted", {
+  expect_true(all.equal(df_u, df_e, check.attributes = FALSE))
+})

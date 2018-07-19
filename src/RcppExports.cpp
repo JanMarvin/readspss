@@ -28,6 +28,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// readencrypted
+Rcpp::List readencrypted(const char * filePath, const bool debug, std::string encStr, std::string const ownEnc, std::string const pass);
+RcppExport SEXP _readspss_readencrypted(SEXP filePathSEXP, SEXP debugSEXP, SEXP encStrSEXP, SEXP ownEncSEXP, SEXP passSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const char * >::type filePath(filePathSEXP);
+    Rcpp::traits::input_parameter< const bool >::type debug(debugSEXP);
+    Rcpp::traits::input_parameter< std::string >::type encStr(encStrSEXP);
+    Rcpp::traits::input_parameter< std::string const >::type ownEnc(ownEncSEXP);
+    Rcpp::traits::input_parameter< std::string const >::type pass(passSEXP);
+    rcpp_result_gen = Rcpp::wrap(readencrypted(filePath, debug, encStr, ownEnc, pass));
+    return rcpp_result_gen;
+END_RCPP
+}
 // readpor
 List readpor(const char * filePath, const bool debug, std::string encStr);
 RcppExport SEXP _readspss_readpor(SEXP filePathSEXP, SEXP debugSEXP, SEXP encStrSEXP) {
@@ -70,6 +85,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_readspss_boost_split", (DL_FUNC) &_readspss_boost_split, 1},
     {"_readspss_fast_factor", (DL_FUNC) &_readspss_fast_factor, 2},
+    {"_readspss_readencrypted", (DL_FUNC) &_readspss_readencrypted, 5},
     {"_readspss_readpor", (DL_FUNC) &_readspss_readpor, 3},
     {"_readspss_readsav", (DL_FUNC) &_readspss_readsav, 4},
     {"_readspss_writesav", (DL_FUNC) &_readspss_writesav, 2},

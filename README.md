@@ -1,13 +1,20 @@
 # Readspss [![Build Status](https://travis-ci.org/JanMarvin/readspss.svg?branch=master)](https://travis-ci.org/JanMarvin/readspss) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/JanMarvin/readspss?branch=master&svg=true)](https://ci.appveyor.com/project/JanMarvin/readspss)
 
-Experimental R package using Rcpp to parse a sav-file into a data.frame().
-Currently `read.sav` is the main function and feature of this package.
+R package using Rcpp to parse a sav-file into a data.frame(). Currently 
+`read.sav` is the main function and feature of this package.
 
 It works. Testing is welcome though the package is still at an early no longer
 experimental stage stage. Its read function is extensively tested on 
-approximately 200 sav-files. It provides unit tests to make sure, that commits
-do not break previouly working things. The read.sav function imports everything
-into a data frame. Including long strings and labels.
+approximately 600+ sav-files. The code is maturing and is frequently tested. The
+read.sav function imports everything into a data frame. Including long strings
+and labels. Various features such as value label are tested and are working as
+intended.
+
+Features of the package are
+
+* reading of sav-files
+* reading of zsav-files
+* reading of encrypted files
 
 Because of the R code wrapped Rcpp-Function the package is pretty fast. The 
 R code for factor conversion slows things down a bit, changing encoding a bit

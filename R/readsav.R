@@ -41,6 +41,8 @@
 #' checked for the ending sav. If the fileending is different, nothing is read.
 #' This option can be used to override this behavior.
 #'@param convert.dates \emph{logical}. Should dates be converted on the fly?
+#'@param pass \emph{character}. If encrypted sav should be imported, this is a
+#' maximum of ten character encryption key.
 #'
 #'@details SPSS files are widely available, though for R long time only foreign
 #' and memisc provided functions to import sav-files. Lately haven joined.
@@ -106,7 +108,8 @@
 #' @export
 read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
                      encoding = TRUE, fromEncoding = NULL, use.missings = TRUE,
-                     debug = FALSE, override = FALSE, convert.dates = TRUE) {
+                     debug = FALSE, override = FALSE, convert.dates = TRUE,
+                     pass) {
 
   # Check if path is a url
   if (length(grep("^(http|ftp|https)://", file))) {
@@ -142,8 +145,17 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   if (encoding == FALSE)
     encStr <- "NA"
 
-  # import data using an rcpp routine
-  data <- readsav(filePath = filepath, debug, encStr, ownEnc)
+  if (missing(pass)) {
+    # import data using an rcpp routine
+    data <- readsav(filepath, debug, encStr, ownEnc)
+  } else {
+
+    if (nchar(pass) > 10) {
+      warning("pass longer than 10 characters. most likely unwanted")
+    }
+
+    data <- readencrypted(filepath, debug, encStr, ownEnc, pass)
+  }
 
   attribs <- attributes(data)
 
@@ -304,29 +316,31 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
                 names(data)[i], "Missing factor labels - no labels assigned.
                 Set option generate.factors=T to generate labels."
               )
-              )
-          }
+            )
           }
         }
       }
     }
+  }
 
   if (convert.dates) {
 
     nams   <- names(data)
     isdate <- varmat[,6] %in% c(20,23,24,38,39)
-    # istime <- varmat[,6] %in% c(21,22,25)
+    istime <- varmat[,6] %in% c(21,22,25)
 
     if (any(isdate)) {
       for (nam in nams[isdate]) {
         data[[nam]] <- as.Date(as.POSIXct(data[[nam]], origin="1582-10-14"))
       }
     }
-    # if (any(istime)) {
+    if (any(istime)) {
+      message("time format found for", nams[istime],
+              "This is a 24 time and no date and thus not converted.")
     #   for (nam in nams[istime]) {
     #     data[[nam]] <- as.POSIXlt(data[[nam]], origin="1582-10-14")
     #   }
-    # }
+    }
 
   }
 
@@ -505,11 +519,11 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
               names(data)[i], "Missing factor labels - no labels assigned.
               Set option generate.factors=T to generate labels."
             )
-            )
-        }
+          )
         }
       }
     }
+  }
 
   # prepare for return
   attr(data, "datalabel") <- attribs$datalabel
@@ -534,4 +548,4 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   # return
   return(data)
 
-  }
+}

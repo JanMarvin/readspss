@@ -52,46 +52,59 @@ std::string read_sav_uncompress (std::istream& sav,
   block_size = readbin(block_size, sav, swapit);
   n_blocks = readbin(n_blocks, sav, swapit);
 
-  // read uncompr and compr ofset and size
-  uncompr_ofs   = readbin(uncompr_ofs, sav, swapit);
-  compr_ofs     = readbin(compr_ofs, sav, swapit);
-  uncompr_size  = readbin(uncompr_size, sav, swapit);
-  compr_size    = readbin(compr_size, sav, swapit);
 
-  // // debug
-  // Rprintf("1: %d\n", zheader_ofs);
-  // Rprintf("2: %d\n", ztrailer_ofs);
-  // Rprintf("3: %d\n", ztrailer_len);
-  // Rprintf("4: %d\n", n_blocks);
-  //
-  // Rprintf("1: %d\n", uncompr_ofs);
-  // Rprintf("2: %d\n", compr_ofs);
-  // Rprintf("3: %d\n", uncompr_size);
-  // Rprintf("4: %d\n", compr_size);
+  std::vector<int64_t> u_ofs(n_blocks), c_ofs(n_blocks);
+  std::vector<int32_t> u_size(n_blocks), c_size(n_blocks);
 
-  // seek to compr ofset
-  sav.seekg(compr_ofs, std::ios_base::beg);
 
-  // Bytef is unsigned char *
-  Bytef compr_block[compr_size];
-  Bytef uncompr_block[uncompr_size];
+  for (int i = 0; i < n_blocks; ++i) {
+    // read uncompr and compr ofset and size
+    u_ofs[i]   = readbin(uncompr_ofs, sav, swapit);
+    c_ofs[i]     = readbin(compr_ofs, sav, swapit);
+    u_size[i]  = readbin(uncompr_size, sav, swapit);
+    c_size[i]    = readbin(compr_size, sav, swapit);
 
-  // read the complete compr data part
-  sav.read((char*)compr_block, compr_size);
+    // // debug
+    // Rprintf("1: %d\n", zheader_ofs);
+    // Rprintf("2: %d\n", ztrailer_ofs);
+    // Rprintf("3: %d\n", ztrailer_len);
+    // Rprintf("4: %d\n", n_blocks);
+    //
+    // Rprintf("1: %d\n", uncompr_ofs);
+    // Rprintf("2: %d\n", compr_ofs);
+    // Rprintf("3: %d\n", uncompr_size);
+    // Rprintf("4: %d\n", compr_size);
 
-  int32_t status = 0;
-  uLong uncompr_block_len = uncompr_size;
-  uLong compr_block_len = compr_size;
+  }
+  // Rcpp::stop("stop");
 
-  // uncompress should be 0
-  status = uncompress(uncompr_block, &uncompr_block_len,
-                      compr_block, compr_block_len);
 
   // write to temporary file
   const std::string tempstr = std::tmpnam(nullptr);
-
   std::fstream outfile (tempstr, std::ios::out | std::ios::binary);
-  outfile.write((char *)(&uncompr_block[0]), uncompr_block_len);
+
+  for (int i = 0; i < n_blocks; ++i) {
+    // seek to compr ofset
+    sav.seekg(c_ofs[i], std::ios_base::beg);
+
+    // Bytef is unsigned char *
+    Bytef compr_block[c_size[i]];
+    Bytef uncompr_block[u_size[i]];
+
+    // read the complete compr data part
+    sav.read((char*)compr_block, c_size[i]);
+
+    int32_t status = 0;
+    uLong uncompr_block_len = u_size[i];
+    uLong compr_block_len = c_size[i];
+
+    // uncompress should be 0
+    status = uncompress(uncompr_block, &uncompr_block_len,
+                        compr_block, compr_block_len);
+
+
+    outfile.write((char *)(&uncompr_block[0]), uncompr_block_len);
+  }
   outfile.close();
 
   return tempstr;

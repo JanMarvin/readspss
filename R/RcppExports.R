@@ -21,6 +21,19 @@ fast_factor <- function(x, y) {
     .Call(`_readspss_fast_factor`, x, y)
 }
 
+#' Read encrypted SPSS file
+#'
+#' @param filePath The full systempath to the dta file you want to import.
+#' @param debug print debug information
+#' @param encStr encoding string
+#' @param ownEnc encoding provided by localeToCharset
+#' @param pass passkey required for encoding
+#' @import Rcpp
+#' @export
+readencrypted <- function(filePath, debug, encStr, ownEnc, pass) {
+    .Call(`_readspss_readencrypted`, filePath, debug, encStr, ownEnc, pass)
+}
+
 #' Reads the binary SPSS file
 #'
 #' @param filePath The full systempath to the dta file you want to import.
