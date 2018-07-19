@@ -67,8 +67,8 @@ write.sav <- function(dat, filepath, label) {
   }
 
   vtyp <- as.integer(sapply(dat, is.character))
-  vtyp[vtyp != 0] <- as.integer(sapply(dat[vtyp!=0], function(x) max(nchar(x),
-                                                                     na.rm = TRUE)))
+  vtyp[vtyp != 0] <- as.integer(sapply(dat[vtyp!=0],
+                                       function(x) max(nchar(x), na.rm = TRUE)))
 
   if (any(vtyp>255)) {
     stop("Strings longer than 255 characters not yet implemented")
