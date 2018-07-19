@@ -39,7 +39,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
   int64_t n = dat.nrows();
 
 
- fstream sav (filePath, ios::out | ios::binary);
+  fstream sav (filePath, ios::out | ios::binary);
   if (sav.is_open())
   {
 
@@ -53,6 +53,9 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
 
     Rcpp::CharacterVector nvarnames = dat.attr("nvarnames");
     Rcpp::CharacterVector label = dat.attr("label");
+
+    Rcpp::IntegerVector haslabel = dat.attr("haslabel");
+    Rcpp::List labtab = dat.attr("labtab");
 
     std::string timestamp = Rcpp::as<std::string>(dat.attr("timestamp"));
     std::string datestamp = Rcpp::as<std::string>(dat.attr("datestamp"));
@@ -90,6 +93,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
     std::string filelabel (67, ' ');
     writestr(filelabel, filelabel.size(), sav);
 
+    // rtype 2 -----------------------------------------------------------------
     // start variable part
     for (int i = 0; i < vartypes.size(); ++i) {
       rtype = 2;
@@ -170,6 +174,64 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
       }
 
     }
+
+
+    // rtype 3 -----------------------------------------------------------------
+
+    int32_t nolabels = haslabel.size();
+
+    for (int i = 0; i < nolabels; ++i) {
+
+
+      Rprintf("%d\n", nolabels);
+
+      rtype = 3;
+      writebin(rtype, sav, swapit);
+
+      Rcpp::IntegerVector code = labtab(i);
+
+      std::vector<std::string> labs = code.attr("names");
+
+      int32_t nolab = code.size();
+      writebin(nolab, sav, swapit);
+
+      for (int j = 0; j < nolab; ++j) {
+
+        double coden = code[j];
+        std::string lab = labs[j];
+
+        writebin(coden, sav, swapit);
+        uint8_t lablen = lab.size();
+        writebin(lablen, sav, swapit);
+
+        lablen = ( ceil((double)(lablen+1)/8) * 8 ) - 1;
+        writestr(lab, lablen, sav);
+
+      }
+
+
+      // rtype 4 ---------------------------------------------------------------
+
+      rtype = 4;
+      writebin(rtype, sav, swapit);
+
+
+      int32_t nolabel = 1;
+
+      writebin(nolabel, sav, swapit);
+
+
+      int32_t lab_id = 0;
+
+      lab_id = haslabel[i];
+
+      writebin(lab_id, sav, swapit);
+    }
+
+
+
+
+    // rtype 7 -----------------------------------------------------------------
 
     if (longvarname.compare(empty) != 0) {
       // beign longvarnames

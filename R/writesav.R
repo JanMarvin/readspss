@@ -130,6 +130,9 @@ write.sav <- function(dat, filepath, label) {
   attr(dat, "timestamp") <- timestamp
   attr(dat, "datestamp") <- datestamp
   attr(dat, "label") <- label
+  attr(dat, "haslabel") <- ff
+  attr(dat, "labtab") <- labtab
+
 
   writesav(filepath, dat)
 }
