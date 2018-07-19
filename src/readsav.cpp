@@ -165,7 +165,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     int64_t unk = 0, bign = 0;
 
     double sysmiss = 0;
-    double highest = INFINITY, lowest = -INFINITY;
+    double highest = R_PosInf, lowest = R_NegInf;
 
 
     Rcpp::List missings, varlist, Label_list, haslabel, doc,
@@ -537,6 +537,18 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
           sysmiss = readbin(sysmiss, sav, swapit);  // sysmiss always 3
           highest = readbin(highest, sav, swapit);  // highest
           lowest = readbin(lowest, sav, swapit);    // lowest
+
+          if (debug) {
+            Rprintf("\nsysmiss %fl\n", sysmiss);
+            Rprintf("highest %d\n", highest);
+            Rprintf("lowest %d\n\n", lowest);
+          }
+
+          // TODO: is this correct?
+          if ( isnan(sysmiss) ) {
+            lowest = highest;
+            highest = R_PosInf;
+          }
 
           break;
         }

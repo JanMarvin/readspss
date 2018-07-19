@@ -29,8 +29,8 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
                Rcpp::IntegerVector vtyp,
                Rcpp::NumericVector res,
                std::vector<int> vartype,
-               double lowest,
-               double highest) {
+               const double lowest,
+               const double highest) {
 
   // final position
   auto curpos = sav.tellg();
@@ -206,7 +206,7 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
         {
           val_d = readbin(val_d, sav, swapit);
 
-          if (val_d< lowest || val_d > highest)
+          if (val_d < lowest || val_d > highest)
             val_d = NA_REAL;
 
           REAL(VECTOR_ELT(df,kk))[nn] = val_d;
@@ -380,7 +380,7 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
       {
         val_d = readbin(val_d, sav, swapit);
 
-        if (val_d< lowest || val_d > highest)
+        if (val_d < lowest || val_d > highest)
           val_d = NA_REAL;
 
         REAL(VECTOR_ELT(df,kk))[nn] = val_d;
