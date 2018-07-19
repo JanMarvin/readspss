@@ -175,59 +175,60 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
 
     }
 
+    if(!Rf_isNull(haslabel))
+    {
 
-    // rtype 3 -----------------------------------------------------------------
+      // rtype 3 ---------------------------------------------------------------
 
-    int32_t nolabels = haslabel.size();
+      int32_t nolabels = haslabel.size();
 
-    for (int i = 0; i < nolabels; ++i) {
+      for (int i = 0; i < nolabels; ++i) {
+
+        rtype = 3;
+        writebin(rtype, sav, swapit);
+
+        Rcpp::IntegerVector code = labtab(i);
+
+        std::vector<std::string> labs = code.attr("names");
+
+        int32_t nolab = code.size();
+        writebin(nolab, sav, swapit);
+
+        for (int j = 0; j < nolab; ++j) {
+
+          double coden = code[j];
+          std::string lab = labs[j];
+
+          writebin(coden, sav, swapit);
+          uint8_t lablen = lab.size();
+          writebin(lablen, sav, swapit);
+
+          lablen = ( ceil((double)(lablen+1)/8) * 8 ) - 1;
+          writestr(lab, lablen, sav);
+
+        }
 
 
-      Rprintf("%d\n", nolabels);
+        // rtype 4 -------------------------------------------------------------
 
-      rtype = 3;
-      writebin(rtype, sav, swapit);
+        rtype = 4;
+        writebin(rtype, sav, swapit);
 
-      Rcpp::IntegerVector code = labtab(i);
 
-      std::vector<std::string> labs = code.attr("names");
+        // if multipe variables share a single value this will be a vector
+        int32_t nolabel = 1;
 
-      int32_t nolab = code.size();
-      writebin(nolab, sav, swapit);
+        writebin(nolabel, sav, swapit);
 
-      for (int j = 0; j < nolab; ++j) {
 
-        double coden = code[j];
-        std::string lab = labs[j];
+        int32_t lab_id = 0;
 
-        writebin(coden, sav, swapit);
-        uint8_t lablen = lab.size();
-        writebin(lablen, sav, swapit);
+        lab_id = haslabel[i];
 
-        lablen = ( ceil((double)(lablen+1)/8) * 8 ) - 1;
-        writestr(lab, lablen, sav);
-
+        writebin(lab_id, sav, swapit);
       }
 
-
-      // rtype 4 ---------------------------------------------------------------
-
-      rtype = 4;
-      writebin(rtype, sav, swapit);
-
-
-      int32_t nolabel = 1;
-
-      writebin(nolabel, sav, swapit);
-
-
-      int32_t lab_id = 0;
-
-      lab_id = haslabel[i];
-
-      writebin(lab_id, sav, swapit);
     }
-
 
 
 
