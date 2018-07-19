@@ -23,4 +23,5 @@ Function to read a SPSS sav file into a data.frame().
 \details{
 For now stores data.frames containing numerics only. Nothing else
  aside varnames and numerics are stored.
+ Missing values in character cols (<NA>) are written as empty ("").
 }

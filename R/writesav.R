@@ -24,6 +24,7 @@
 #' @param label \emph{character} vector of labels. must be of size `ncol(dat)`
 #' @details For now stores data.frames containing numerics only. Nothing else
 #'  aside varnames and numerics are stored.
+#'  Missing values in character cols (<NA>) are written as empty ("").
 #'
 #' @return \code{readspss} returns nothing
 #'
@@ -66,7 +67,8 @@ write.sav <- function(dat, filepath, label) {
   }
 
   vtyp <- as.integer(sapply(dat, is.character))
-  vtyp[vtyp != 0] <- as.integer(sapply(dat[vtyp!=0], function(x) max(nchar(x))))
+  vtyp[vtyp != 0] <- as.integer(sapply(dat[vtyp!=0], function(x) max(nchar(x),
+                                                                     na.rm = TRUE)))
 
   if (any(vtyp>255)) {
     stop("Strings longer than 255 characters not yet implemented")

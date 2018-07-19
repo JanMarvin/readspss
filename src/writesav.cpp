@@ -222,7 +222,15 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
 
           default:
           {
-            string val_s = as<string>(as<CharacterVector>(dat[j])[i]);
+
+            CharacterVector cv_s = NA_STRING;
+            cv_s = as<CharacterVector>(dat[j])[i];
+
+            string val_s = "";
+
+            if (cv_s[0] != NA_STRING)
+              val_s = as<string>(cv_s);
+
             writestr(val_s, type, sav);
             break;
           }
