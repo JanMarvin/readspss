@@ -135,12 +135,10 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
         case 0:
         {
           // SPSS compression
-          val_b = val_b - 100;
-
-          if (val_b< lowest || val_b > highest)
+          if (val_b < lowest || val_b > highest)
             val_b = NA_REAL;
 
-          REAL(VECTOR_ELT(df,kk))[nn] = val_b;
+          REAL(VECTOR_ELT(df,kk))[nn] = val_b - 100;
 
           break;
         }
