@@ -70,6 +70,18 @@ write.sav <- function(dat, filepath, label) {
   vtyp[vtyp != 0] <- as.integer(sapply(dat[vtyp!=0],
                                        function(x) max(nchar(x), na.rm = TRUE)))
 
+  ff <- which(sapply(dat, is.factor))
+
+  labtab <- lapply(ff, function(x) {
+
+    ll <- levels(dat[[x]])
+
+    x <- as.integer(labels(ll))
+    names(x) <- ll
+
+    x
+  })
+
   if (any(vtyp>255)) {
     stop("Strings longer than 255 characters not yet implemented")
   }
