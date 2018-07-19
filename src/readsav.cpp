@@ -355,7 +355,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         nolab = readbin(nolab, sav, swapit);
 
         // if (debug)
-        //   Rprintf("%d", nolab);
+        //   Rprintf("nolab %d", nolab);
 
         Rcpp::CharacterVector label(nolab), codeV(nolab);
         Rcpp::NumericVector code(nolab);
@@ -396,22 +396,8 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
             lablen = readbin(lablen, sav, swapit);
 
-            // if (debug) {
-            //   Rprintf("%d %d %d ", i, noNum, lablen);
-            //   if (noNum)
-            //     std::cout << cV << std::endl;
-            //   else
-            //     Rprintf("%f\n", coden);
-            // }
-
-            if (!((lablen+1)%8==0))
-            {
-              for(int8_t i=1; i<8; ++i)
-              {
-                if (((lablen+1)+i)%8==0)
-                  lablen = lablen+i;
-              }
-            }
+            // +1 is whitespace caracter
+            lablen = ( ceil((double)(lablen+1)/8) * 8 ) - 1;
 
             std::string lab (lablen, '\0');
             lab = readstring(lab, sav, lab.size());
