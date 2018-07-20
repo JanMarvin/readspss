@@ -642,7 +642,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
           CharacterVector longv(nvars);
           CharacterVector longl(nvars);
 
-          for (int8_t i = 0; i<nvars; ++i){
+          for (int32_t i = 0; i<nvars; ++i){
 
             int32_t len1 = 0, len2 = 0;
 
