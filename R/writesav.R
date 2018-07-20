@@ -59,7 +59,7 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
 
   LONGVAR <- FALSE
 
-  if (all(nchar(nams)<=8)) {
+  if (all(nchar(nams)<=8) & (identical(toupper(nams), nams))) {
     nams <- toupper(nams)
     nvarnames <- substr(nams, 0, 8)
   } else {
