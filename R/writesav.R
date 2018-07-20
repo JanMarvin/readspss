@@ -66,12 +66,33 @@ write.sav <- function(dat, filepath, label) {
     LONGVAR <- TRUE
   }
 
-  vtyp <- as.integer(sapply(dat, is.character))
-  vtyp[vtyp != 0] <- as.integer(sapply(dat[vtyp!=0],
-                                       function(x) max(nchar(x), na.rm = TRUE)))
+  # check length of factor labels
+  ff <- which(sapply(dat, function(x) {
 
-  ff <- which(sapply(dat, is.factor))
+    z <- FALSE
+    if (is.factor(x))
+     z <- max(nchar(levels(x)), na.rm = TRUE) <= 120
 
+    z
+  }))
+
+  ffl <- which(sapply(dat, function(x) {
+
+    z <- FALSE
+    if (is.factor(x))
+      z <- max(nchar(levels(x)), na.rm = TRUE) > 120
+
+    z
+  }))
+
+  # if empty set to NULL
+  if (length(ff)==0L)
+    ff <- integer(0)
+
+  if (length(ffl)==0L)
+    ffl <- integer(0)
+
+  # create (long)labtab
   labtab <- lapply(ff, function(x) {
 
     ll <- levels(dat[[x]])
@@ -81,6 +102,28 @@ write.sav <- function(dat, filepath, label) {
 
     x
   })
+
+  longlabtab <- lapply(ffl, function(x) {
+
+    ll <- levels(dat[[x]])
+
+    x <- sprintf("%-16s", labels(ll))
+    names(x) <- ll
+
+    x
+  })
+
+  if (length(ffl) > 0L) {
+    for (fl in ffl)
+      dat[[fl]] <- sprintf("%-16s", as.numeric(dat[[fl]]))
+  }
+
+  dat <<- dat
+
+
+  vtyp <- as.integer(sapply(dat, is.character))
+  vtyp[vtyp != 0] <- as.integer(sapply(dat[vtyp!=0],
+                                       function(x) max(nchar(x), na.rm = TRUE)))
 
   if (any(vtyp>255)) {
     stop("Strings longer than 255 characters not yet implemented")
@@ -132,6 +175,7 @@ write.sav <- function(dat, filepath, label) {
   attr(dat, "label") <- label
   attr(dat, "haslabel") <- ff
   attr(dat, "labtab") <- labtab
+  attr(dat, "longllist") <- longlabtab
 
 
   writesav(filepath, dat)

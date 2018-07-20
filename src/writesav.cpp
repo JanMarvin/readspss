@@ -56,6 +56,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
 
     Rcpp::IntegerVector haslabel = dat.attr("haslabel");
     Rcpp::List labtab = dat.attr("labtab");
+    Rcpp::List longllist = dat.attr("longllist");
 
     std::string timestamp = Rcpp::as<std::string>(dat.attr("timestamp"));
     std::string datestamp = Rcpp::as<std::string>(dat.attr("datestamp"));
@@ -95,7 +96,8 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
 
     // rtype 2 -----------------------------------------------------------------
     // start variable part
-    for (int i = 0; i < vartypes.size(); ++i) {
+    for (int i = 0; i < vartypes.size(); ++i)
+    {
       rtype = 2;
       writebin(rtype, sav, swapit);
 
@@ -114,7 +116,8 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
 
       int32_t var4;
       char tmp1[4];
-      if (subtyp == 0) {
+      if (subtyp == 0)
+      {
         tmp1[0] = 2;
         tmp1[1] = 8;
         tmp1[2] = 5;
@@ -137,7 +140,8 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
 
       int32_t var5;
       char tmp2[4];
-      if (subtyp == 0) {
+      if (subtyp == 0)
+      {
         tmp2[0] = 2;
         tmp2[1] = 8;
         tmp2[2] = 5;
@@ -161,7 +165,8 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
       std::string nvarname = Rcpp::as<std::string>(nvarnames[i]);
       writestr(nvarname, 8, sav);
 
-      if (vlflag == 1) {
+      if (vlflag == 1)
+      {
 
         std::string lab = Rcpp::as<std::string>(label[i]);
 
@@ -175,14 +180,15 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
 
     }
 
-    if(!Rf_isNull(haslabel))
+    if(haslabel.size() > 0)
     {
 
       // rtype 3 ---------------------------------------------------------------
 
       int32_t nolabels = haslabel.size();
 
-      for (int i = 0; i < nolabels; ++i) {
+      for (int i = 0; i < nolabels; ++i)
+      {
 
         rtype = 3;
         writebin(rtype, sav, swapit);
@@ -234,7 +240,8 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
 
     // rtype 7 -----------------------------------------------------------------
 
-    if (longvarname.compare(empty) != 0) {
+    if (longvarname.compare(empty) != 0)
+    {
       // beign longvarnames
       rtype = 7;
       writebin(rtype, sav, swapit);
@@ -251,6 +258,76 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
       writestr(longvarname, longvarname.size(), sav);
       // end longvarnames
     }
+
+    if(longllist.size() > 0)
+    {
+
+      // beign longvarnames
+      rtype = 7;
+      writebin(rtype, sav, swapit);
+
+      subtyp = 21;
+      writebin(subtyp, sav, swapit);
+
+      size = 1;
+      writebin(size, sav, swapit);
+
+
+      auto countbeg = sav.tellg();
+
+      count = 0;
+      writebin(count, sav, swapit);
+
+
+      for (int32_t i = 0; i < longllist.size(); ++i)
+      {
+        Rcpp::CharacterVector vns = longllist.attr("names");
+        std::string vn = as<std::string>(vns[i]);
+        Rcpp::CharacterVector longtab = longllist[i];
+
+        int32_t len = 0;
+        len = vn.size();
+        writebin(len, sav, swapit);
+        writestr(vn, len, sav);
+
+        int32_t varw = 16, nvars = 0;
+        writebin(varw, sav, swapit); // I do not use this. Is it needed?
+
+        nvars = longtab.size();
+        writebin(nvars, sav, swapit);
+
+        Rcpp::CharacterVector longvCV = longtab;
+        Rcpp::CharacterVector longcCV = longtab.attr("names");
+
+        for (int32_t j = 0; j<nvars; ++j) {
+
+          std::string longv = as<std::string>(longvCV[j]);
+          std::string longc = as<std::string>(longcCV[j]);
+
+          int32_t len1 = 0, len2 = 0;
+
+          len1 = longv.size();
+          writebin(len1, sav, swapit);
+          writestr(longv, len1, sav);
+
+          len2 = longc.size();
+          writebin(len2, sav, swapit);
+          writestr(longc, len2, sav);
+
+        }
+
+        auto countend = sav.tellg();
+
+        // correct for the count int32_t
+        count = countend - countbeg - sizeof(count);
+        sav.seekg(countbeg, ios_base::beg);
+        writebin(count, sav, swapit);
+        sav.seekg(countend, ios_base::beg);
+
+      }
+
+    }
+
 
     rtype = 999;
 
