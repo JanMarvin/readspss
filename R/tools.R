@@ -40,8 +40,6 @@ get.filepath <- function(path=""){
 #' contain integer type data.
 #'
 #' @param x vector of data frame
-# @author Jan Marvin Garbuszus \email{jan.garbuszus@@ruhr-uni-bochum.de}
-# @author Sebastian Jeworutzki \email{sebastian.jeworutzki@@ruhr-uni-bochum.de}
 saveToExport <- function(x) {
-  isTRUE(all.equal(x, as.integer(x)))
+  isTRUE(all.equal(x, as.integer(x))) | isTRUE(is.factor(x))
 }

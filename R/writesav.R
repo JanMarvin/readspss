@@ -126,10 +126,11 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
 
 
   ii <- sapply(dat, is.integer)
-  nn <- sapply(dat, is.numeric)
+  nn <- sapply(dat, function(x){is.numeric(x) | is.factor(x)})
   itc <- NULL
 
   if (compress) {
+    warning("Compression is not yet implemented")
     # check if numerics can be stored as integers
     numToCompress <- sapply(dat[nn], saveToExport)
 

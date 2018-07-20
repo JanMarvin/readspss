@@ -310,8 +310,6 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
           }
         }
       }
-
-      Rcpp::warning("Compressoin is not yet implemented");
     } else {
 
       for (int64_t i = 0; i < n; ++i) {
