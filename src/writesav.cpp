@@ -50,6 +50,8 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
     std::string empty = "";
 
     Rcpp::IntegerVector vtyp = dat.attr("vtyp");
+    Rcpp::IntegerVector cc = dat.attr("cc");
+    Rcpp::IntegerVector itc = dat.attr("itc");
     Rcpp::IntegerVector vartypes = dat.attr("vartypes");
 
     Rcpp::CharacterVector nvarnames = dat.attr("nvarnames");
@@ -271,43 +273,87 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
     if (cflag) {
 
       // data is read in 8 byte chunks. k*n/8 (data remains)
-      double chunk = 0, val_d = 0;
+      double chunk = 0;
 
       int8_t iter = 0;
+
+
+      unsigned char chnk[8];
+
+      // set chnk to 0
+      for (int8_t itr = 0; itr < 8; ++itr) {
+        chnk[itr] = 0;
+      }
+
+      uint8_t val_b = 0;
+      int16_t val_i = 0;
+      double val_d = 0.0;
+
 
       for (int64_t i = 0; i < n; ++i) {
         for (int32_t j = 0; j < k; ++j) {
 
 
           int32_t const type = vtyp[j];
+          int32_t const ITC = itc[j];
 
-          unsigned char chnk[8];
 
-          if (type == 0) {
-            int16_t val_i =  Rcpp::as<Rcpp::IntegerVector>(dat[j])[i];
-            uint8_t val_b = val_i + 100;
-            chnk[iter] = val_b;
+          // write compressed
+          if (type == 0  & ITC == 0) {
+            const double val_d = Rcpp::as<Rcpp::NumericVector>(dat[j])[i];
+            chnk[iter] = 253;
 
             ++iter;
 
-            if (iter == 8) {
-              iter = 0;
-
-              std::memcpy(&chunk, chnk, sizeof(double));
-
-              writebin(chunk, sav, swapit);
+            for (int8_t itr = iter; itr < 8; ++itr) {
+              chnk[itr] = 0;
             }
 
-            if ((i == n-1) & (j == k -1)) {
-              val_b = 252;
-              chnk[iter] = val_b;
+            std::memcpy(&chunk, chnk, sizeof(double));
+            writebin(chunk, sav, swapit);
+            writebin(val_d, sav, swapit);
 
-              std::memcpy(&chunk, chnk, sizeof(double));
-
-              writebin(chunk, sav, swapit);
+            // reset chnk
+            for (int8_t itr = 0; itr < 8; ++itr) {
+              chnk[itr] = 0;
             }
 
+            iter = 0;
           }
+
+          if (type == 0 & ITC == 1) {
+            val_i =  Rcpp::as<Rcpp::IntegerVector>(dat[j])[i];
+            val_b = val_i + 100;
+            chnk[iter] = val_b;
+
+            ++iter;
+          }
+
+          // write chunk of eight and clear chnk
+          if (iter == 8) {
+
+            std::memcpy(&chunk, chnk, sizeof(double));
+            writebin(chunk, sav, swapit);
+
+            // reset chnk
+            for (int8_t itr = 0; itr < 8; ++itr) {
+              chnk[itr] = 0;
+            }
+
+            iter = 0;
+          }
+
+          // write end of file
+          if ((i == n-1) & (j == k -1)) {
+            val_b = 252;
+            chnk[iter] = val_b;
+
+            std::memcpy(&chunk, chnk, sizeof(double));
+
+            writebin(chunk, sav, swapit);
+          }
+
+
         }
       }
     } else {

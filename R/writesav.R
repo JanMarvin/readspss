@@ -127,7 +127,7 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
 
   ii <- sapply(dat, is.integer)
   nn <- sapply(dat, function(x){is.numeric(x) | is.factor(x)})
-  itc <- NULL
+  itc <- rep(0, NCOL(dat))
 
   if (compress) {
     warning("Compression is not yet implemented")
@@ -141,13 +141,27 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
     }
 
     ii <- sapply(dat, is.integer)
-    gg <- sapply(dat, function(x) {max(x  < 151, na.rm = TRUE) &
-        min(x >= -100, na.rm = TRUE)})
-    itc <- which(ii == gg)
+    gg <- sapply(dat, function(x) {
+        is.integer(x) & (min(x, na.rm = TRUE) >= -100 &
+      max(x, na.rm = TRUE) < 151)
+    })
+    itc <- apply(rbind(ii,gg), 2, all)
+
   }
 
+  # ii <<- ii
+  # gg <<- gg
+  #
+  # dat <<- dat
+  # itc <<- itc
 
-  attr(dat, "vtyp") <- vtyp
+  # isnum <- sapply(dat, function(x){is.numeric(x) & !is.integer(x)})
+
+  # vartypes[which(isnum == TRUE)] <- 253
+
+  cc <- sapply(dat, is.character)
+
+  attr(dat, "vtyp") <- vartypes
   attr(dat, "vartypes") <- vartypes
   attr(dat, "nvarnames") <- nvarnames
   attr(dat, "longvarnames") <- longvarnames
@@ -157,6 +171,7 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
   attr(dat, "haslabel") <- ff
   attr(dat, "labtab") <- labtab
   attr(dat, "itc") <- itc
+  attr(dat, "cc") <- cc
 
 
   writesav(filepath, dat, compress)
