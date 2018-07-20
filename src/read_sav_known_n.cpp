@@ -193,7 +193,7 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
           break;
         }
 
-        case  253:
+        case 253:
         {
           //           Rcpp::Rcout << "## Debug ... 253" << std::endl;
           //           Rprintf("nn %d & kk %d \n", nn, kk);
