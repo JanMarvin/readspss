@@ -284,8 +284,8 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
           unsigned char chnk[8];
 
           if (type == 0) {
-            uint8_t val_b =  Rcpp::as<Rcpp::IntegerVector>(dat[j])[i];
-            val_b += 100;
+            int16_t val_i =  Rcpp::as<Rcpp::IntegerVector>(dat[j])[i];
+            uint8_t val_b = val_i + 100;
             chnk[iter] = val_b;
 
             ++iter;

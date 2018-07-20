@@ -124,18 +124,26 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
   timestamp <- substr(systime, 12, 19)
   datestamp <- format(Sys.Date(), "%d %b %y")
 
+
+  ii <- sapply(dat, is.integer)
+  nn <- sapply(dat, is.numeric)
+  itc <- NULL
+
   if (compress) {
     # check if numerics can be stored as integers
-    numToCompress <- sapply(dat[ff], saveToExport)
+    numToCompress <- sapply(dat[nn], saveToExport)
 
     if (any(numToCompress)) {
-      saveToConvert <- names(ff[numToCompress])
+      saveToConvert <- names(nn[numToCompress])
       # replace numerics as intergers
       dat[saveToConvert] <- sapply(dat[saveToConvert], as.integer)
     }
-  }
 
-  vtyp <<- vtyp
+    ii <- sapply(dat, is.integer)
+    gg <- sapply(dat, function(x) {max(x  < 151, na.rm = TRUE) &
+        min(x >= -100, na.rm = TRUE)})
+    itc <- which(ii == gg)
+  }
 
 
   attr(dat, "vtyp") <- vtyp
@@ -147,6 +155,7 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
   attr(dat, "label") <- label
   attr(dat, "haslabel") <- ff
   attr(dat, "labtab") <- labtab
+  attr(dat, "itc") <- itc
 
 
   writesav(filepath, dat, compress)
