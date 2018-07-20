@@ -4,7 +4,7 @@
 \alias{write.sav}
 \title{read.sav}
 \usage{
-write.sav(dat, filepath, label)
+write.sav(dat, filepath, label, compress = FALSE)
 }
 \arguments{
 \item{dat}{\emph{data.frame} a dat.aframe to strore as sav-file.}
@@ -13,6 +13,8 @@ write.sav(dat, filepath, label)
 stored}
 
 \item{label}{\emph{character} vector of labels. must be of size `ncol(dat)`}
+
+\item{compress}{\emph{logical} should compression be used}
 }
 \value{
 \code{readspss} returns nothing

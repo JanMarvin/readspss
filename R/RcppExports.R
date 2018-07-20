@@ -61,9 +61,10 @@ readsav <- function(filePath, debug, encStr, ownEnc) {
 #'
 #' @param filePath The full systempath to the dta file you want to import.
 #' @param dat the data frame
+#' @param compress the file
 #' @import Rcpp
 #' @export
-writesav <- function(filePath, dat) {
-    invisible(.Call(`_readspss_writesav`, filePath, dat))
+writesav <- function(filePath, dat, compress) {
+    invisible(.Call(`_readspss_writesav`, filePath, dat, compress))
 }
 

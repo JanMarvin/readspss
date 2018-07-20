@@ -30,10 +30,11 @@ using namespace std;
 //'
 //' @param filePath The full systempath to the dta file you want to import.
 //' @param dat the data frame
+//' @param compress the file
 //' @import Rcpp
 //' @export
 // [[Rcpp::export]]
-void writesav(const char * filePath, Rcpp::DataFrame dat)
+void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
 {
   int32_t k = dat.size();
   int64_t n = dat.nrows();
@@ -76,6 +77,9 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
     writebin(k, sav, swapit);
 
     int32_t cflag=0, cwvariables = 0;
+
+    if (compress)
+      cflag = 1;
 
     writebin(cflag, sav, swapit);
     writebin(cwvariables, sav, swapit);
@@ -201,6 +205,11 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
 
           writebin(coden, sav, swapit);
           uint8_t lablen = lab.size();
+          if (lablen > 120) {
+            lablen = 120;
+            warning("Label longer than 120 characters found. Trimmed to 120.");
+          }
+
           writebin(lablen, sav, swapit);
 
           lablen = ( ceil((double)(lablen+1)/8) * 8 ) - 1;
@@ -260,7 +269,49 @@ void writesav(const char * filePath, Rcpp::DataFrame dat)
     writebin(unk8, sav, swapit);
 
     if (cflag) {
-      Rcout << "not yet implemented" << std::endl;
+
+      // data is read in 8 byte chunks. k*n/8 (data remains)
+      double chunk = 0, val_d = 0;
+
+      int8_t iter = 0;
+
+      for (int64_t i = 0; i < n; ++i) {
+        for (int32_t j = 0; j < k; ++j) {
+
+
+          int32_t const type = vtyp[j];
+
+          unsigned char chnk[8];
+
+          if (type == 0) {
+            uint8_t val_b =  Rcpp::as<Rcpp::IntegerVector>(dat[j])[i];
+            val_b += 100;
+            chnk[iter] = val_b;
+
+            ++iter;
+
+            if (iter == 8) {
+              iter = 0;
+
+              std::memcpy(&chunk, chnk, sizeof(double));
+
+              writebin(chunk, sav, swapit);
+            }
+
+            if ((i == n-1) & (j == k -1)) {
+              val_b = 252;
+              chnk[iter] = val_b;
+
+              std::memcpy(&chunk, chnk, sizeof(double));
+
+              writebin(chunk, sav, swapit);
+            }
+
+          }
+        }
+      }
+
+      Rcpp::warning("Compressoin is not yet implemented");
     } else {
 
       for (int64_t i = 0; i < n; ++i) {

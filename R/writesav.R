@@ -22,6 +22,7 @@
 #' @param filepath \emph{string} full path where and how this file should be
 #'  stored
 #' @param label \emph{character} vector of labels. must be of size `ncol(dat)`
+#' @param compress \emph{logical} should compression be used
 #' @details For now stores data.frames containing numerics only. Nothing else
 #'  aside varnames and numerics are stored.
 #'  Missing values in character cols (<NA>) are written as empty ("").
@@ -29,7 +30,7 @@
 #' @return \code{readspss} returns nothing
 #'
 #' @export
-write.sav <- function(dat, filepath, label) {
+write.sav <- function(dat, filepath, label, compress = FALSE) {
 
   filepath <- path.expand(filepath)
 
@@ -123,6 +124,20 @@ write.sav <- function(dat, filepath, label) {
   timestamp <- substr(systime, 12, 19)
   datestamp <- format(Sys.Date(), "%d %b %y")
 
+  if (compress) {
+    # check if numerics can be stored as integers
+    numToCompress <- sapply(dat[ff], saveToExport)
+
+    if (any(numToCompress)) {
+      saveToConvert <- names(ff[numToCompress])
+      # replace numerics as intergers
+      dat[saveToConvert] <- sapply(dat[saveToConvert], as.integer)
+    }
+  }
+
+  vtyp <<- vtyp
+
+
   attr(dat, "vtyp") <- vtyp
   attr(dat, "vartypes") <- vartypes
   attr(dat, "nvarnames") <- nvarnames
@@ -134,7 +149,7 @@ write.sav <- function(dat, filepath, label) {
   attr(dat, "labtab") <- labtab
 
 
-  writesav(filepath, dat)
+  writesav(filepath, dat, compress)
 }
 
 

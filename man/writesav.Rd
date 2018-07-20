@@ -4,12 +4,14 @@
 \alias{writesav}
 \title{writes the binary SPSS file}
 \usage{
-writesav(filePath, dat)
+writesav(filePath, dat, compress)
 }
 \arguments{
 \item{filePath}{The full systempath to the dta file you want to import.}
 
 \item{dat}{the data frame}
+
+\item{compress}{the file}
 }
 \description{
 writes the binary SPSS file
