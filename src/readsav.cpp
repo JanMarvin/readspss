@@ -629,14 +629,26 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
         case 21:
         {
+          auto end21pos = sav.tellg();
+          end21pos += count;
+
+          while(sav.tellg() < end21pos)
+          {
+
           len = readbin(len, sav, swapit);
           std::string vn (len, '\0');
 
           vn = readstring(vn, sav, len);
 
+          // Rprintf("vn %d \n", len);
+          // Rcout << vn << std::endl;
+
+          // 8 is the minimal value
           int32_t varw = 0, nvars = 0;
           varw = readbin(varw, sav, swapit);
           nvars = readbin(nvars, sav, swapit);
+
+          // Rprintf("varw %d\n", varw);
 
           // set size
           CharacterVector longv(nvars);
@@ -669,6 +681,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
           longllist.push_back(longv);
 
           longllist.attr("names") = longlabvn;
+          }
 
           break;
         }
