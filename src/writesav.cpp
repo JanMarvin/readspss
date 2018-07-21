@@ -303,7 +303,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
 
 
           // write compressed
-          if (type == 0  & ITC == 0 & CC == 0) {
+          if ((type == 0)  & (ITC == 0) & (CC == 0)) {
             const double val_d = Rcpp::as<Rcpp::NumericVector>(dat[j])[i];
 
             // buf.push_back(val_d);
@@ -328,7 +328,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
             iter = 0;
           }
 
-          if (type >= 0  & ITC == 0 & CC == 1) {
+          if ((type >= 0)  & (ITC == 0) & (CC == 1)) {
             string val_s = as<string>(as<CharacterVector>(dat[j])[i]);
 
 
@@ -393,7 +393,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
           }
 
           // compression val_b
-          if (type == 0 & ITC == 1 & CC == 0) {
+          if ((type == 0) & (ITC == 1) & (CC == 0)) {
             val_i =  Rcpp::as<Rcpp::IntegerVector>(dat[j])[i];
 
             val_b = val_i + 100; // add bias
