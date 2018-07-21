@@ -135,33 +135,41 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
     numToCompress <- sapply(dat[nn], saveToExport)
 
     if (any(numToCompress)) {
-      saveToConvert <- names(nn[numToCompress])
+      saveToConvert <- names(nn[names(numToCompress)])
       # replace numerics as intergers
       dat[saveToConvert] <- sapply(dat[saveToConvert], as.integer)
     }
 
     ii <- sapply(dat, is.integer)
-    gg <- sapply(dat, function(x) {
+    gg <- sapply(dat[ii], function(x) {
         is.integer(x) & (min(x, na.rm = TRUE) >= -100 &
       max(x, na.rm = TRUE) < 151)
     })
-    itc <- apply(rbind(ii,gg), 2, all)
+
+    checkll <- rbind(ii,gg)
+
+    itc <- as.logical(checkll)
+    if (length(gg) > 0)
+      itc <- apply(checkll, 2, all)
 
   }
 
+  cc <- sapply(dat, is.character)
   # ii <<- ii
   # gg <<- gg
   #
   # dat <<- dat
   # itc <<- itc
+  # vartypes <<- vartypes
+  # vtyp <<- vtyp
+  # cc <<- cc
 
   # isnum <- sapply(dat, function(x){is.numeric(x) & !is.integer(x)})
 
   # vartypes[which(isnum == TRUE)] <- 253
 
-  cc <- sapply(dat, is.character)
 
-  attr(dat, "vtyp") <- vartypes
+  attr(dat, "vtyp") <- vtyp
   attr(dat, "vartypes") <- vartypes
   attr(dat, "nvarnames") <- nvarnames
   attr(dat, "longvarnames") <- longvarnames
