@@ -194,12 +194,17 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     if (debug)
       Rcout << prod << std::endl;
 
-
-
     // optional
-    // 3 : extra record
+    // 2 or 3 : author and extra record
     varrec = readstring(varrec, por, varrec.size());
 
+    // optional
+    // 2 : author
+    if (varrec.compare("2") == 0) {
+      stop("unhandled case");
+    }
+
+    // 3 : extra record
     if (varrec.compare("3") == 0) {
 
       // can be base-30 digit if 0 then read until next digit
@@ -224,6 +229,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
     // 4 : variables record
     if (varrec.compare("4") == 0) {
+
       // number of vars
       std::string varsize (1, '\0');
       varsize = readstring(varsize, por, varsize.size());
@@ -242,7 +248,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     // 5 : precision record
     if (varrec.compare("5") == 0) {
 
-
       std::string prec (1, '\0');
       prec = readstring(prec, por, prec.size());
 
@@ -252,6 +257,12 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       readstring(slash, por, slash.size());
       varrec = readstring(varrec, por, varrec.size());
 
+    }
+
+    // 6 : weighting record
+    if (varrec.compare("6") == 0) {
+      // single string
+      stop("unhandled case");
     }
 
 
@@ -264,7 +275,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     while (varrec.compare("7") == 0)
     {
 
-      // 0 or more (should read to next slash)
+      // 0 or 1-255 (should read to next slash)
       std::string vartyp (1, '\0');
       vartyp = readstring(vartyp, por, vartyp.size());
       readstring(slash, por, slash.size());
@@ -284,18 +295,20 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       // varname
       varnames.push_back(varname);
 
-      // 5
+      /* Printformat */
+      // 5 Format typ
       readstring(unkstr, por, unkstr.size());
       readstring(slash, por, slash.size());
 
-      // 8
+      // 8 Format width:  1-40
       readstring(unkstr, por, unkstr.size());
       readstring(slash, por, slash.size());
 
-      // 2
+      // 2 Number of decimalplaces: 1-40
       readstring(unkstr, por, unkstr.size());
       readstring(slash, por, slash.size());
 
+      /* Writeformat */
       // 5
       readstring(unkstr, por, unkstr.size());
       readstring(slash, por, slash.size());
@@ -316,6 +329,35 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         Rcout << varname << std::endl;
         Rcout << varnamelen << std::endl;
       }
+
+      // missing values
+      while (varrec.compare("8") == 0) {
+        stop("unhandled case");
+      }
+
+
+      // low thru x
+      while (varrec.compare("9") == 0) {
+        stop("unhandled case");
+      }
+
+
+      // x thru high
+      while (varrec.compare("A") == 0) {
+        stop("unhandled case");
+      }
+
+      // variable label
+      while (varrec.compare("C") == 0) {
+        stop("unhandled case");
+      }
+
+    }
+
+
+    // D : value labels
+    if (varrec.compare("D") == 0) {
+      stop("unhandled case");
 
     }
 
