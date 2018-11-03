@@ -47,7 +47,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     while (getline(por_file, input))
       file += input;
   } else {
-    stop ("woops");
+    stop ("No file was read.");
   }
 
   // std::regex e("([^\r\n]|^)\r\n([^\r\n]|$)");
@@ -56,7 +56,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
   // remove all newline characters \r and \n
   file.erase( std::remove(file.begin(), file.end(), '\r'), file.end() );
   file.erase( std::remove(file.begin(), file.end(), '\n'), file.end() );
-
 
   por << file;
 
@@ -121,7 +120,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
     if (debug)
       Rcout << "lower: " << lower << std::endl;
-      // Rprintf("lower: %s \n", lower.c_str());
+    // Rprintf("lower: %s \n", lower.c_str());
 
     // random
     std::string random (61, '\0');
@@ -150,6 +149,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     std::string vers (1, '\0');
     vers = readstring(vers, por, vers.size());
 
+    // filedate is yyyymmdd should be 8
     std::string filedatelen = string(1, '\0');
     filedatelen = readstring(filedatelen, por, filedatelen.size());
 
@@ -159,7 +159,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     std::string filedate (std::stoi(filedatelen), '\0');
     filedate = readstring(filedate, por, filedate.size());
 
-
+    // filetime is hhmmss should be 6
     std::string filetimelen = string(1, '\0');
     filetimelen = readstring(filetimelen, por, filetimelen.size());
 
@@ -169,48 +169,207 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     filetime = readstring(filetime, por, filetime.size());
 
 
-
     Rcout << vers << " " << filedate << " " << filetime << std::endl;
 
-    // identification record
+
+    // 1 : identification record
     std::string prodrec (1, '\0');
     prodrec = readstring(prodrec, por, prodrec.size());
 
-    std::string prodlen (2, '\0');
+    // can be base-30 digit
+    std::string prodlen (1, '\0');
     prodlen = readstring(prodlen, por, prodlen.size());
 
     readstring(slash, por, slash.size());
 
-    // std::string prod (std::stoi(prodlen), '\0');
-    std::string prod (std::stoi(prodlen)+20, '\0');
+    // strtoi as in R
+    std::string prod (std::stol(prodlen, NULL, 30), '\0');
     prod = readstring(prod, por, prod.size());
 
     Rcout << prod << std::endl;
 
-    // readstring(slash, por, slash.size());
 
-    std::string rtype (1, '\0');
-    rtype = readstring(rtype, por, rtype.size());
+    // optional
 
+    // 3 : extra record
+    std::string extrarec (1, '\0');
+    extrarec = readstring(extrarec, por, extrarec.size());
 
-    // if (rtype == 4) {
-      std::string varcount (1, '\0');
-      varcount = readstring(varcount, por, rtype.size());
-    // }
-
-    Rcout << varcount << std::endl;
-
-    readstring(slash, por, slash.size());
-    rtype = readstring(rtype, por, rtype.size());
-
-    std::string floatcount (1, '\0');
-    floatcount = readstring(floatcount, por, floatcount.size());
-
+    // can be base-30 digit if 0 then read until next digit
+    std::string extralen (1, '\0');
+    extralen = readstring(extralen, por, extralen.size());
 
     readstring(slash, por, slash.size());
 
+    // extra information
+    std::string extra (std::stol(extralen, NULL, 30), '\0');
+    extra = readstring(extra, por, extra.size());
 
-    return 0;
+    Rcout << extra << std::endl;
+
+
+
+    // 4 : variables record
+    std::string varrec (1, '\0');
+    varrec = readstring(varrec, por, varrec.size());
+
+    // number of vars
+    std::string varsize (1, '\0');
+    varsize = readstring(varsize, por, varsize.size());
+
+    int vars = 0;
+    vars = std::strtol(varsize.c_str(), NULL, 30);
+
+    Rprintf("%d", vars);
+
+
+    readstring(slash, por, slash.size());
+
+    // 5 : precision record
+    std::string precrec (1, '\0');
+    precrec = readstring(precrec, por, precrec.size());
+
+    std::string prec (1, '\0');
+    prec = readstring(prec, por, prec.size());
+
+    int precs = 0;
+    precs = std::strtol(prec.c_str(), NULL, 30);
+
+    readstring(slash, por, slash.size());
+
+    // 7 : variable records
+    varrec = readstring(varrec, por, varrec.size());
+
+
+    std::vector<int> vartypes;
+    std::vector<std::string> varnames;
+    std::string unkstr (1, '\0');
+
+    while (varrec.compare("7") == 0)
+    {
+
+      // 0 or more (should read to next slash)
+      std::string vartyp (1, '\0');
+      vartyp = readstring(vartyp, por, vartyp.size());
+      readstring(slash, por, slash.size());
+
+      // vartype
+      vartypes.push_back(std::atoi(vartyp.c_str()));
+
+
+      // varnamelen (1 - 8)
+      std::string varnamelen (1, '\0');
+      varnamelen = readstring(varnamelen, por, varnamelen.size());
+      readstring(slash, por, slash.size());
+
+      std::string varname (std::atoi(varnamelen.c_str()), '\0');
+      varname = readstring(varname, por, varname.size());
+
+      // varname
+      varnames.push_back(varname);
+
+      // 5
+      readstring(unkstr, por, unkstr.size());
+      readstring(slash, por, slash.size());
+
+      // 8
+      readstring(unkstr, por, unkstr.size());
+      readstring(slash, por, slash.size());
+
+      // 2
+      readstring(unkstr, por, unkstr.size());
+      readstring(slash, por, slash.size());
+
+      // 5
+      readstring(unkstr, por, unkstr.size());
+      readstring(slash, por, slash.size());
+
+      // 8
+      readstring(unkstr, por, unkstr.size());
+      readstring(slash, por, slash.size());
+
+      // 2
+      readstring(unkstr, por, unkstr.size());
+      readstring(slash, por, slash.size());
+
+      // varrec
+      varrec = readstring(varrec, por, varrec.size());
+
+
+      Rcout << varname << std::endl;
+      Rcout << varnamelen << std::endl;
+    }
+
+    // if varrec == "F"
+
+
+    Rcout << varrec << std::endl;
+
+    int n = 2;
+
+    // 1. Create Rcpp::List
+    Rcpp::List df(varnames.size());
+    for (int32_t i=0; i<varnames.size(); ++i)
+    {
+      int const type = vartypes[i];
+      switch(type)
+      {
+      case 0:
+        SET_VECTOR_ELT(df, i, Rcpp::NumericVector(Rcpp::no_init(n)));
+        break;
+
+      default:
+        SET_VECTOR_ELT(df, i, Rcpp::CharacterVector(Rcpp::no_init(n)));
+      break;
+      }
+    }
+
+    if ( varrec.compare("F") == 0) {
+
+
+      // fill list with data
+      for (int kk = 0; kk < n; ++kk) { // 2
+        for (int ii = 0; ii < vars; ++ii) { // 2
+
+
+
+
+          int const type = vartypes[ii];
+
+          switch(type)
+          {
+          case 0:
+          {
+            std::string val (1, '\0');
+            int val_i = 0;
+
+            val = readstring(val, por, val.size());
+            readstring(slash, por, slash.size());
+
+            Rcout << val << std::endl;
+
+            val_i = std::strtol(val.c_str(), NULL, 30);
+
+            REAL(VECTOR_ELT(df,ii))[kk] = val_i;
+
+            break;
+          }
+          }
+
+        }
+
+      }
+
+    }
+
+
+    // 3. Create a data.frame
+    R_xlen_t nrows = Rf_length(df[0]);
+    df.attr("row.names") = IntegerVector::create(NA_INTEGER, nrows);
+    df.attr("names") = varnames;
+    df.attr("class") = "data.frame";
+
+    return(df);
 
 
   } else {
