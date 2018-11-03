@@ -72,26 +72,27 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
     // 1
     spss = readstring(spss, por, spss.size());
-    Rcout << spss << std::endl;
+    // Rcout << spss << std::endl;
 
     // 2
     spss = readstring(spss, por, spss.size());
-    Rcout << spss << std::endl;
+    // Rcout << spss << std::endl;
 
     // 3
     spss = readstring(spss, por, spss.size());
-    Rcout << spss << std::endl;
+    // Rcout << spss << std::endl;
 
     // 4
     spss = readstring(spss, por, spss.size());
-    Rcout << spss << std::endl;
+    // Rcout << spss << std::endl;
 
     // 5
     spss = readstring(spss, por, spss.size());
-    Rcout << spss << std::endl;
+    // Rcout << spss << std::endl;
 
     // Rcpp::stop("Debug!");
-    Rcout << "Pos: " << por.tellg() << std::endl;
+    if (debug)
+      Rcout << "Pos: " << por.tellg() << std::endl;
 
 
     // Controll characters
@@ -141,7 +142,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     if (debug)
       Rcout << "tag: " << tag << std::endl;
 
-    Rcout << "Pos: " << por.tellg() << std::endl;
+    if (debug)
+      Rcout << "Pos: " << por.tellg() << std::endl;
     // end of header -----------------------------------------------------------
 
 
@@ -169,12 +171,14 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     filetime = readstring(filetime, por, filetime.size());
 
 
-    Rcout << vers << " " << filedate << " " << filetime << std::endl;
+    if (debug)
+      Rcout << vers << " " << filedate << " " << filetime << std::endl;
 
+
+    std::string varrec (1, '\0');
 
     // 1 : identification record
-    std::string prodrec (1, '\0');
-    prodrec = readstring(prodrec, por, prodrec.size());
+    varrec = readstring(varrec, por, varrec.size());
 
     // can be base-30 digit
     std::string prodlen (1, '\0');
@@ -186,65 +190,77 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     std::string prod (std::stol(prodlen, NULL, 30), '\0');
     prod = readstring(prod, por, prod.size());
 
-    Rcout << prod << std::endl;
+
+    if (debug)
+      Rcout << prod << std::endl;
+
 
 
     // optional
-
     // 3 : extra record
-    std::string extrarec (1, '\0');
-    extrarec = readstring(extrarec, por, extrarec.size());
+    varrec = readstring(varrec, por, varrec.size());
 
-    // can be base-30 digit if 0 then read until next digit
-    std::string extralen (1, '\0');
-    extralen = readstring(extralen, por, extralen.size());
+    if (varrec.compare("3") == 0) {
 
-    readstring(slash, por, slash.size());
+      // can be base-30 digit if 0 then read until next digit
+      std::string extralen (1, '\0');
+      extralen = readstring(extralen, por, extralen.size());
 
-    // extra information
-    std::string extra (std::stol(extralen, NULL, 30), '\0');
-    extra = readstring(extra, por, extra.size());
+      readstring(slash, por, slash.size());
 
-    Rcout << extra << std::endl;
+      // extra information
+      std::string extra (std::stol(extralen, NULL, 30), '\0');
+      extra = readstring(extra, por, extra.size());
 
+
+      if (debug)
+        Rcout << extra << std::endl;
+
+      varrec = readstring(varrec, por, varrec.size());
+    }
+
+    int vars = 0;
 
 
     // 4 : variables record
-    std::string varrec (1, '\0');
-    varrec = readstring(varrec, por, varrec.size());
+    if (varrec.compare("4") == 0) {
+      // number of vars
+      std::string varsize (1, '\0');
+      varsize = readstring(varsize, por, varsize.size());
 
-    // number of vars
-    std::string varsize (1, '\0');
-    varsize = readstring(varsize, por, varsize.size());
+      vars = std::strtol(varsize.c_str(), NULL, 30);
 
-    int vars = 0;
-    vars = std::strtol(varsize.c_str(), NULL, 30);
+      if (debug)
+        Rprintf("%d", vars);
 
-    Rprintf("%d", vars);
+      readstring(slash, por, slash.size());
+      varrec = readstring(varrec, por, varrec.size());
 
+    }
 
-    readstring(slash, por, slash.size());
 
     // 5 : precision record
-    std::string precrec (1, '\0');
-    precrec = readstring(precrec, por, precrec.size());
+    if (varrec.compare("5") == 0) {
 
-    std::string prec (1, '\0');
-    prec = readstring(prec, por, prec.size());
 
-    int precs = 0;
-    precs = std::strtol(prec.c_str(), NULL, 30);
+      std::string prec (1, '\0');
+      prec = readstring(prec, por, prec.size());
 
-    readstring(slash, por, slash.size());
+      int precs = 0;
+      precs = std::strtol(prec.c_str(), NULL, 30);
 
-    // 7 : variable records
-    varrec = readstring(varrec, por, varrec.size());
+      readstring(slash, por, slash.size());
+      varrec = readstring(varrec, por, varrec.size());
+
+    }
 
 
     std::vector<int> vartypes;
     std::vector<std::string> varnames;
     std::string unkstr (1, '\0');
 
+
+    // 7 : variable records
     while (varrec.compare("7") == 0)
     {
 
@@ -296,42 +312,42 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       varrec = readstring(varrec, por, varrec.size());
 
 
-      Rcout << varname << std::endl;
-      Rcout << varnamelen << std::endl;
+      if (debug) {
+        Rcout << varname << std::endl;
+        Rcout << varnamelen << std::endl;
+      }
+
     }
 
-    // if varrec == "F"
 
-
-    Rcout << varrec << std::endl;
+    if (debug)
+      Rcout << varrec << std::endl;
 
     int n = 2;
 
     // 1. Create Rcpp::List
     Rcpp::List df(varnames.size());
-    for (int32_t i=0; i<varnames.size(); ++i)
-    {
-      int const type = vartypes[i];
-      switch(type)
-      {
-      case 0:
-        SET_VECTOR_ELT(df, i, Rcpp::NumericVector(Rcpp::no_init(n)));
-        break;
-
-      default:
-        SET_VECTOR_ELT(df, i, Rcpp::CharacterVector(Rcpp::no_init(n)));
-      break;
-      }
-    }
 
     if ( varrec.compare("F") == 0) {
 
+      for (int32_t i=0; i<varnames.size(); ++i)
+      {
+        int const type = vartypes[i];
+        switch(type)
+        {
+        case 0:
+          SET_VECTOR_ELT(df, i, Rcpp::NumericVector(Rcpp::no_init(n)));
+          break;
+
+        default:
+          SET_VECTOR_ELT(df, i, Rcpp::CharacterVector(Rcpp::no_init(n)));
+        break;
+        }
+      }
 
       // fill list with data
       for (int kk = 0; kk < n; ++kk) { // 2
         for (int ii = 0; ii < vars; ++ii) { // 2
-
-
 
 
           int const type = vartypes[ii];
@@ -346,7 +362,9 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
             val = readstring(val, por, val.size());
             readstring(slash, por, slash.size());
 
-            Rcout << val << std::endl;
+
+            if (debug)
+              Rcout << val << std::endl;
 
             val_i = std::strtol(val.c_str(), NULL, 30);
 
