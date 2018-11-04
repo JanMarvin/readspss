@@ -452,7 +452,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         eof = val.find_first_not_of("Z") == string::npos;
 
         if (eof) {
-          Rcout << "End of file found. n is" << n << std::endl;
+          if (debug)
+            Rcout << "End of file found. n is" << n << std::endl;
           break;
         }
 
@@ -530,6 +531,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
             double val_d = 0.0;
             double val_g = 0.0;
             int    test = 0;
+            int    mv = 0;
 
             // val_d = readfloat(val);
 
@@ -537,17 +539,13 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
             strcpy(cstr, val.c_str());
 
             // TDA function
-            test = dnum(cstr, val_g);
+            test = dnum(cstr, val_g, &mv);
 
 
             val_d = val_g;
 
             // FixMe: If I delete this R dies
             // delete [] cstr;
-
-            // ToDo: PSPP states that a dot is not required for a missing
-            if (val.compare("*.") == 0)
-              val_d = NA_REAL;
 
 
             if (debug) {
