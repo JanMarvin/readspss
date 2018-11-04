@@ -480,17 +480,23 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
             val = readtostring(por);
 
 
-            if (debug)
-              Rcout << val << std::endl;
 
-            val_d = std::strtol(val.c_str(), NULL, 30);
 
+
+            val_d = readfloat(val);
+
+            // ToDo: PSPP states that a dot is not required for a missing
             if (val.compare("*.") == 0)
               val_d = NA_REAL;
 
+            if (debug) {
 
-            if (debug)
+              Rcout << varnames[ii] << std::endl;
+
+              Rcout << val << std::endl;
               Rprintf("%f\n", val_d);
+
+            }
 
 
             REAL(VECTOR_ELT(df,ii))[kk] = val_d;

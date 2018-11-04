@@ -156,6 +156,43 @@ static std::string readtostring(T& sav)
 }
 
 
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
+
+static double readfloat (std::string &str) {
+
+  double intp = 0.0, frcp = 0.0, res = 0.0;
+  std::vector<std::string> vec_r;
+
+  // if is digit do this else strtol
+  if (str.find(".") != std::string::npos) {
+
+    boost::split(vec_r, str,
+                 boost::is_any_of("."), boost::token_compress_on);
+
+
+    intp = std::strtol(vec_r[0].c_str(), NULL, 30);
+    frcp = std::strtol(vec_r[1].c_str(), NULL, 30);
+
+
+    Rprintf("integer: %f\n", intp);
+    Rprintf("fractal: %f\n", frcp);
+
+    // ToDo: This is a guess
+    res = intp * 30.0 + frcp;
+
+    res *= pow(30.0, (double) -1);
+
+  } else {
+
+    res = std::strtol(str.c_str(), NULL, 30);
+  }
+
+  return(res);
+
+}
+
+
 
 template <typename T>
 static T Riconv(T &mystring, std::string &encStr) {
