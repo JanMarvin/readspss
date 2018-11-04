@@ -441,7 +441,66 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     if (debug)
       Rcout << varrec << std::endl;
 
-    int n = 2;
+    int n = 0;
+
+    bool eof = false;
+
+    size_t data_begin = por.tellg();
+
+    // dry run until end of file is reached
+    for (int kk = 0; kk < R_PosInf; ++kk) {
+      for (int ii = 0; ii < vars; ++ii) {
+
+        std::string val;
+        val = readtostring(por);
+
+        if (debug)
+          Rcout << val << std::endl;
+
+        eof = val.find_first_not_of("Z") == string::npos;
+
+        if (eof) {
+          Rcout << "End of file found. n is" << n << std::endl;
+          break;
+        }
+
+        int const type = vartypes[ii];
+        switch(type)
+        {
+        case 0:
+        {
+          if (debug)
+            Rcout << "numeric do nothing" << std::endl;
+          break;
+        }
+
+        default:
+        {
+          int val_s_len = std::strtol(val.c_str(), NULL, 30);
+
+          std::string val_s (val_s_len, '\0');
+          val_s = readstring(val_s, por, val_s.size());
+
+          Rcpp::Rcout << val_s << std::endl;
+
+          break;
+        }
+        }
+
+      }
+
+      if (eof)
+        break;
+
+      ++n;
+
+    }
+
+    if (debug)
+      Rcout << "Dry run finished. n is known import beginns" << std::endl;
+
+    // back to the data_begin part
+    por.seekg(data_begin);
 
     // 1. Create Rcpp::List
     Rcpp::List df(varnames.size());
@@ -464,9 +523,11 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       }
 
       // fill list with data
-      for (int kk = 0; kk < n; ++kk) { // 2
-        for (int ii = 0; ii < vars; ++ii) { // 2
+      for (int kk = 0; kk < n; ++kk) {
+        for (int ii = 0; ii < vars; ++ii) {
 
+          std::string val;
+          val = readtostring(por);
 
           int const type = vartypes[ii];
 
@@ -474,14 +535,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
           {
           case 0:
           {
-            std::string val (1, '\0');
             double val_d = 0.0;
-
-            val = readtostring(por);
-
-
-
-
 
             val_d = readfloat(val);
 
@@ -489,13 +543,12 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
             if (val.compare("*.") == 0)
               val_d = NA_REAL;
 
-            if (debug) {
 
+            if (debug) {
               Rcout << varnames[ii] << std::endl;
 
               Rcout << val << std::endl;
               Rprintf("%f\n", val_d);
-
             }
 
 
@@ -506,10 +559,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
           default:
           {
-
-            std::string val_slen;
-            val_slen = readtostring(por);
-            int val_s_len = std::strtol(val_slen.c_str(), NULL, 30);
+            int val_s_len = std::strtol(val.c_str(), NULL, 30);
 
             std::string val_s (val_s_len, '\0');
             val_s = readstring(val_s, por, val_s.size());
@@ -521,9 +571,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
           }
           }
 
-
-        // if (ii == 9)
-        //   break;
         }
 
       }
