@@ -101,9 +101,9 @@ static const std::string codepage(int cp) {
   case 51932:
     res = "euc-jp";
     break;
-    case 65001:
-      res = "UTF-8";
-      break;
+  case 65001:
+    res = "UTF-8";
+    break;
   }
 
   return(res);
@@ -134,15 +134,19 @@ static std::string readtostring(T& sav)
     std::string next(1, '\0');
     next = readstring(next, sav, next.size());
 
-    // Rcpp::Rcout << next << std::endl;
-
-    if (next.compare("/") == 0 ||
-        ( res.compare("*") == 0 & next.compare(".") == 0)) {
-
-      // Rcpp::Rcout << res << std::endl;
+    if ( res.compare("*") == 0 & next.compare(".") == 0) {
+      // missing (combine so we can check for "*.")
+      res = res + next;
 
       break;
+
+    } else if (next.compare("/") == 0) {
+      // slash reached return w/o slash
+
+      break;
+
     } else {
+      // all good read another value
       res = res + next;
     }
 
