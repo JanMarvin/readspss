@@ -168,6 +168,10 @@ static int getdigit(char *p, int *err)
     return((int)(10 + *p - 'A'));
   else
     *err = 1;
+
+  /* for debugging */
+  // Rcpp::Rcout << *p << std::endl;
+
   return(0);
 }
 
@@ -175,7 +179,7 @@ static int getdigit(char *p, int *err)
 // Part of TDA. Program for Transition Data Analysis, written by Goetz Rohwer.
 // Copyright (C) 1989,1991-97 Goetz Rohwer. GPL-2
 static
-int dnum(char *p, double &x)
+int dnum(char *p, double &x, int *mv)
 {
   int err;
   int neg = 0;
@@ -192,6 +196,15 @@ int dnum(char *p, double &x)
   while (*p && *p == ' ') {
     RSPCnt--;
     p++;
+  }
+
+  *mv = 0;
+  if (*p == '*') {                /* check for internal missing value */
+    *mv = 1;
+    RSPCnt -= 2;
+    p += 2;
+    x = NA_REAL;
+    return(0);                   // return(p);
   }
 
   if (*p == '-') {
@@ -214,11 +227,9 @@ int dnum(char *p, double &x)
         man *= 30.0;
         man += (double) getdigit(p, &err);
 
-        // Rcpp::Rcout << "man: " << man << std::endl;
-
         if (err) {
-          Rprintf("Unk0: %d\n", q);
-          return(0);
+          Rprintf("Unk0: %d\n", q); // digit_err(q)
+          return(0);                // return(NULL);
         }
         k++;
         if (k > 13)
@@ -228,12 +239,9 @@ int dnum(char *p, double &x)
         mex *= 30.0;
         mex += (double) getdigit(p, &err);
 
-
-        // Rcpp::Rcout << "mex: " << mex << std::endl;
-
         if (err) {
-          Rprintf("Unk1: %d\n", q);
-          return(0);
+          Rprintf("Unk1: %d\n", q); // digit_err(q)
+          return(0);                // return(NULL);
         }
       }
     }
@@ -254,10 +262,8 @@ int dnum(char *p, double &x)
     man /= pow(30.0,mex);
   x = man;
 
-  // Rcpp::Rcout << "x: " << x << std::endl;
-
   RSPCnt--;
-  // Rprintf("hier will ++p zurueck");
+  // return(++p);
 
   return(1);
 }
