@@ -300,29 +300,23 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
       /* Printformat */
       // 5 Format typ
-      readstring(unkstr, por, unkstr.size());
-      readstring(slash, por, slash.size());
+      unkstr = readtostring(por);
 
       // 8 Format width:  1-40
-      readstring(unkstr, por, unkstr.size());
-      readstring(slash, por, slash.size());
+      unkstr = readtostring(por);
 
       // 2 Number of decimalplaces: 1-40
-      readstring(unkstr, por, unkstr.size());
-      readstring(slash, por, slash.size());
+      unkstr = readtostring(por);
 
       /* Writeformat */
       // 5
-      readstring(unkstr, por, unkstr.size());
-      readstring(slash, por, slash.size());
+      unkstr = readtostring(por);
 
       // 8
-      readstring(unkstr, por, unkstr.size());
-      readstring(slash, por, slash.size());
+      unkstr = readtostring(por);
 
       // 2
-      readstring(unkstr, por, unkstr.size());
-      readstring(slash, por, slash.size());
+      unkstr = readtostring(por);
 
       // varrec
       varrec = readstring(varrec, por, varrec.size());
