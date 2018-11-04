@@ -233,17 +233,15 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     if (varrec.compare("4") == 0) {
 
       // number of vars
-      std::string varsize (1, '\0');
-      varsize = readstring(varsize, por, varsize.size());
+      std::string varsize;
+      varsize = readtostring(por);
 
       vars = std::strtol(varsize.c_str(), NULL, 30);
 
       if (debug)
-        Rprintf("%d\n", vars);
+        Rprintf("varsize: %d\n", vars);
 
-      readstring(slash, por, slash.size());
       varrec = readstring(varrec, por, varrec.size());
-
     }
 
 
@@ -463,8 +461,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         {
         case 0:
         {
-          if (debug)
-            Rcout << "numeric do nothing" << std::endl;
+          // if (debug)
+          //   Rcout << "numeric do nothing" << std::endl;
           break;
         }
 
@@ -475,7 +473,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
           std::string val_s (val_s_len, '\0');
           val_s = readstring(val_s, por, val_s.size());
 
-          Rcpp::Rcout << val_s << std::endl;
+          // Rcpp::Rcout << val_s << std::endl;
 
           break;
         }
@@ -558,7 +556,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
             std::string val_s (val_s_len, '\0');
             val_s = readstring(val_s, por, val_s.size());
 
-            Rcpp::Rcout << val_s << std::endl;
+            // Rcpp::Rcout << val_s << std::endl;
             Rcpp::as<Rcpp::CharacterVector>(df[ii])[kk] = val_s;
 
             break;
