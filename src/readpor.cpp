@@ -62,6 +62,16 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
   if (por) {
 
+
+    Rcpp::List missings;
+    Rcpp::List labtab;
+    std::vector<int> vartypes;
+    std::vector<std::string> varnames;
+    std::vector<std::string> vn;
+    std::vector<std::string> varlabels;
+    std::vector<std::string> labelsetnams;
+    std::string unkstr (1, '\0');
+
     // int32_t n = 0;
     // int32_t k = 0;<
 
@@ -226,112 +236,120 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
     int vars = 0;
 
+    while (1) {
+      Rcpp::checkUserInterrupt();
 
-    // 4 : variables record
-    if (varrec.compare("4") == 0) {
+      // 4 : variables record
+      if (varrec.compare("4") == 0) {
 
-      // number of vars
-      std::string varsize;
-      varsize = readtostring(por);
+        // number of vars
+        std::string varsize;
+        varsize = readtostring(por);
 
-      vars = std::strtol(varsize.c_str(), NULL, 30);
+        vars = std::strtol(varsize.c_str(), NULL, 30);
 
-      if (debug)
-        Rprintf("varsize: %d\n", vars);
+        if (debug)
+          Rprintf("varsize: %d\n", vars);
 
-      varrec = readstring(varrec, por, varrec.size());
-    }
-
-
-    // 5 : precision record
-    if (varrec.compare("5") == 0) {
-
-      std::string prec (1, '\0');
-      prec = readstring(prec, por, prec.size());
-
-      int precs = 0;
-      precs = std::strtol(prec.c_str(), NULL, 30);
-
-      readstring(slash, por, slash.size());
-      varrec = readstring(varrec, por, varrec.size());
-
-    }
-
-    // 6 : weighting record
-    if (varrec.compare("6") == 0) {
-      // single string
-      stop("unhandled case 6");
-    }
-
-
-    Rcpp::List missings;
-    std::vector<int> vartypes;
-    std::vector<std::string> varnames;
-    std::vector<std::string> varlabels;
-    std::string unkstr (1, '\0');
-
-
-    // 7 : variable records
-    while (varrec.compare("7") == 0)
-    {
-
-      // 0 or 1-255
-      std::string vartyp;
-      vartyp = readtostring(por);
-
-      // vartype
-      vartypes.push_back(std::strtol(vartyp.c_str(), NULL, 30));
-
-
-      // varnamelen (1 - 8)
-      std::string varnamelen (1, '\0');
-      varnamelen = readstring(varnamelen, por, varnamelen.size());
-      readstring(slash, por, slash.size());
-
-      std::string varname (std::atoi(varnamelen.c_str()), '\0');
-      varname = readstring(varname, por, varname.size());
-
-      // varname
-      varnames.push_back(varname);
-
-      /* Printformat */
-      // 5 Format typ
-      unkstr = readtostring(por);
-
-      // 8 Format width:  1-40
-      unkstr = readtostring(por);
-
-      // 2 Number of decimalplaces: 1-40
-      unkstr = readtostring(por);
-
-      /* Writeformat */
-      // 5
-      unkstr = readtostring(por);
-
-      // 8
-      unkstr = readtostring(por);
-
-      // 2
-      unkstr = readtostring(por);
-
-      // varrec
-      varrec = readstring(varrec, por, varrec.size());
-
-
-      if (debug) {
-        Rcout << varname << std::endl;
-        Rcout << varnamelen << std::endl;
+        varrec = readstring(varrec, por, varrec.size());
       }
 
+
+      // 5 : precision record
+      if (varrec.compare("5") == 0) {
+
+        std::string prec (1, '\0');
+        prec = readstring(prec, por, prec.size());
+
+        int precs = 0;
+        precs = std::strtol(prec.c_str(), NULL, 30);
+
+        readstring(slash, por, slash.size());
+        varrec = readstring(varrec, por, varrec.size());
+
+      }
+
+      // 6 : weighting record
+      if (varrec.compare("6") == 0) {
+        // single string
+        stop("unhandled case 6");
+      }
+
+
+      // 7 : variable records
+      if (varrec.compare("7") == 0)
+      {
+
+        // 0 or 1-255
+        std::string vartyp;
+        vartyp = readtostring(por);
+
+        // vartype
+        vartypes.push_back(std::strtol(vartyp.c_str(), NULL, 30));
+
+
+        // varnamelen (1 - 8)
+        std::string varnamelen (1, '\0');
+        varnamelen = readstring(varnamelen, por, varnamelen.size());
+        readstring(slash, por, slash.size());
+
+        std::string varname (std::atoi(varnamelen.c_str()), '\0');
+        varname = readstring(varname, por, varname.size());
+
+        // varname
+        varnames.push_back(varname);
+
+        /* Printformat */
+        // 5 Format typ
+        unkstr = readtostring(por);
+
+        // 8 Format width:  1-40
+        unkstr = readtostring(por);
+
+        // 2 Number of decimalplaces: 1-40
+        unkstr = readtostring(por);
+
+        /* Writeformat */
+        // 5
+        unkstr = readtostring(por);
+
+        // 8
+        unkstr = readtostring(por);
+
+        // 2
+        unkstr = readtostring(por);
+
+        // varrec
+        varrec = readstring(varrec, por, varrec.size());
+
+
+        if (debug) {
+          Rcout << varname << std::endl;
+          Rcout << varnamelen << std::endl;
+        }
+      }
+
+
       // missing values
-      while (varrec.compare("8") == 0) {
+      if (varrec.compare("8") == 0) {
+
+        Rcout << "--- 8 ---" << std::endl;
 
         std::string misslen;
 
         misslen = readtostring(por);
 
         // char for > 0 otherwise its integer
-        if (std::strtol(vartyp.c_str(), NULL, 30) > 0) {
+
+        ptrdiff_t pos = distance(varnames.begin(), find(varnames.begin(),
+                                                varnames.end(),
+                                                varnames[varnames.size()]));
+
+        int vartyp = vartypes[pos-1];
+
+        Rprintf("vartyp %d \n", pos);
+
+        if (vartyp > 0) {
 
           std::string miss(std::strtol(misslen.c_str(), NULL, 30), '\0');
           miss = readstring(miss, por, miss.size());
@@ -358,18 +376,19 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
 
       // low thru x
-      while (varrec.compare("9") == 0) {
+      if (varrec.compare("9") == 0) {
         stop("unhandled case 9");
       }
 
 
       // x thru high
-      while (varrec.compare("A") == 0) {
+      if (varrec.compare("A") == 0) {
         stop("unhandled case A");
       }
 
+
       // unknown
-      while (varrec.compare("B") == 0) {
+      if (varrec.compare("B") == 0) {
 
         std::string unk1;
         std::string unk2;
@@ -382,8 +401,9 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         warning("unknown values read");
       }
 
+
       // variable label
-      while (varrec.compare("C") == 0) {
+      if (varrec.compare("C") == 0) {
 
         // Rcout << "--- C ---" << std::endl;
 
@@ -405,110 +425,129 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
       }
 
-    }
 
 
-    Rcpp::List labtab;
+      // D : value labels
+      if (varrec.compare("D") == 0) {
 
-    std::vector<std::string> labelsetnams;
+        if (debug)
+          Rcout << "--- D ---" << std::endl;
 
-    // D : value labels
-    while (varrec.compare("D") == 0) {
+        std::string unk1;
+        unk1 = readtostring(por);
 
-      if (debug)
-        Rcout << "--- D ---" << std::endl;
+        Rcout << "unk1 :: " << unk1 << std::endl;
 
-      std::string unk1;
-      unk1 = readtostring(por);
+        int nolab = std::strtol(unk1.c_str(), NULL, 30);
 
-      Rcout << "unk1 :: " << unk1 << std::endl;
+        // unknown reason chained labelsets?
+        for (int i = 0; i < nolab; ++i) {
 
-      std::string labelset;
-      labelset = readtostring(por);
+          std::string labelset;
+          labelset = readtostring(por);
 
-      std::string labelsetnam (std::strtol(labelset.c_str(), NULL, 30), '\0');
-      labelsetnam = readstring(labelsetnam, por, labelsetnam.size());
-      labelsetnams.push_back(labelsetnam);
+          std::string labelsetnam(std::strtol(labelset.c_str(),
+                                              NULL, 30), '\0');
+          labelsetnam = readstring(labelsetnam, por, labelsetnam.size());
 
-      Rcout << labelset << labelsetnam << std::endl;
+          if (i == 0) // FixMe: store the others as well
+            labelsetnams.push_back(labelsetnam);
 
-      std::string labelnum;
-      labelnum = readtostring(por);
+          Rcout << labelset << labelsetnam << std::endl;
 
-      int labnums = std::strtol(labelnum.c_str(), NULL, 30);
-      Rcpp::CharacterVector labvals(labnums);
-      Rcpp::CharacterVector labtxts(labnums);
-
-      // Rprintf("labnums %d\n", labnums);
-
-      ptrdiff_t pos = distance(varnames.begin(), find(varnames.begin(),
-                                              varnames.end(), labelsetnam));
-
-      int vartyp = vartypes[pos];
-
-      // Rprintf("vartyp %d\n", vartyp);
-
-      if (vartyp == 0) {
-
-        // Rcout << "numerisches Label" << std::endl;
-
-        for (int i = 0; i < labnums; ++i) {
-
-          std::string labval;
-          std::string labtxtlen;
-
-          labval = readtostring(por);
-          labtxtlen = readtostring(por);
-
-          // Rcout << labval <<" - "<< labtxtlen << std::endl;
-
-          std::string labtxt (std::strtol(labtxtlen.c_str(), NULL, 30), '\0');
-          labtxt = readstring(labtxt, por, labtxt.size());
-
-          // Rcout << labtxt << std::endl;
-
-          labvals[i] = labval;
-          labtxts[i] = labtxt;
         }
 
-      } else {
+        std::string labelnum;
+        labelnum = readtostring(por);
+
+        int labnums = std::strtol(labelnum.c_str(), NULL, 30);
+        Rcpp::CharacterVector labvals(labnums);
+        Rcpp::CharacterVector labtxts(labnums);
+
+        // Rprintf("labnums %d\n", labnums);
+
+        ptrdiff_t pos = distance(varnames.begin(), find(varnames.begin(),
+                                                varnames.end(),
+                                                labelsetnams[labelsetnams.size()-1]));
+
+        int vartyp = vartypes[pos];
+
+        // Rprintf("vartyp %d\n", vartyp);
+
+        if (vartyp == 0) {
+
+          // Rcout << "numerisches Label" << std::endl;
+
+          for (int i = 0; i < labnums; ++i) {
+
+            std::string labval;
+            std::string labtxtlen;
+
+            labval = readtostring(por);
+            labtxtlen = readtostring(por);
+
+            // Rcout << labval <<" - "<< labtxtlen << std::endl;
+
+            std::string labtxt (std::strtol(labtxtlen.c_str(), NULL, 30), '\0');
+            labtxt = readstring(labtxt, por, labtxt.size());
+
+            // Rcout << labtxt << std::endl;
+
+            labvals[i] = labval;
+            labtxts[i] = labtxt;
+          }
+
+          labvals.attr("names") = labtxts;
+
+        } else {
           // Rcout << "character Label" << std::endl;
 
-        for (int i = 0; i < labnums; ++i) {
-          std::string labval_len;
-          labval_len = readtostring(por);
+          for (int i = 0; i < labnums; ++i) {
+            std::string labval_len;
+            labval_len = readtostring(por);
 
-          std::string labval(std::strtol(labval_len.c_str(), NULL, 30), '\0');
-          labval = readstring(labval, por, labval.size());
+            std::string labval(std::strtol(labval_len.c_str(), NULL, 30), '\0');
+            labval = readstring(labval, por, labval.size());
 
-          std::string labtxtlen;
-          labtxtlen = readtostring(por);
+            std::string labtxtlen;
+            labtxtlen = readtostring(por);
 
-          // Rcout << labval <<" - "<< labtxtlen << std::endl;
+            // Rcout << labval <<" - "<< labtxtlen << std::endl;
 
-          std::string labtxt (std::strtol(labtxtlen.c_str(), NULL, 30), '\0');
-          labtxt = readstring(labtxt, por, labtxt.size());
+            std::string labtxt (std::strtol(labtxtlen.c_str(), NULL, 30), '\0');
+            labtxt = readstring(labtxt, por, labtxt.size());
 
-          // Rcout << labtxt << std::endl;
+            // Rcout << labtxt << std::endl;
 
-          labvals[i] = labval;
-          labtxts[i] = labtxt;
+            labvals[i] = labval;
+            labtxts[i] = labtxt;
 
+          }
+
+          labvals.attr("names") = labtxts;
         }
+
+
+        Rcout << labvals <<std::endl;
+
+        labtab.push_back(labvals);
+        labtab.attr("names") = labelsetnams;
+
+        varrec = readstring(varrec, por, varrec.size());
+
+        // Rcout << varrec << std::endl;
+
       }
 
-      labvals.attr("names") = labtxts;
+
+      if (varrec.compare("E") == 0) {
+        stop("unhandled case E");
+      }
 
 
-      Rcout << labvals << std::endl;
-
-      labtab.push_back(labvals);
-      labtab.attr("names") = labelsetnams;
-
-      varrec = readstring(varrec, por, varrec.size());
-
-      // Rcout << varrec << std::endl;
-
+      // data part reached
+      if (varrec.compare("F") == 0)
+        break;
     }
 
     // stop("debug");
