@@ -2,6 +2,7 @@
 
 export(boost_split)
 export(fast_factor)
+export(read.por)
 export(read.sav)
 export(readencrypted)
 export(readpor)
