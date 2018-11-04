@@ -159,15 +159,18 @@ static std::string readtostring(T& sav)
 
 // Part of TDA. Program for Transition Data Analysis, written by Goetz Rohwer.
 // Copyright (C) 1989,1991-97 Goetz Rohwer. GPL-2
-static int getdigit(char *p)
+static int getdigit(char *p, int *err)
 {
+  *err = 0;
   if (*p >= '0' && *p <= '9')
     return((int)(*p - '0'));
   else if (*p >= 'A' && *p <= 'T')
     return((int)(10 + *p - 'A'));
-
+  else
+    *err = 1;
   return(0);
 }
+
 
 // Part of TDA. Program for Transition Data Analysis, written by Goetz Rohwer.
 // Copyright (C) 1989,1991-97 Goetz Rohwer. GPL-2
@@ -209,12 +212,12 @@ int dnum(char *p, double &x)
     else {
       if (!ex) {
         man *= 30.0;
-        man += (double) getdigit(p);
+        man += (double) getdigit(p, &err);
 
-        Rcpp::Rcout << "man: " << man << std::endl;
+        // Rcpp::Rcout << "man: " << man << std::endl;
 
         if (err) {
-          Rprintf("%d", q);
+          Rprintf("Unk0: %d\n", q);
           return(0);
         }
         k++;
@@ -223,13 +226,13 @@ int dnum(char *p, double &x)
       }
       else {
         mex *= 30.0;
-        mex += (double) getdigit(p);
+        mex += (double) getdigit(p, &err);
 
 
-        Rcpp::Rcout << "mex: " << mex << std::endl;
+        // Rcpp::Rcout << "mex: " << mex << std::endl;
 
         if (err) {
-          Rprintf("%d", q);
+          Rprintf("Unk1: %d\n", q);
           return(0);
         }
       }
@@ -251,10 +254,10 @@ int dnum(char *p, double &x)
     man /= pow(30.0,mex);
   x = man;
 
-  Rcpp::Rcout << "x: " << x << std::endl;
+  // Rcpp::Rcout << "x: " << x << std::endl;
 
   RSPCnt--;
-  Rprintf("hier will ++p zurueck");
+  // Rprintf("hier will ++p zurueck");
 
   return(1);
 }
@@ -281,8 +284,8 @@ static double readfloat (std::string &str) {
     frcp = std::strtol(vec_r[1].c_str(), NULL, 30);
 
 
-    Rprintf("integer: %f\n", intp);
-    Rprintf("fractal: %f\n", frcp);
+    // Rprintf("integer: %f\n", intp);
+    // Rprintf("fractal: %f\n", frcp);
 
     // ToDo: This is a guess
     res = intp * 30.0 + frcp;
