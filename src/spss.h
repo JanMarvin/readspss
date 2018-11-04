@@ -157,10 +157,115 @@ static std::string readtostring(T& sav)
 }
 
 
+// Part of TDA. Program for Transition Data Analysis, written by Goetz Rohwer.
+// Copyright (C) 1989,1991-97 Goetz Rohwer. GPL-2
+static int getdigit(char *p)
+{
+  if (*p >= '0' && *p <= '9')
+    return((int)(*p - '0'));
+  else if (*p >= 'A' && *p <= 'T')
+    return((int)(10 + *p - 'A'));
+
+  return(0);
+}
+
+// Part of TDA. Program for Transition Data Analysis, written by Goetz Rohwer.
+// Copyright (C) 1989,1991-97 Goetz Rohwer. GPL-2
+static
+int dnum(char *p, double &x)
+{
+  int err;
+  int neg = 0;
+  int pnt = 0;
+  int ex  = 0;
+  int k = 0;
+  int n = 0;
+  double man = 0.0;
+  double mex = 0.0;
+  char *q;
+  int RSPCnt = 0;
+
+  q = p;
+  while (*p && *p == ' ') {
+    RSPCnt--;
+    p++;
+  }
+
+  if (*p == '-') {
+    neg = 1;
+    RSPCnt--;
+    p++;
+  }
+  while (*p && *p != '/') {
+
+    if (*p == '.') {
+      pnt = 1;
+      n = k;
+    }
+    else if (*p == '+')
+      ex = 1;
+    else if (*p == '-')
+      ex = -1;
+    else {
+      if (!ex) {
+        man *= 30.0;
+        man += (double) getdigit(p);
+
+        Rcpp::Rcout << "man: " << man << std::endl;
+
+        if (err) {
+          Rprintf("%d", q);
+          return(0);
+        }
+        k++;
+        if (k > 13)
+          Rprintf("Warning: found entry with %2d (base-30) digits.\n",k);
+      }
+      else {
+        mex *= 30.0;
+        mex += (double) getdigit(p);
+
+
+        Rcpp::Rcout << "mex: " << mex << std::endl;
+
+        if (err) {
+          Rprintf("%d", q);
+          return(0);
+        }
+      }
+    }
+    RSPCnt--;
+    p++;
+  }
+  if (neg)
+    man = -man;
+
+  if (pnt) {
+    k -= n;
+    while (k--)
+      man /= 30.0;
+  }
+  if (ex == 1)
+    man *= pow(30.0,mex);
+  else if (ex == -1)
+    man /= pow(30.0,mex);
+  x = man;
+
+  Rcpp::Rcout << "x: " << x << std::endl;
+
+  RSPCnt--;
+  Rprintf("hier will ++p zurueck");
+
+  return(1);
+}
+
+
+
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 
 static double readfloat (std::string &str) {
+
 
   double intp = 0.0, frcp = 0.0, res = 0.0;
   std::vector<std::string> vec_r;

@@ -528,8 +528,22 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
           case 0:
           {
             double val_d = 0.0;
+            double val_g = 0.0;
+            int    test = 0;
 
-            val_d = readfloat(val);
+            // val_d = readfloat(val);
+
+            char *cstr = new char[val.length() + 1];
+            strcpy(cstr, val.c_str());
+
+            // TDA function
+            test = dnum(cstr, val_g);
+
+
+            val_d = val_g;
+
+            // FixMe: If I delete this R dies
+            // delete [] cstr;
 
             // ToDo: PSPP states that a dot is not required for a missing
             if (val.compare("*.") == 0)

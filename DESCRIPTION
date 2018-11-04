@@ -9,7 +9,8 @@ Authors@R: c(
     comment = "author of encryption part"),
     person("Jeroen", "Ooms", role ="ctr"),
     person("readstata13", role="cph"),
-    person("R Core Team", role="cph")
+    person("R Core Team", role="cph"),
+    person("Goetz Rohwer", role="cph")
     )
 Maintainer: Jan Marvin Garbuszus <jan.garbuszus@ruhr-uni-bochum.de>
 Description: Experimental function to read the SPSS file format.
