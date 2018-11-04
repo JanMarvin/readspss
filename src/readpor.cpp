@@ -181,10 +181,12 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     varrec = readstring(varrec, por, varrec.size());
 
     // can be base-30 digit
-    std::string prodlen (1, '\0');
-    prodlen = readstring(prodlen, por, prodlen.size());
+    std::string prodlen;
+    prodlen = readtostring(por);
 
-    readstring(slash, por, slash.size());
+    // Rcout << prodlen << std::endl;
+
+    // readstring(slash, por, slash.size());
 
     // strtoi as in R
     std::string prod (std::stol(prodlen, NULL, 30), '\0');
@@ -201,7 +203,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     // optional
     // 2 : author
     if (varrec.compare("2") == 0) {
-      stop("unhandled case");
+      stop("unhandled case 2");
     }
 
     // 3 : extra record
@@ -237,7 +239,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       vars = std::strtol(varsize.c_str(), NULL, 30);
 
       if (debug)
-        Rprintf("%d", vars);
+        Rprintf("%d\n", vars);
 
       readstring(slash, por, slash.size());
       varrec = readstring(varrec, por, varrec.size());
@@ -262,12 +264,14 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     // 6 : weighting record
     if (varrec.compare("6") == 0) {
       // single string
-      stop("unhandled case");
+      stop("unhandled case 6");
     }
 
 
     std::vector<int> vartypes;
     std::vector<std::string> varnames;
+    std::vector<std::string> varlabels;
+    std::vector<std::string> missings;
     std::string unkstr (1, '\0');
 
 
@@ -275,13 +279,12 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     while (varrec.compare("7") == 0)
     {
 
-      // 0 or 1-255 (should read to next slash)
-      std::string vartyp (1, '\0');
-      vartyp = readstring(vartyp, por, vartyp.size());
-      readstring(slash, por, slash.size());
+      // 0 or 1-255
+      std::string vartyp;
+      vartyp = readtostring(por);
 
       // vartype
-      vartypes.push_back(std::atoi(vartyp.c_str()));
+      vartypes.push_back(std::strtol(vartyp.c_str(), NULL, 30));
 
 
       // varnamelen (1 - 8)
@@ -332,32 +335,103 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
       // missing values
       while (varrec.compare("8") == 0) {
-        stop("unhandled case");
+
+        std::string misslen;
+
+        misslen = readtostring(por);
+
+        std::string miss(std::strtol(misslen.c_str(), NULL, 30), '\0');
+        miss = readstring(miss, por, miss.size());
+
+        missings.push_back(miss);
+
+        varrec = readstring(varrec, por, varrec.size());
+
       }
 
 
       // low thru x
       while (varrec.compare("9") == 0) {
-        stop("unhandled case");
+        stop("unhandled case 9");
       }
 
 
       // x thru high
       while (varrec.compare("A") == 0) {
-        stop("unhandled case");
+        stop("unhandled case A");
       }
 
       // variable label
       while (varrec.compare("C") == 0) {
-        stop("unhandled case");
+
+        std::string labellen;
+
+        labellen = readtostring(por);
+
+        std::string label(std::strtol(labellen.c_str(), NULL, 30), '\0');
+        label = readstring(label, por, label.size());
+
+        if (debug)
+          Rcout << label << std::endl;
+
+        varlabels.push_back(label);
+
+        varrec = readstring(varrec, por, varrec.size());
       }
 
     }
 
+    Rcpp::List labtab;
+
+    std::vector<std::string> labelsetnams;
 
     // D : value labels
-    if (varrec.compare("D") == 0) {
-      stop("unhandled case");
+    while (varrec.compare("D") == 0) {
+
+      std::string unk1;
+      unk1 = readtostring(por);
+
+      std::string labelset;
+      labelset = readtostring(por);
+
+      std::string labelsetnam (std::strtol(labelset.c_str(), NULL, 30), '\0');
+      labelsetnam = readstring(labelsetnam, por, labelsetnam.size());
+      labelsetnams.push_back(labelsetnam);
+
+      // Rcout << labelset << labelsetnam << std::endl;
+
+      std::string labelnum;
+      labelnum = readtostring(por);
+
+      int labnums = std::strtol(labelnum.c_str(), NULL, 30);
+      Rcpp::CharacterVector labvals(labnums);
+      Rcpp::CharacterVector labtxts(labnums);
+
+
+      for (int i = 0; i < labnums; ++i) {
+
+        std::string labval;
+        std::string labtxtlen;
+
+        labval = readtostring(por);
+        labtxtlen = readtostring(por);
+
+        std::string labtxt (std::strtol(labtxtlen.c_str(), NULL, 30), '\0');
+        labtxt = readstring(labtxt, por, labtxt.size());
+
+        // Rcout << labtxt << std::endl;
+
+        labvals[i] = labval;
+        labtxts[i] = labtxt;
+
+      }
+
+      labvals.attr("names") = labtxts;
+
+      labtab.push_back(labvals);
+      labtab.attr("names") = labelsetnams;
+
+      varrec = readstring(varrec, por, varrec.size());
 
     }
 
@@ -399,23 +473,49 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
           case 0:
           {
             std::string val (1, '\0');
-            int val_i = 0;
+            double val_d = 0.0;
 
-            val = readstring(val, por, val.size());
-            readstring(slash, por, slash.size());
+            val = readtostring(por);
 
 
             if (debug)
               Rcout << val << std::endl;
 
-            val_i = std::strtol(val.c_str(), NULL, 30);
+            val_d = std::strtol(val.c_str(), NULL, 30);
 
-            REAL(VECTOR_ELT(df,ii))[kk] = val_i;
+            if (val.compare("*.") == 0)
+              val_d = NA_REAL;
+
+
+            if (debug)
+              Rprintf("%f\n", val_d);
+
+
+            REAL(VECTOR_ELT(df,ii))[kk] = val_d;
+
+            break;
+          }
+
+          default:
+          {
+
+            std::string val_slen;
+            val_slen = readtostring(por);
+            int val_s_len = std::strtol(val_slen.c_str(), NULL, 30);
+
+            std::string val_s (val_s_len, '\0');
+            val_s = readstring(val_s, por, val_s.size());
+
+            Rcpp::Rcout << val_s << std::endl;
+            Rcpp::as<Rcpp::CharacterVector>(df[ii])[kk] = val_s;
 
             break;
           }
           }
 
+
+        // if (ii == 9)
+        //   break;
         }
 
       }
@@ -428,6 +528,12 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     df.attr("row.names") = IntegerVector::create(NA_INTEGER, nrows);
     df.attr("names") = varnames;
     df.attr("class") = "data.frame";
+
+
+    df.attr("labels") = varlabels;
+    df.attr("missings") = missings;
+    df.attr("labtab") = labtab;
+    df.attr("vartypes") = vartypes;
 
     return(df);
 

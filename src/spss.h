@@ -121,6 +121,37 @@ static std::string readstring(std::string mystring, T& sav,
   return(mystring);
 }
 
+template <typename T>
+static std::string readtostring(T& sav)
+{
+
+  std::string res(1, '\0');
+  res = readstring(res, sav, res.size());
+
+  while (1)
+  {
+
+    std::string next(1, '\0');
+    next = readstring(next, sav, next.size());
+
+    // Rcpp::Rcout << next << std::endl;
+
+    if (next.compare("/") == 0 ||
+        ( res.compare("*") == 0 & next.compare(".") == 0)) {
+
+      // Rcpp::Rcout << res << std::endl;
+
+      break;
+    } else {
+      res = res + next;
+    }
+
+  }
+
+  return(res);
+}
+
+
 
 template <typename T>
 static T Riconv(T &mystring, std::string &encStr) {
