@@ -128,7 +128,8 @@ static std::string readtostring(T& sav)
   std::string res(1, '\0');
   res = readstring(res, sav, res.size());
 
-  while (1)
+  // run until EOF is reached. file does not end on "/" but "Z"
+  while (sav.peek() != EOF)
   {
 
     std::string next(1, '\0');
