@@ -1,4 +1,41 @@
-#' read.sav
+#' read.por
+#'
+#' Function to read a SPSS por file into a data.frame().
+#'@param file \emph{string} a por-file to import. can be a file on a computer
+#' or an url. in this case the file will be downloaded and read befor it is
+#' used.
+#'@param convert.factors \emph{logical} if true numeric or character variables
+#' will be converted into a factor in R.
+#'@param generate.factors \emph{logical} function to convert variables with
+#' partial labels into factors. e.g. 1 - low and 5 - high are provided, labels
+#' 2, 3 and 4 will be created. especially useful in combination with
+#' \code{use.missings=TRUE}.
+#'@param encoding \emph{logical} shall values be converted? If true, read.por
+#' will try the charcode stored inside the por-file. If this value is 2 or not
+#' available, fromEncoding can be used to change encoding.
+#'@param fromEncoding \emph{character.} encoding of the imported file. This
+#' information is stored inside the por-file, but is currently unused. Still
+#' this option can be used to define the inital encoding by hand.
+#'@param use.missings \emph{logical} should missing values be converted.
+#' Defaults to TRUE.
+#' @param debug \emph{logical} provides additional debug information. Most
+#' likely not usefull to any user.
+#'@param override \emph{logical}. The filename provided in \code{file} is
+#' checked for the ending por. If the fileending is different, nothing is read.
+#' This option can be used to override this behavior.
+#'@param convert.dates \emph{logical}. Should dates be converted on the fly?
+#'
+#'@details SPSS files are widely available, though for R long time only foreign
+#' and memisc provided functions to import por-files. Lately haven joined.
+#' This package is an approach to offer another alternative, to document the
+#' por-format and provide additional options to import the data.
+#'
+#'@note Information to decrypt the por-format was provided by tda
+#' \url{http://www.stat.ruhr-uni-bochum.de/tda.html} and pspp
+#'  \url{http://www.gnu.org/software/pspp/}
+#'@author Jan Marvin Garbuszus \email{jan.garbuszus@@ruhr-uni-bochum.de}
+#'
+#'@seealso \code{\link[foreign]{read.spss}}, \code{memisc}.
 #'
 #' @useDynLib readspss, .registration=TRUE
 #' @importFrom tools file_ext
