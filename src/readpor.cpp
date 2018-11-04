@@ -347,6 +347,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
         varrec = readstring(varrec, por, varrec.size());
 
+        warning("Belongs to %s", varname);
+
       }
 
 
