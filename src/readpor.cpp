@@ -76,6 +76,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     std::vector<std::string> labelsetnams;
     std::string unkstr (1, '\0');
 
+    int nvarnames = 0;
+
     // int32_t n = 0;
     // int32_t k = 0;<
 
@@ -302,6 +304,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
         // varname
         varnames.push_back(varname);
+        ++nvarnames;
 
         /* Printformat */
         // 5 Format typ
@@ -347,7 +350,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
         ptrdiff_t pos = distance(varnames.begin(), find(varnames.begin(),
                                                 varnames.end(),
-                                                varnames[varnames.size()]));
+                                                varnames[nvarnames]));
 
         int vartyp = vartypes[pos-1];
         std::string miss_nam = varnames[pos-1];
