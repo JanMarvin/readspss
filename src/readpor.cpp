@@ -456,10 +456,10 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
                                               NULL, 30), '\0');
           labelsetnam = readstring(labelsetnam, por, labelsetnam.size());
 
-          if (i == 0) // FixMe: store the others as well
-            labelsetnams.push_back(labelsetnam);
+          labelsetnams.push_back(labelsetnam);
 
-          // Rcout << labelset << labelsetnam << std::endl;
+          // if (nolab > 1)
+          //   Rcout << "CHAINED: " << labelsetnam << std::endl;
 
         }
 
@@ -472,9 +472,10 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
         // Rprintf("labnums %d\n", labnums);
 
-        ptrdiff_t pos = distance(varnames.begin(), find(varnames.begin(),
-                                                varnames.end(),
-                                                labelsetnams[labelsetnams.size()-1]));
+        ptrdiff_t pos = distance(varnames.begin(),
+                                 find(varnames.begin(),
+                                      varnames.end(),
+                                      labelsetnams[labelsetnams.size()-1]));
 
         int vartyp = vartypes[pos];
 
@@ -536,7 +537,10 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
         // Rcout << labvals <<std::endl;
 
-        labtab.push_back(labvals);
+        // push it back nolab times so that it matches the labelsetnams
+        for (int i = 0; i < nolab; ++i)
+          labtab.push_back(labvals);
+
         labtab.attr("names") = labelsetnams;
 
         varrec = readstring(varrec, por, varrec.size());
