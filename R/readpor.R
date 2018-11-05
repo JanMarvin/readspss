@@ -115,6 +115,19 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   }
 
 
+  # if autoenc labels were not encoded during readsav() so encode now
+  if (encoding) {
+
+    # print(encStr)
+
+    # label
+    for (i in seq_along(label))
+      names(label[[i]]) <- read.encoding(names(label[[i]]),
+                                         fromEncoding = encStr,
+                                         encoding = ownEnc)
+  }
+
+
   # FixME: unsure
   if (convert.factors) {
     # vnames <- names(data)
