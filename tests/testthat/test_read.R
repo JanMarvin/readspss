@@ -1,6 +1,7 @@
 
 # prepare packages #############################################################
 
+require(testthat)
 library(readspss)
 require(foreign)
 
@@ -185,3 +186,19 @@ df_e <- read.sav(fle, pass = "pspp")
 test_that("encrypted", {
   expect_true(all.equal(df_u, df_e, check.attributes = FALSE))
 })
+
+#### por test ####
+
+
+f_sav <- system.file("extdata", "electric.sav", package="readspss")
+f_por <- system.file("extdata", "electric.por", package="readspss")
+
+df_sav <- read.sav(f_sav)
+df_por <- read.por(f_por)
+
+
+test_that("por_vs_sav", {
+  expect_true(all.equal(df_sav, df_por, check.attributes = FALSE))
+})
+
+
