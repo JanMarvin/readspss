@@ -76,7 +76,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     std::vector<std::string> labelsetnams;
     std::string unkstr (1, '\0');
 
-    int nvarnames = 0;
+    int nvarnames = 0, nlabelsetnams = 0;
 
     // int32_t n = 0;
     // int32_t k = 0;<
@@ -245,6 +245,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     while (1) {
       Rcpp::checkUserInterrupt();
 
+      // Rcout << varrec << std::endl;
+
       // 4 : variables record
       if (varrec.compare("4") == 0) {
 
@@ -285,6 +287,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       // 7 : variable records
       if (varrec.compare("7") == 0)
       {
+
+        // Rcout << "--- 7 ---" << std::endl;
 
         // 0 or 1-255
         std::string vartyp;
@@ -343,18 +347,20 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         // Rcout << "--- 8 ---" << std::endl;
 
         std::string misslen;
-
         misslen = readtostring(por);
 
+
         // char for > 0 otherwise its integer
+        ptrdiff_t pos = 0;
+        pos = distance(varnames.begin(), find(varnames.begin(),
+                                      varnames.end(),
+                                      varnames[nvarnames-1]));
 
-        ptrdiff_t pos = distance(varnames.begin(), find(varnames.begin(),
-                                                varnames.end(),
-                                                varnames[nvarnames]));
+        int vartyp = 0;
+        vartyp = vartypes[pos];
+        std::string miss_nam = varnames[pos];
 
-        int vartyp = vartypes[pos-1];
-        std::string miss_nam = varnames[pos-1];
-
+        // Rcout << misslen << nvarnames << vartyp << std::endl;
         // Rcout << miss_nam << std::endl;
 
         // Rprintf("vartyp %d \n", pos);
@@ -403,6 +409,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       // unknown
       if (varrec.compare("B") == 0) {
 
+        // Rcout << "--- B ---" << std::endl;
+
         std::string unk1;
         std::string unk2;
 
@@ -438,20 +446,19 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
       }
 
-
-
       // D : value labels
       if (varrec.compare("D") == 0) {
 
-        if (debug)
-          Rcout << "--- D ---" << std::endl;
+        // if (debug)
+          // Rcout << "--- D ---" << std::endl;
 
         std::string unk1;
         unk1 = readtostring(por);
 
         // Rcout << "unk1 :: " << unk1 << std::endl;
 
-        int nolab = std::strtol(unk1.c_str(), NULL, 30);
+        int nolab = 0;
+        nolab = std::strtol(unk1.c_str(), NULL, 30);
 
         // unknown reason chained labelsets?
         for (int i = 0; i < nolab; ++i) {
@@ -464,6 +471,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
           labelsetnam = readstring(labelsetnam, por, labelsetnam.size());
 
           labelsetnams.push_back(labelsetnam);
+          ++nlabelsetnams;
 
           // if (nolab > 1)
           //   Rcout << "CHAINED: " << labelsetnam << std::endl;
@@ -473,7 +481,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         std::string labelnum;
         labelnum = readtostring(por);
 
-        int labnums = std::strtol(labelnum.c_str(), NULL, 30);
+        int labnums = 0;
+        labnums = std::strtol(labelnum.c_str(), NULL, 30);
         Rcpp::CharacterVector labvals(labnums);
         Rcpp::CharacterVector labtxts(labnums);
 
@@ -482,9 +491,10 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         ptrdiff_t pos = distance(varnames.begin(),
                                  find(varnames.begin(),
                                       varnames.end(),
-                                      labelsetnams[labelsetnams.size()-1]));
+                                      labelsetnams[nlabelsetnams-1]));
 
-        int vartyp = vartypes[pos];
+        int vartyp = 0;
+        vartyp = vartypes[pos];
 
         // Rprintf("vartyp %d\n", vartyp);
 
@@ -570,11 +580,13 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     // stop("debug");
 
 
+
     if (debug)
       Rcout << "varrec " << varrec << std::endl;
 
     int n = 0;
-    int nvars = varnames.size();
+    int nvars = 0;
+    nvars = varnames.size();
 
     bool eof = false;
 
@@ -686,7 +698,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
             cstr.push_back('\0');
 
             // TDA function
-            // test = dnum(&cstr[0], val_g, &mv);
+            test = dnum(&cstr[0], val_g, &mv);
 
             val_d = val_g;
 
