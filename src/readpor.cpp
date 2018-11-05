@@ -346,26 +346,32 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
                                                 varnames[varnames.size()]));
 
         int vartyp = vartypes[pos-1];
+        std::string miss_nam = varnames[pos-1];
+
+        // Rcout << miss_nam << std::endl;
 
         // Rprintf("vartyp %d \n", pos);
+        std::string miss_val;
 
         if (vartyp > 0) {
 
           std::string miss(std::strtol(misslen.c_str(), NULL, 30), '\0');
           miss = readstring(miss, por, miss.size());
 
-          missings.push_back(miss);
+          miss_val = miss;
 
         } else {
 
           // same name as char
-          std::string miss = misslen;
+          miss_val = misslen;
         }
 
+
+
         // // create named char and push back
-        // Rcpp::CharacterVector missCV = miss;
-        // missCV.attr(varname);
-        // missings.push_back(missCV);
+        Rcpp::CharacterVector missCV = miss_val;
+        missCV.attr("names") = miss_nam;
+        missings.push_back(missCV);
 
 
         varrec = readstring(varrec, por, varrec.size());
