@@ -267,8 +267,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         std::string prec (1, '\0');
         prec = readstring(prec, por, prec.size());
 
-        int precs = 0;
-        precs = std::strtol(prec.c_str(), NULL, 30);
+        // int precs = 0;
+        // precs = std::strtol(prec.c_str(), NULL, 30);
 
         readstring(slash, por, slash.size());
         varrec = readstring(varrec, por, varrec.size());
@@ -574,11 +574,12 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       Rcout << "varrec " << varrec << std::endl;
 
     int n = 0;
+    int nvars = varnames.size();
 
     bool eof = false;
 
     // Create Rcpp::List
-    Rcpp::List df(varnames.size());
+    Rcpp::List df(nvars);
 
 
     // Data part found. Starts with F ends with Z...
@@ -645,7 +646,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
 
       // 1. Create data frame --------------------------------------------------
-      for (int32_t i=0; i<varnames.size(); ++i)
+      for (int32_t i=0; i<nvars; ++i)
       {
         int const type = vartypes[i];
         switch(type)
@@ -685,7 +686,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
             cstr.push_back('\0');
 
             // TDA function
-            test = dnum(&cstr[0], val_g, &mv);
+            // test = dnum(&cstr[0], val_g, &mv);
 
             val_d = val_g;
 

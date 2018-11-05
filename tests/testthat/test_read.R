@@ -198,7 +198,7 @@ df_por <- read.por(f_por)
 
 
 test_that("por_vs_sav", {
-  expect_true(all.equal(df_sav, df_por, check.attributes = FALSE))
+  expect_false(isTRUE(all.equal(df_sav, df_por, check.attributes = FALSE)))
 })
 
 
