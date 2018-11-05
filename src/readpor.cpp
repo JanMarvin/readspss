@@ -664,18 +664,13 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
             // val_d = readfloat(val);
 
-            char *cstr = new char[val.length() + 1];
-            strcpy(cstr, val.c_str());
+            std::vector<char> cstr(val.begin(), val.end());
+            cstr.push_back('\0');
 
             // TDA function
-            test = dnum(cstr, val_g, &mv);
-
+            test = dnum(&cstr[0], val_g, &mv);
 
             val_d = val_g;
-
-            // FixMe: If I delete this R dies
-            // delete [] cstr;
-
 
             if (debug) {
               Rcout << varnames[ii] << std::endl;
