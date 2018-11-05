@@ -333,7 +333,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       // missing values
       if (varrec.compare("8") == 0) {
 
-        Rcout << "--- 8 ---" << std::endl;
+        // Rcout << "--- 8 ---" << std::endl;
 
         std::string misslen;
 
@@ -347,7 +347,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
         int vartyp = vartypes[pos-1];
 
-        Rprintf("vartyp %d \n", pos);
+        // Rprintf("vartyp %d \n", pos);
 
         if (vartyp > 0) {
 
@@ -436,7 +436,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         std::string unk1;
         unk1 = readtostring(por);
 
-        Rcout << "unk1 :: " << unk1 << std::endl;
+        // Rcout << "unk1 :: " << unk1 << std::endl;
 
         int nolab = std::strtol(unk1.c_str(), NULL, 30);
 
@@ -453,7 +453,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
           if (i == 0) // FixMe: store the others as well
             labelsetnams.push_back(labelsetnam);
 
-          Rcout << labelset << labelsetnam << std::endl;
+          // Rcout << labelset << labelsetnam << std::endl;
 
         }
 
@@ -528,7 +528,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         }
 
 
-        Rcout << labvals <<std::endl;
+        // Rcout << labvals <<std::endl;
 
         labtab.push_back(labvals);
         labtab.attr("names") = labelsetnams;
