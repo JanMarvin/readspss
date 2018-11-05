@@ -93,6 +93,28 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   varnames <- attribs$names
   vartypes <- attribs$vartypes
 
+
+  # convert NAs by missing information provided by SPSS.
+  # these are just different missing values in Stata and NA in R.
+  if (use.missings) {
+    if (!identical(attribs$missings, list())) {
+
+      mvtab <- attribs$missings
+
+      for (i in seq_along(mvtab)) {
+        mvtabi <- mvtab[[i]]
+
+        missinf <- names(mvtabi)
+        naval <- mvtabi[[1]]
+        # print(naval)
+
+        data[missinf][data[missinf] == naval] <- NA
+
+      }
+    }
+  }
+
+
   # FixME: unsure
   if (convert.factors) {
     # vnames <- names(data)
