@@ -43,9 +43,13 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
   stringstream por;
 
   std::ifstream por_file(filePath, std::ios::in | std::ios::binary);
+
   if (por_file) {
+
     while (getline(por_file, input))
       file += input;
+
+    por_file.close();
   } else {
     stop ("No file was read.");
   }
