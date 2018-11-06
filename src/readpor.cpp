@@ -245,7 +245,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     while (1) {
       Rcpp::checkUserInterrupt();
 
-      // Rcout << varrec << std::endl;
 
       // 4 : variables record
       if (varrec.compare("4") == 0) {
@@ -268,9 +267,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
         std::string prec (1, '\0');
         prec = readstring(prec, por, prec.size());
-
-        // int precs = 0;
-        // precs = std::strtol(prec.c_str(), NULL, 30);
 
         readstring(slash, por, slash.size());
         varrec = readstring(varrec, por, varrec.size());
@@ -350,7 +346,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         std::string misslen;
         misslen = readtostring(por);
 
-
         // char for > 0 otherwise its integer
         ptrdiff_t pos = 0;
         pos = distance(varnames.begin(), find(varnames.begin(),
@@ -360,7 +355,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         vartyp = vartypes[pos];
         std::string miss_nam = varnames[pos];
         std::string miss_val;
-
 
         if (vartyp > 0) {
           std::string miss(std::strtol(misslen.c_str(), NULL, 30), '\0');
@@ -372,12 +366,10 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
           miss_val = misslen;
         }
 
-
         // create named char and push back
         Rcpp::CharacterVector missCV = miss_val;
         missCV.attr("names") = miss_nam;
         missings.push_back(missCV);
-
 
         varrec = readstring(varrec, por, varrec.size());
 
@@ -421,8 +413,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         std::string labellen;
 
         labellen = readtostring(por);
-
-        // Rcout << "labellen " << labellen << std::endl;
 
         std::string label(std::strtol(labellen.c_str(), NULL, 30), '\0');
         label = readstring(label, por, label.size());
