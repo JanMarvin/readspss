@@ -345,6 +345,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       if (varrec.compare("8") == 0) {
 
         // Rcout << "--- 8 ---" << std::endl;
+        int vartyp = 0;
 
         std::string misslen;
         misslen = readtostring(por);
@@ -356,40 +357,29 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
                                       varnames.end(),
                                       varnames[nvarnames-1]));
 
-        int vartyp = 0;
         vartyp = vartypes[pos];
         std::string miss_nam = varnames[pos];
-
-        // Rcout << misslen << nvarnames << vartyp << std::endl;
-        // Rcout << miss_nam << std::endl;
-
-        // Rprintf("vartyp %d \n", pos);
         std::string miss_val;
 
-        if (vartyp > 0) {
 
+        if (vartyp > 0) {
           std::string miss(std::strtol(misslen.c_str(), NULL, 30), '\0');
           miss = readstring(miss, por, miss.size());
 
           miss_val = miss;
-
         } else {
-
           // same name as char
           miss_val = misslen;
         }
 
 
-
-        // // create named char and push back
+        // create named char and push back
         Rcpp::CharacterVector missCV = miss_val;
         missCV.attr("names") = miss_nam;
         missings.push_back(missCV);
 
 
         varrec = readstring(varrec, por, varrec.size());
-
-        // Rcout << "varrec " << varrec << std::endl;
 
       }
 
