@@ -106,11 +106,30 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
         missinf <- names(mvtabi)
         naval <- mvtabi[[1]]
-        # print(naval)
 
         data[missinf][data[missinf] == naval] <- NA
 
       }
+    }
+
+    varrange <- attribs$varrange
+
+    if (!identical(varrange, list())) {
+
+      for (i in seq_along(varrange)) {
+
+        # range
+        mvtabi <- varrange[[i]]
+        missinf <- names(varrange[i])
+
+        minval <- mvtabi[1]
+        maxval <- mvtabi[2]
+
+        data[missinf][data[missinf] >= minval &
+                        data[missinf] <= maxval] <- NA
+
+      }
+
     }
   }
 

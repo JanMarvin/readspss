@@ -68,9 +68,11 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
 
     Rcpp::List missings;
+    Rcpp::List varrange;
     Rcpp::List labtab;
     std::vector<int> vartypes;
     std::vector<std::string> varnames;
+    std::vector<std::string> varrangnams;
     std::vector<std::string> vn;
     std::vector<std::string> varlabels;
     std::vector<std::string> labelsetnams;
@@ -388,20 +390,39 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       }
 
 
-      // unknown
+      // range of min and max val
       if (varrec.compare("B") == 0) {
 
         // Rcout << "--- B ---" << std::endl;
+        std::string varname;
 
-        std::string unk1;
-        std::string unk2;
+        ptrdiff_t pos = 0;
+        pos = distance(varnames.begin(), find(varnames.begin(),
+                                      varnames.end(),
+                                      varnames[nvarnames-1]));
 
-        unk1 = readtostring(por); // seen as -2
-        unk2 = readtostring(por); // seen as -1
+        varname = varnames[pos];
+
+        std::string minval;
+        std::string maxval;
+
+        Rcpp::CharacterVector varrangCV(2);
+
+        minval = readtostring(por); // min value
+        maxval = readtostring(por); // max value
+
+        // Rcout << minval << " and " << maxval << std::endl;
+
+        varrangCV(0) = minval;
+        varrangCV(1) = maxval;
+
+        varrangnams.push_back(varname);
+
+        varrange.push_back(varrangCV);
+        varrange.attr("names") = varrangnams;
 
         varrec = readstring(varrec, por, varrec.size());
 
-        warning("unknown values read");
       }
 
 
@@ -727,6 +748,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     df.attr("missings") = missings;
     df.attr("labtab") = labtab;
     df.attr("vartypes") = vartypes;
+    df.attr("varrange") = varrange;
 
     return(df);
 
