@@ -143,9 +143,10 @@ static int
   {
     int i;
 
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < 4; i++) {
       if (table[i][0] & (1 << nibble))
         return table[i][1];
+    }
 
       return 0;
   }

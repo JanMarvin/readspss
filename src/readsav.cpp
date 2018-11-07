@@ -152,7 +152,6 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
 
     uint8_t lablen = 0;
-    int8_t div = 0;
     int32_t rtype = 0;
 
     std::string name (8, '\0');
@@ -200,9 +199,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
       bool noNum = 0;
 
-      int32_t typeINT = 0, has_var_label = 0, n_missing_values = 0,
-        printINT = 0, writeINT = 0, lablen32 = 0, len = 0, nolabels = 0,
-        lab_id = 0;
+      int32_t len = 0, nolabels = 0, lab_id = 0;
 
       if (debug)
         Rprintf("rtype %d ", rtype);

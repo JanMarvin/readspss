@@ -691,19 +691,14 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
           case 0:
           {
             double val_d = 0.0;
-            double val_g = 0.0;
-            int    test = 0;
             int    mv = 0;
-
-            // val_d = readfloat(val);
 
             std::vector<char> cstr(val.begin(), val.end());
             cstr.push_back('\0');
 
             // TDA function
-            test = dnum(&cstr[0], val_g, &mv);
-
-            val_d = val_g;
+            if (dnum(&cstr[0], val_d, &mv) != 1)
+              stop("reading numeric failed");
 
             if (debug) {
               Rcout << varnames[ii] << std::endl;

@@ -32,7 +32,7 @@ int64_t read_sav_unknown_n (std::istream& sav,
   size_t curpos = sav.tellg();
 
   sav.seekg(0, sav.end);
-  size_t endoffile = sav.tellg();
+  std::streamoff endoffile = sav.tellg();
   sav.seekg(curpos);
 
   int32_t n = 0;
@@ -293,7 +293,7 @@ int64_t read_sav_unknown_n (std::istream& sav,
 
     std::string val_s = "";
 
-    while(!(sav.tellg()== endoffile)) {
+    while(!(sav.tellg() == endoffile)) {
 
       int32_t const type = vtyp[kk];
 

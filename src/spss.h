@@ -204,7 +204,7 @@ int dnum(char *p, double &x, int *mv)
     RSPCnt -= 2;
     p += 2;
     x = NA_REAL;
-    return(0);                   // return(p);
+    return(1);                   // return(p);
   }
 
   if (*p == '-') {
@@ -311,17 +311,6 @@ static void writestr(std::string val_s, T len, std::fstream& sav)
 
   sav.write(val_strl.c_str(),val_strl.length());
 
-}
-
-static void debug(std::istream& sav, int size) {
-  char * memblock;
-
-  memblock = new char [size];
-  sav.read (memblock, size);
-
-  Rcpp::Rcout << memblock << std::endl;
-
-  delete[] memblock;
 }
 
 #endif

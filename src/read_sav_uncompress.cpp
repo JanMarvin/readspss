@@ -43,7 +43,6 @@ std::string read_sav_uncompress (std::istream& sav,
   ztail_ofs = readbin(ztail_ofs, sav, swapit);
   ztail_len = readbin(ztail_len, sav, swapit);
 
-  size_t curpos = sav.tellg();
   sav.seekg(ztail_ofs, std::ios_base::beg);
 
   // read ztrailer
@@ -101,6 +100,9 @@ std::string read_sav_uncompress (std::istream& sav,
     // uncompress should be 0
     status = uncompress(uncompr_block, &uncompr_block_len,
                         compr_block, compr_block_len);
+
+    if (status != 0)
+      Rcpp::stop("uncompress failed.");
 
 
     outfile.write((char *)(&uncompr_block[0]), uncompr_block_len);
