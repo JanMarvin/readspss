@@ -87,19 +87,21 @@ std::string read_sav_uncompress (std::istream& sav,
     sav.seekg(c_ofs[i], std::ios_base::beg);
 
     // Bytef is unsigned char *
-    Bytef compr_block[c_size[i]];
-    Bytef uncompr_block[u_size[i]];
+    // Bytef compr_block[c_size[i]];
+    // Bytef uncompr_block[u_size[i]];
+    std::vector<unsigned char>   compr_block(c_size[i]);
+    std::vector<unsigned char> uncompr_block(u_size[i]);
 
     // read the complete compr data part
-    sav.read((char*)compr_block, c_size[i]);
+    sav.read((char*)&compr_block[0], c_size[i]);
 
     int32_t status = 0;
     uLong uncompr_block_len = u_size[i];
     uLong compr_block_len = c_size[i];
 
     // uncompress should be 0
-    status = uncompress(uncompr_block, &uncompr_block_len,
-                        compr_block, compr_block_len);
+    status = uncompress(&uncompr_block[0], &uncompr_block_len,
+                        &compr_block[0], compr_block_len);
 
     if (status != 0)
       Rcpp::stop("uncompress failed.");

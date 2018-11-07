@@ -42,7 +42,7 @@ int encryptfile (const char * filePath, std::string &outpath, std::string pass)
   char *argv = (char *)pass.c_str();
 
   // currently unused do not know if swapping is required
-  bool swapit = false;
+  // bool swapit = false;
 
 
   std::ifstream sav(filePath, std::ios::in | std::ios::binary);
