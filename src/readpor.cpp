@@ -610,7 +610,9 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
           if (debug)
             Rcout << val << std::endl;
 
-          eof = val.find_first_not_of("Z") == string::npos;
+          // check that eof is really reached and not only a string "Z"
+          // if (por.peek() == EOF)
+            eof = val.find_first_not_of("Z") == string::npos;
 
           if (eof) {
             if (debug)
