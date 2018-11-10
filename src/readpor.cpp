@@ -76,6 +76,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     std::vector<std::string> vn;
     std::vector<std::string> varlabels;
     std::vector<std::string> labelsetnams;
+    std::vector<std::string> weightvars;
     std::string unkstr (1, '\0');
 
 
@@ -305,8 +306,20 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
       // 6 : weighting record
       if (varrec.compare("6") == 0) {
+
+        if (debug)
+          Rcout << "--- 6 ---" << std::endl;
+
         // single string
-        stop("unhandled case 6");
+        std::string len;
+        len = readtostring(por);
+
+        std::string wvar(std::strtol(len.c_str(), NULL, 30), '\0');
+        wvar = readstring(wvar, por, wvar.size());
+        weightvars.push_back(wvar);
+
+        varrec = readstring(varrec, por, varrec.size());
+
       }
 
       // 7 : variable records
@@ -803,6 +816,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     df.attr("labtab") = labtab;
     df.attr("vartypes") = vartypes;
     df.attr("varrange") = varrange;
+    df.attr("weightvars") = weightvars;
 
     df.attr("fmt") = fmt;
 
