@@ -70,6 +70,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     Rcpp::List missings;
     Rcpp::List varrange;
     Rcpp::List labtab;
+    Rcpp::List file_info;
     std::vector<int> vartypes;
     std::vector<std::string> varnames;
     std::vector<std::string> varrangnams;
@@ -78,6 +79,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     std::vector<std::string> labelsetnams;
     std::vector<std::string> weightvars;
     std::string unkstr (1, '\0');
+
 
 
     Rcpp::List fmt;
@@ -234,6 +236,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     std::string prod (std::stol(prodlen, NULL, 30), '\0');
     prod = readstring(prod, por, prod.size());
 
+    file_info.push_back(prod);
+
 
     if (debug)
       Rcout << prod << std::endl;
@@ -245,7 +249,21 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     // optional
     // 2 : author
     if (varrec.compare("2") == 0) {
-      stop("unhandled case 2");
+
+      // can be base-30 digit if 0 then read until next digit
+      std::string authorlen;
+      authorlen = readtostring(por);
+
+      // author name
+      std::string author (std::stol(authorlen, NULL, 30), '\0');
+      author = readstring(author, por, author.size());
+
+      file_info.push_back(author);
+
+      if (debug)
+        Rcout << author << std::endl;
+
+      varrec = readstring(varrec, por, varrec.size());
     }
 
     // 3 : extra record
@@ -259,6 +277,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       std::string extra (std::stol(extralen, NULL, 30), '\0');
       extra = readstring(extra, por, extra.size());
 
+      file_info.push_back(extra);
 
       if (debug)
         Rcout << extra << std::endl;
@@ -810,7 +829,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     df.attr("names") = varnames;
     df.attr("class") = "data.frame";
 
-
     df.attr("labels") = varlabels;
     df.attr("missings") = missings;
     df.attr("labtab") = labtab;
@@ -819,6 +837,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     df.attr("weightvars") = weightvars;
 
     df.attr("fmt") = fmt;
+    df.attr("file_info") = file_info;
 
     return(df);
 
