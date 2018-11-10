@@ -87,7 +87,7 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   attribs <- attributes(data)
 
-  if (NROW(dd) == 0) {
+  if (NROW(data) == 0) {
     message("file contains no data")
     use.missings = FALSE
     convert.factors = FALSE
