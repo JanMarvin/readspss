@@ -73,7 +73,11 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     Rcpp::List file_info;
     Rcpp::List loThruX;
     Rcpp::List xThruHi;
+    Rcpp::List fmt;
+    Rcpp::List doc;
+
     std::vector<int> vartypes;
+
     std::vector<std::string> varnames;
     std::vector<std::string> varrangnams;
     std::vector<std::string> vn;
@@ -85,7 +89,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     std::string unkstr (1, '\0');
 
 
-    Rcpp::List fmt;
     Rcpp::NumericVector fmt_print_write(6);
 
     int nvarnames = 0, nlabelsetnams = 0;
@@ -700,8 +703,35 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       }
 
 
+      // documentation
       if (varrec.compare("E") == 0) {
-        stop("unhandled case E");
+
+        if (debug)
+          Rcout << "--- E ---" << std::endl;
+
+        std::string doclen;
+        int doclen_i = 0;
+
+        doclen = readtostring(por);
+        doclen_i = strtol(doclen.c_str(), NULL, 30);
+
+
+        for (int i = 0; i < doclen_i; ++i)
+        {
+          std::string linelen;
+          linelen = readtostring(por);
+
+          std::string docline(std::strtol(linelen.c_str(), NULL, 30), '\0');
+          docline = readstring(docline, por, docline.size());
+
+          if (debug)
+            Rcout << docline << std::endl;
+
+          doc.push_back(docline);
+        }
+
+        varrec = readstring(varrec, por, varrec.size());
+
       }
 
 
@@ -886,6 +916,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     df.attr("file_info") = file_info;
     df.attr("lothrux") = loThruX;
     df.attr("xthruhi") = xThruHi;
+    df.attr("doc") = doc;
 
     return(df);
 
