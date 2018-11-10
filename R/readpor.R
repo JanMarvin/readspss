@@ -142,6 +142,40 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
       }
 
     }
+
+    lothrux <- attribs$lothrux
+
+    if (!identical(lothrux, list())) {
+      for (i in seq_along(lothrux)) {
+
+        # range
+        mvtabi <- lothrux[[i]]
+        missinf <- names(mvtabi)
+
+        maxval <- mvtabi
+
+        data[missinf][data[missinf] <= maxval] <- NA
+
+      }
+
+    }
+
+    xthruhi <- attribs$xthruhi
+
+    if (!identical(xthruhi, list())) {
+      for (i in seq_along(xthruhi)) {
+
+        # range
+        mvtabi <- xthruhi[[i]]
+        missinf <- names(mvtabi)
+
+        maxval <- mvtabi
+
+        data[missinf][data[missinf] >= maxval] <- NA
+
+      }
+
+    }
   }
 
 

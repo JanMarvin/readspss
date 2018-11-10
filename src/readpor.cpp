@@ -71,6 +71,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     Rcpp::List varrange;
     Rcpp::List labtab;
     Rcpp::List file_info;
+    Rcpp::List loThruX;
+    Rcpp::List xThruHi;
     std::vector<int> vartypes;
     std::vector<std::string> varnames;
     std::vector<std::string> varrangnams;
@@ -78,8 +80,9 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     std::vector<std::string> varlabels;
     std::vector<std::string> labelsetnams;
     std::vector<std::string> weightvars;
-    std::string unkstr (1, '\0');
 
+
+    std::string unkstr (1, '\0');
 
 
     Rcpp::List fmt;
@@ -466,13 +469,56 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
       // low thru x
       if (varrec.compare("9") == 0) {
-        stop("unhandled case 9");
+
+        std::string lowthrux;
+        lowthrux = readtostring(por); // ToDo: guess? needs varname
+
+        std::string varname;
+        ptrdiff_t pos = 0;
+
+        pos = distance(varnames.begin(), find(varnames.begin(),
+                                      varnames.end(),
+                                      varnames[nvarnames-1]));
+
+        varname = varnames[pos];
+
+        Rcpp::NumericVector res(1);
+        res(0) = std::strtol(lowthrux.c_str(), NULL, 30);
+
+        res.attr("names") = varname;
+
+
+        loThruX.push_back(res);
+
+        varrec = readstring(varrec, por, varrec.size());
       }
 
 
       // x thru high
       if (varrec.compare("A") == 0) {
-        stop("unhandled case A");
+
+        std::string xthruhigh;
+        xthruhigh = readtostring(por); // ToDo: guess? needs varname
+
+        std::string varname;
+        ptrdiff_t pos = 0;
+
+        pos = distance(varnames.begin(), find(varnames.begin(),
+                                      varnames.end(),
+                                      varnames[nvarnames-1]));
+
+        varname = varnames[pos];
+
+        Rcpp::NumericVector res(1);
+        res(0) = std::strtol(xthruhigh.c_str(), NULL, 30);
+
+        res.attr("names") = varname;
+
+
+        xThruHi.push_back(res);
+
+        varrec = readstring(varrec, por, varrec.size());
+
       }
 
 
@@ -838,6 +884,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
     df.attr("fmt") = fmt;
     df.attr("file_info") = file_info;
+    df.attr("lothrux") = loThruX;
+    df.attr("xthruhi") = xThruHi;
 
     return(df);
 
