@@ -22,4 +22,4 @@ Suggests: testthat, foreign, datasets
 LinkingTo: Rcpp, BH
 SystemRequirements: C++11, OpenSSL >= 1.0.1
 ByteCompile: yes
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
