@@ -84,8 +84,14 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   # import data using an rcpp routine
   data <- readpor(filepath, debug, encStr)
 
+
   attribs <- attributes(data)
 
+  if (NROW(dd) == 0) {
+    message("file contains no data")
+    use.missings = FALSE
+    convert.factors = FALSE
+  }
 
 
   label    <- attribs$labtab
@@ -95,7 +101,6 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   fmt      <- attribs$fmt
 
   fmt <- do.call(rbind, fmt)
-  mode(fmt) <- "integer"
   attr(data, "fmt") <- fmt
 
 

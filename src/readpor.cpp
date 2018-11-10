@@ -80,7 +80,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
 
     Rcpp::List fmt;
-    Rcpp::CharacterVector fmt_print_write(6);
+    Rcpp::NumericVector fmt_print_write(6);
 
     int nvarnames = 0, nlabelsetnams = 0;
 
@@ -290,11 +290,16 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       // 5 : precision record
       if (varrec.compare("5") == 0) {
 
+        if (debug)
+        Rcout << "--- 5 ---" << std::endl;
+
         std::string prec (1, '\0');
         prec = readstring(prec, por, prec.size());
 
         readstring(slash, por, slash.size());
         varrec = readstring(varrec, por, varrec.size());
+
+        // Rcout << varrec << std::endl;
 
       }
 
@@ -308,7 +313,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       if (varrec.compare("7") == 0)
       {
 
-        // Rcout << "--- 7 ---" << std::endl;
+        if (debug)
+        Rcout << "--- 7 ---" << std::endl;
 
         // 0 or 1-255
         std::string vartyp;
@@ -330,31 +336,47 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         varnames.push_back(varname);
         ++nvarnames;
 
+        double fmt_d = 0.0;
+        int mv = 0;
+
         /* Printformat */
         // 5 Format typ
         unkstr = readtostring(por);
-        fmt_print_write(0) = unkstr;
+
+        if (dnum(&unkstr[0], fmt_d, &mv) == 1)
+          fmt_print_write(0) = fmt_d;
+
 
         // 8 Format width:  1-40
         unkstr = readtostring(por);
-        fmt_print_write(1) = unkstr;
+
+        if (dnum(&unkstr[0], fmt_d, &mv) == 1)
+          fmt_print_write(1) = fmt_d;
 
         // 2 Number of decimalplaces: 1-40
         unkstr = readtostring(por);
-        fmt_print_write(2) = unkstr;
+
+        if (dnum(&unkstr[0], fmt_d, &mv) == 1)
+          fmt_print_write(2) = fmt_d;
 
         /* Writeformat */
         // 5
         unkstr = readtostring(por);
-        fmt_print_write(3) = unkstr;
+
+        if (dnum(&unkstr[0], fmt_d, &mv) == 1)
+          fmt_print_write(3) = fmt_d;
 
         // 8
         unkstr = readtostring(por);
-        fmt_print_write(4) = unkstr;
+
+        if (dnum(&unkstr[0], fmt_d, &mv) == 1)
+          fmt_print_write(4) = fmt_d;
 
         // 2
         unkstr = readtostring(por);
-        fmt_print_write(5) = unkstr;
+
+        if (dnum(&unkstr[0], fmt_d, &mv) == 1)
+          fmt_print_write(5) = fmt_d;
 
 
         fmt.push_back(fmt_print_write);
@@ -373,7 +395,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       // missing values
       if (varrec.compare("8") == 0) {
 
-        // Rcout << "--- 8 ---" << std::endl;
+        if (debug)
+        Rcout << "--- 8 ---" << std::endl;
         int vartyp = 0;
 
         std::string misslen;
@@ -424,7 +447,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       // range of min and max val
       if (varrec.compare("B") == 0) {
 
-        // Rcout << "--- B ---" << std::endl;
+        if (debug)
+        Rcout << "--- B ---" << std::endl;
         std::string varname;
 
         ptrdiff_t pos = 0;
@@ -460,7 +484,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       // variable label
       if (varrec.compare("C") == 0) {
 
-        // Rcout << "--- C ---" << std::endl;
+        if (debug)
+        Rcout << "--- C ---" << std::endl;
 
         std::string labellen;
 
@@ -481,8 +506,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       // D : value labels
       if (varrec.compare("D") == 0) {
 
-        // if (debug)
-          // Rcout << "--- D ---" << std::endl;
+        if (debug)
+          Rcout << "--- D ---" << std::endl;
 
         std::string unk1;
         unk1 = readtostring(por);
@@ -594,8 +619,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
         varrec = readstring(varrec, por, varrec.size());
 
-        // Rcout << varrec << std::endl;
-
       }
 
 
@@ -605,7 +628,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
 
       // data part reached
-      if (varrec.compare("F") == 0)
+      if ((varrec.compare("F") == 0) || (varrec.compare("Z") == 0))
         break;
     }
 
@@ -643,7 +666,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
           // check that eof is really reached and not only a string "Z"
           // if (por.peek() == EOF)
-            eof = val.find_first_not_of("Z") == string::npos;
+          eof = val.find_first_not_of("Z") == string::npos;
 
           if (eof) {
             if (debug)
@@ -690,24 +713,27 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       // back to the data_begin part
       por.seekg(data_begin);
 
+    }
 
-      // 1. Create data frame --------------------------------------------------
-      for (int32_t i=0; i<nvars; ++i)
+
+    // 1. Create data frame --------------------------------------------------
+    for (int32_t i=0; i<nvars; ++i)
+    {
+      int const type = vartypes[i];
+      switch(type)
       {
-        int const type = vartypes[i];
-        switch(type)
-        {
-        case 0:
-          SET_VECTOR_ELT(df, i, Rcpp::NumericVector(Rcpp::no_init(n)));
-          break;
-
-        default:
-          SET_VECTOR_ELT(df, i, Rcpp::CharacterVector(Rcpp::no_init(n)));
+      case 0:
+        SET_VECTOR_ELT(df, i, Rcpp::NumericVector(Rcpp::no_init(n)));
         break;
-        }
+
+      default:
+        SET_VECTOR_ELT(df, i, Rcpp::CharacterVector(Rcpp::no_init(n)));
+      break;
       }
+    }
 
 
+    if ( varrec.compare("F") == 0) {
       // 2 . fill list with data -----------------------------------------------
       for (int kk = 0; kk < n; ++kk) {
         for (int ii = 0; ii < vars; ++ii) {
@@ -761,8 +787,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         }
 
       }
-
     }
+
 
 
     // 3. Create a data.frame
