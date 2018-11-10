@@ -106,7 +106,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     // 1
     spss = readstring(spss, por, spss.size());
 
-    std::string ebcdic = "EBCDIC-IT";
+    std::string ebcdic = "IBM037"; // EBCDIC
     std::string cdc = "ASCII";
 
     if (spss.compare("ASCII SPSS PORT FILE") != 0) {
