@@ -317,7 +317,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       if (varrec.compare("5") == 0) {
 
         if (debug)
-        Rcout << "--- 5 ---" << std::endl;
+          Rcout << "--- 5 ---" << std::endl;
 
         std::string prec (1, '\0');
         prec = readstring(prec, por, prec.size());
@@ -352,7 +352,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       {
 
         if (debug)
-        Rcout << "--- 7 ---" << std::endl;
+          Rcout << "--- 7 ---" << std::endl;
 
         // 0 or 1-255
         std::string vartyp;
@@ -434,7 +434,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       if (varrec.compare("8") == 0) {
 
         if (debug)
-        Rcout << "--- 8 ---" << std::endl;
+          Rcout << "--- 8 ---" << std::endl;
         int vartyp = 0;
 
         std::string misslen;
@@ -529,7 +529,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       if (varrec.compare("B") == 0) {
 
         if (debug)
-        Rcout << "--- B ---" << std::endl;
+          Rcout << "--- B ---" << std::endl;
         std::string varname;
 
         ptrdiff_t pos = 0;
@@ -566,7 +566,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       if (varrec.compare("C") == 0) {
 
         if (debug)
-        Rcout << "--- C ---" << std::endl;
+          Rcout << "--- C ---" << std::endl;
 
         std::string labellen;
 
@@ -689,8 +689,10 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
           labvals.attr("names") = labtxts;
         }
 
-
-        // Rcout << labvals <<std::endl;
+        if (debug) {
+          Rcout << labtxts << std::endl;
+          Rcout << labvals <<std::endl;
+        }
 
         // push it back nolab times so that it matches the labelsetnams
         for (int i = 0; i < nolab; ++i)
