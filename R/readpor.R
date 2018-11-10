@@ -95,6 +95,7 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
 
   label    <- attribs$labtab
+  labels   <- attribs$labels
   labnames <- names(label)
   varnames <- attribs$names
   vartypes <- attribs$vartypes
@@ -154,6 +155,10 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
       names(label[[i]]) <- read.encoding(names(label[[i]]),
                                          fromEncoding = encStr,
                                          encoding = ownEnc)
+
+    labels <- read.encoding(labels,
+                            fromEncoding = encStr,
+                            encoding = ownEnc)
   }
 
 
@@ -241,6 +246,9 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   #
   # }
 
+
+  attr(data, "labtab") <- label
+  attr(data, "labels") <- labels
 
   # return
   return(data)
