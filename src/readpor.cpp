@@ -43,19 +43,15 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
   stringstream por;
 
   std::ifstream por_file(filePath, std::ios::in | std::ios::binary);
-
   if (por_file) {
 
     while (getline(por_file, input))
       file += input;
 
-    por_file.close();
   } else {
     stop ("No file was read.");
   }
-
-  // std::regex e("([^\r\n]|^)\r\n([^\r\n]|$)");
-  // std::cout << std::regex_replace(file, e, "$1$2") << std::endl;
+  por_file.close();
 
   // remove all newline characters \r and \n
   file.erase( std::remove(file.begin(), file.end(), '\r'), file.end() );
@@ -93,15 +89,13 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
     int nvarnames = 0, nlabelsetnams = 0;
 
-    // int32_t n = 0;
-    // int32_t k = 0;<
-
     // 5 x SPSS PORT FILE
     // EBCDIC, 7-bit ASCII, CDC 6-bit ASCII, 6-bit ASCII, Honeywell 6-bit
     // ASCII
     std::string spss (20, '\0');
     std::string espss1 (20, '\0');
-    std::string espss2 (20, '\0');
+    std::string spss20 (20, '\0');
+    std::string spss40 (40, '\0');
 
     // 1
     spss = readstring(spss, por, spss.size());
@@ -117,32 +111,19 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         stop("header indicates file is no spss por file");
     }
 
-    std::string spss20 (20, '\0');
     spss20 = readstring(spss20, por, spss20.size());
-
-    // Rcout << spss << std::endl;
-
-    std::string spss40 (40, '\0');
 
     // 2
     spss40 = readstring(spss40, por, spss40.size());
-    // Rcout << spss << std::endl;
 
     // 3
     spss40 = readstring(spss40, por, spss40.size());
-    // Rcout << spss << std::endl;
 
     // 4
     spss40 = readstring(spss40, por, spss40.size());
-    // Rcout << spss << std::endl;
 
     // 5
     spss40 = readstring(spss40, por, spss40.size());
-    // Rcout << spss << std::endl;
-
-    // Rcpp::stop("Debug!");
-    if (debug)
-      Rcout << "Pos: " << por.tellg() << std::endl;
 
 
     // Controll characters
@@ -171,7 +152,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
     if (debug)
       Rcout << "lower: " << lower << std::endl;
-    // Rprintf("lower: %s \n", lower.c_str());
 
     // random
     std::string random (61, '\0');
@@ -179,7 +159,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
     if (debug)
       Rcout << "random: " << random << std::endl;
-
 
     // Reserved
     std::string reserved (69, '\0');
@@ -194,6 +173,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
     if (debug)
       Rcout << "Pos: " << por.tellg() << std::endl;
+
     // end of header -----------------------------------------------------------
 
 
@@ -233,10 +213,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     // can be base-30 digit
     std::string prodlen;
     prodlen = readtostring(por);
-
-    // Rcout << prodlen << std::endl;
-
-    // readstring(slash, por, slash.size());
 
     // strtoi as in R
     std::string prod (std::stol(prodlen, NULL, 30), '\0');
@@ -324,8 +300,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
         readstring(slash, por, slash.size());
         varrec = readstring(varrec, por, varrec.size());
-
-        // Rcout << varrec << std::endl;
 
       }
 
@@ -474,7 +448,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       if (varrec.compare("9") == 0) {
 
         std::string lowthrux;
-        lowthrux = readtostring(por); // ToDo: guess? needs varname
+        lowthrux = readtostring(por);
 
         std::string varname;
         ptrdiff_t pos = 0;
@@ -501,7 +475,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
       if (varrec.compare("A") == 0) {
 
         std::string xthruhigh;
-        xthruhigh = readtostring(por); // ToDo: guess? needs varname
+        xthruhigh = readtostring(por);
 
         std::string varname;
         ptrdiff_t pos = 0;
@@ -547,8 +521,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         minval = readtostring(por); // min value
         maxval = readtostring(por); // max value
 
-        // Rcout << minval << " and " << maxval << std::endl;
-
         varrangCV(0) = minval;
         varrangCV(1) = maxval;
 
@@ -593,12 +565,10 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         std::string unk1;
         unk1 = readtostring(por);
 
-        // Rcout << "unk1 :: " << unk1 << std::endl;
-
         int nolab = 0;
         nolab = std::strtol(unk1.c_str(), NULL, 30);
 
-        // unknown reason chained labelsets?
+        // chained labelsets
         for (int i = 0; i < nolab; ++i) {
 
           std::string labelset;
@@ -611,9 +581,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
           labelsetnams.push_back(labelsetnam);
           ++nlabelsetnams;
 
-          // if (nolab > 1)
-          //   Rcout << "CHAINED: " << labelsetnam << std::endl;
-
         }
 
         std::string labelnum;
@@ -624,8 +591,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         Rcpp::CharacterVector labvals(labnums);
         Rcpp::CharacterVector labtxts(labnums);
 
-        // Rprintf("labnums %d\n", labnums);
-
         ptrdiff_t pos = distance(varnames.begin(),
                                  find(varnames.begin(),
                                       varnames.end(),
@@ -634,11 +599,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         int vartyp = 0;
         vartyp = vartypes[pos];
 
-        // Rprintf("vartyp %d\n", vartyp);
-
         if (vartyp == 0) {
-
-          // Rcout << "numerisches Label" << std::endl;
 
           for (int i = 0; i < labnums; ++i) {
 
@@ -648,12 +609,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
             labval = readtostring(por);
             labtxtlen = readtostring(por);
 
-            // Rcout << labval <<" - "<< labtxtlen << std::endl;
-
             std::string labtxt (std::strtol(labtxtlen.c_str(), NULL, 30), '\0');
             labtxt = readstring(labtxt, por, labtxt.size());
-
-            // Rcout << labtxt << std::endl;
 
             labvals[i] = labval;
             labtxts[i] = labtxt;
@@ -662,7 +619,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
           labvals.attr("names") = labtxts;
 
         } else {
-          // Rcout << "character Label" << std::endl;
 
           for (int i = 0; i < labnums; ++i) {
             std::string labval_len;
@@ -674,12 +630,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
             std::string labtxtlen;
             labtxtlen = readtostring(por);
 
-            // Rcout << labval <<" - "<< labtxtlen << std::endl;
-
             std::string labtxt (std::strtol(labtxtlen.c_str(), NULL, 30), '\0');
             labtxt = readstring(labtxt, por, labtxt.size());
-
-            // Rcout << labtxt << std::endl;
 
             labvals[i] = labval;
             labtxts[i] = labtxt;
@@ -742,9 +694,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         break;
     }
 
-    // stop("debug");
-
-
 
     if (debug)
       Rcout << "varrec " << varrec << std::endl;
@@ -800,8 +749,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
             std::string val_s (val_s_len, '\0');
             val_s = readstring(val_s, por, val_s.size());
-
-            // Rcpp::Rcout << val_s << std::endl;
 
             break;
           }
@@ -887,7 +834,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
             std::string val_s (val_s_len, '\0');
             val_s = readstring(val_s, por, val_s.size());
 
-            // Rcpp::Rcout << val_s << std::endl;
             Rcpp::as<Rcpp::CharacterVector>(df[ii])[kk] = val_s;
 
             break;
@@ -898,7 +844,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
       }
     }
-
 
 
     // 3. Create a data.frame
