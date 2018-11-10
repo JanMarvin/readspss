@@ -78,6 +78,10 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     std::vector<std::string> labelsetnams;
     std::string unkstr (1, '\0');
 
+
+    Rcpp::List fmt;
+    Rcpp::CharacterVector fmt_print_write(6);
+
     int nvarnames = 0, nlabelsetnams = 0;
 
     // int32_t n = 0;
@@ -86,26 +90,45 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     // 5 x SPSS PORT FILE
     // EBCDIC, 7-bit ASCII, CDC 6-bit ASCII, 6-bit ASCII, Honeywell 6-bit
     // ASCII
-    std::string spss (40, '\0');
+    std::string spss (20, '\0');
+    std::string espss1 (20, '\0');
+    std::string espss2 (20, '\0');
 
     // 1
     spss = readstring(spss, por, spss.size());
+
+    std::string ebcdic = "EBCDIC-IT";
+    std::string cdc = "ASCII";
+
+    if (spss.compare("ASCII SPSS PORT FILE") != 0) {
+
+      espss1 = Riconv(spss, ebcdic);
+
+      if (espss1.compare("ASCII SPSS PORT FILE") != 0)
+        stop("header indicates file is no spss por file");
+    }
+
+    std::string spss20 (20, '\0');
+    spss20 = readstring(spss20, por, spss20.size());
+
     // Rcout << spss << std::endl;
 
+    std::string spss40 (40, '\0');
+
     // 2
-    spss = readstring(spss, por, spss.size());
+    spss40 = readstring(spss40, por, spss40.size());
     // Rcout << spss << std::endl;
 
     // 3
-    spss = readstring(spss, por, spss.size());
+    spss40 = readstring(spss40, por, spss40.size());
     // Rcout << spss << std::endl;
 
     // 4
-    spss = readstring(spss, por, spss.size());
+    spss40 = readstring(spss40, por, spss40.size());
     // Rcout << spss << std::endl;
 
     // 5
-    spss = readstring(spss, por, spss.size());
+    spss40 = readstring(spss40, por, spss40.size());
     // Rcout << spss << std::endl;
 
     // Rcpp::stop("Debug!");
@@ -281,7 +304,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         stop("unhandled case 6");
       }
 
-
       // 7 : variable records
       if (varrec.compare("7") == 0)
       {
@@ -311,22 +333,31 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         /* Printformat */
         // 5 Format typ
         unkstr = readtostring(por);
+        fmt_print_write(0) = unkstr;
 
         // 8 Format width:  1-40
         unkstr = readtostring(por);
+        fmt_print_write(1) = unkstr;
 
         // 2 Number of decimalplaces: 1-40
         unkstr = readtostring(por);
+        fmt_print_write(2) = unkstr;
 
         /* Writeformat */
         // 5
         unkstr = readtostring(por);
+        fmt_print_write(3) = unkstr;
 
         // 8
         unkstr = readtostring(por);
+        fmt_print_write(4) = unkstr;
 
         // 2
         unkstr = readtostring(por);
+        fmt_print_write(5) = unkstr;
+
+
+        fmt.push_back(fmt_print_write);
 
         // varrec
         varrec = readstring(varrec, por, varrec.size());
@@ -746,6 +777,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     df.attr("labtab") = labtab;
     df.attr("vartypes") = vartypes;
     df.attr("varrange") = varrange;
+
+    df.attr("fmt") = fmt;
 
     return(df);
 

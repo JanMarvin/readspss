@@ -92,6 +92,11 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   labnames <- names(label)
   varnames <- attribs$names
   vartypes <- attribs$vartypes
+  fmt      <- attribs$fmt
+
+  fmt <- do.call(rbind, fmt)
+  mode(fmt) <- "integer"
+  attr(data, "fmt") <- fmt
 
 
   # convert NAs by missing information provided by SPSS.
