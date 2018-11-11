@@ -357,39 +357,39 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
         // 5 Format typ
         unkstr = readtostring(por);
 
-        if (dnum(&unkstr[0], fmt_d, &mv) == 1)
+        if (dnum(&unkstr[0], fmt_d, &mv))
           fmt_print_write(0) = fmt_d;
 
 
         // 8 Format width:  1-40
         unkstr = readtostring(por);
 
-        if (dnum(&unkstr[0], fmt_d, &mv) == 1)
+        if (dnum(&unkstr[0], fmt_d, &mv))
           fmt_print_write(1) = fmt_d;
 
         // 2 Number of decimalplaces: 1-40
         unkstr = readtostring(por);
 
-        if (dnum(&unkstr[0], fmt_d, &mv) == 1)
+        if (dnum(&unkstr[0], fmt_d, &mv))
           fmt_print_write(2) = fmt_d;
 
         /* Writeformat */
         // 5
         unkstr = readtostring(por);
 
-        if (dnum(&unkstr[0], fmt_d, &mv) == 1)
+        if (dnum(&unkstr[0], fmt_d, &mv))
           fmt_print_write(3) = fmt_d;
 
         // 8
         unkstr = readtostring(por);
 
-        if (dnum(&unkstr[0], fmt_d, &mv) == 1)
+        if (dnum(&unkstr[0], fmt_d, &mv))
           fmt_print_write(4) = fmt_d;
 
         // 2
         unkstr = readtostring(por);
 
-        if (dnum(&unkstr[0], fmt_d, &mv) == 1)
+        if (dnum(&unkstr[0], fmt_d, &mv))
           fmt_print_write(5) = fmt_d;
 
 
@@ -613,7 +613,14 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
             std::string labtxt ( b30int(labtxtlen), '\0');
             labtxt = readstring(labtxt, por);
 
-            labvals[i] = b30str(labval);
+            double lab_d = 0.0;
+            int mv = 0;
+
+            if (!dnum(&labval[0], lab_d, &mv))
+              stop("label wrong");
+
+
+            labvals[i] = std::to_string(lab_d);
             labtxts[i] = labtxt;
           }
 
@@ -819,7 +826,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
             cstr.push_back('\0');
 
             // TDA function
-            if (dnum(&cstr[0], val_d, &mv) != 1)
+            if (!dnum(&cstr[0], val_d, &mv))
               stop("reading numeric failed");
 
             if (debug) {

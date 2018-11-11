@@ -220,7 +220,7 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
         if (isNum | all(is.na(labtable))) {
           nam <- names(labtable)
-          labtable <- strtoi(labtable, 30)
+          labtable <- as.numeric(labtable)
           names(labtable) <- nam
         }
 
