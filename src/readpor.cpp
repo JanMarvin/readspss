@@ -75,6 +75,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
 
     std::vector<int> vartypes;
 
+    std::vector<std::string> ftime;
+    std::vector<std::string> fdate;
     std::vector<std::string> varnames;
     std::vector<std::string> varrangnams;
     std::vector<std::string> vn;
@@ -186,22 +188,21 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
 
     // filedate is yyyymmdd should be 8
     std::string filedatelen = string(1, '\0');
-    filedatelen = readstring(filedatelen, por);
+    filedatelen = readtostring(por);
 
     std::string slash = string(1, '\0');
-    readstring(slash, por);
 
     std::string filedate (std::stoi(filedatelen), '\0');
     filedate = readstring(filedate, por);
+    fdate.push_back(filedate);
 
     // filetime is hhmmss should be 6
     std::string filetimelen = string(1, '\0');
-    filetimelen = readstring(filetimelen, por);
-
-    readstring(slash, por);
+    filetimelen = readtostring(por);
 
     std::string filetime (std::stoi(filetimelen), '\0');
     filetime = readstring(filetime, por);
+    ftime.push_back(filetime);
 
 
     if (debug)
@@ -859,6 +860,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
     df.attr("names") = varnames;
     df.attr("class") = "data.frame";
 
+    df.attr("filetime") = ftime;
+    df.attr("filedate") = fdate;
     df.attr("labels") = varlabels;
     df.attr("missings") = missings;
     df.attr("labtab") = labtab;
