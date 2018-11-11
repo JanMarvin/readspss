@@ -82,7 +82,7 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     encStr <- "NA"
 
   # import data using an rcpp routine
-  data <- readpor(filepath, debug, encStr)
+  data <- readpor(filepath, debug, encStr, override)
 
 
   attribs <- attributes(data)

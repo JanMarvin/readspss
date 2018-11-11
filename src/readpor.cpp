@@ -35,7 +35,8 @@ using namespace std;
 //' @import Rcpp
 //' @export
 // [[Rcpp::export]]
-List readpor(const char * filePath, const bool debug, std::string encStr)
+List readpor(const char * filePath, const bool debug, std::string encStr,
+             bool override)
 {
 
   std::string input;
@@ -103,12 +104,14 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     std::string ebcdic = "IBM037"; // EBCDIC
     std::string cdc = "ASCII";
 
-    if (spss.compare("ASCII SPSS PORT FILE") != 0) {
+    if (!override){
+      if (spss.compare("ASCII SPSS PORT FILE") != 0) {
 
-      espss1 = Riconv(spss, ebcdic);
+        espss1 = Riconv(spss, ebcdic);
 
-      if (espss1.compare("ASCII SPSS PORT FILE") != 0)
-        stop("header indicates file is no spss por file");
+        if (espss1.compare("ASCII SPSS PORT FILE") != 0)
+          stop("header indicates file is no spss por file");
+      }
     }
 
     spss20 = readstring(spss20, por);
@@ -708,6 +711,9 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     // Data part found. Starts with F ends with Z...
     if ( varrec.compare("F") == 0) {
 
+      if (debug)
+        Rcout << "--- F ---" << std::endl;
+
       size_t data_begin = por.tellg();
 
       // dry run until end of file is reached ----------------------------------
@@ -731,24 +737,28 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
           }
 
           int const type = vartypes[ii];
+
+          if (debug)
+            Rprintf("type: %d\n", type);
+
           switch(type)
           {
           case 0:
-          {
-            // if (debug)
-            //   Rcout << "numeric do nothing" << std::endl;
-            break;
-          }
+            {
+              // if (debug)
+              //   Rcout << "numeric do nothing" << std::endl;
+              break;
+            }
 
           default:
-          {
-            int val_s_len = b30int(val);
+            {
+              int val_s_len = b30int(val);
 
-            std::string val_s (val_s_len, '\0');
-            val_s = readstring(val_s, por);
+              std::string val_s (val_s_len, '\0');
+              val_s = readstring(val_s, por);
 
-            break;
-          }
+              break;
+            }
           }
 
         }

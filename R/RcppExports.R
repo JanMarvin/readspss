@@ -41,8 +41,8 @@ readencrypted <- function(filePath, debug, encStr, ownEnc, pass) {
 #' @param encStr encoding string
 #' @import Rcpp
 #' @export
-readpor <- function(filePath, debug, encStr) {
-    .Call(`_readspss_readpor`, filePath, debug, encStr)
+readpor <- function(filePath, debug, encStr, override) {
+    .Call(`_readspss_readpor`, filePath, debug, encStr, override)
 }
 
 #' Reads the binary SPSS file
