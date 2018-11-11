@@ -145,7 +145,8 @@ inline std::string readtostring(T& sav)
     std::string next(1, '\0');
     next = readstring(next, sav);
 
-    if ( (res.compare("*") == 0) & (next.compare(".") == 0)) {
+    if ( (res.compare("*") == 0) &
+         (((next.compare(".") == 0)) || (next.compare("1") == 0) ) ) {
       // missing (combine so we can check for "*.")
       res = res + next;
 
