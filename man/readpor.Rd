@@ -4,7 +4,7 @@
 \alias{readpor}
 \title{Reads the binary SPSS file}
 \usage{
-readpor(filePath, debug, encStr)
+readpor(filePath, debug, encStr, override)
 }
 \arguments{
 \item{filePath}{The full systempath to the dta file you want to import.}
@@ -12,6 +12,8 @@ readpor(filePath, debug, encStr)
 \item{debug}{print debug information}
 
 \item{encStr}{encoding string}
+
+\item{override}{override bool}
 }
 \description{
 Reads the binary SPSS file

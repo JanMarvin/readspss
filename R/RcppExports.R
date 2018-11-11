@@ -39,6 +39,7 @@ readencrypted <- function(filePath, debug, encStr, ownEnc, pass) {
 #' @param filePath The full systempath to the dta file you want to import.
 #' @param debug print debug information
 #' @param encStr encoding string
+#' @param override override bool
 #' @import Rcpp
 #' @export
 readpor <- function(filePath, debug, encStr, override) {
