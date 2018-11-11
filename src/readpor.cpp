@@ -98,7 +98,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     std::string spss40 (40, '\0');
 
     // 1
-    spss = readstring(spss, por, spss.size());
+    spss = readstring(spss, por);
 
     std::string ebcdic = "IBM037"; // EBCDIC
     std::string cdc = "ASCII";
@@ -111,19 +111,19 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         stop("header indicates file is no spss por file");
     }
 
-    spss20 = readstring(spss20, por, spss20.size());
+    spss20 = readstring(spss20, por);
 
     // 2
-    spss40 = readstring(spss40, por, spss40.size());
+    spss40 = readstring(spss40, por);
 
     // 3
-    spss40 = readstring(spss40, por, spss40.size());
+    spss40 = readstring(spss40, por);
 
     // 4
-    spss40 = readstring(spss40, por, spss40.size());
+    spss40 = readstring(spss40, por);
 
     // 5
-    spss40 = readstring(spss40, por, spss40.size());
+    spss40 = readstring(spss40, por);
 
 
     // Controll characters
@@ -134,39 +134,39 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
     // Digits 0 - 9
     std::string digits (10, '\0');
-    digits = readstring(digits, por, digits.size());
+    digits = readstring(digits, por);
 
     if (debug)
       Rcout << "digits: " << digits << std::endl;
 
     // Capitals
     std::string capitals (26, '\0');
-    capitals = readstring(capitals, por, capitals.size());
+    capitals = readstring(capitals, por);
 
     if (debug)
       Rcout << "capitals: " << capitals << std::endl;
 
     // lowercase
     std::string lower (26, '\0');
-    lower = readstring(lower, por, lower.size());
+    lower = readstring(lower, por);
 
     if (debug)
       Rcout << "lower: " << lower << std::endl;
 
     // random
     std::string random (61, '\0');
-    random = readstring(random, por, random.size());
+    random = readstring(random, por);
 
     if (debug)
       Rcout << "random: " << random << std::endl;
 
     // Reserved
     std::string reserved (69, '\0');
-    reserved = readstring(reserved, por, reserved.size());
+    reserved = readstring(reserved, por);
 
     // tag
     std::string tag (8, '\0');
-    tag = readstring(tag, por, tag.size());
+    tag = readstring(tag, por);
 
     if (debug)
       Rcout << "tag: " << tag << std::endl;
@@ -179,26 +179,26 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
     // version and date record
     std::string vers (1, '\0');
-    vers = readstring(vers, por, vers.size());
+    vers = readstring(vers, por);
 
     // filedate is yyyymmdd should be 8
     std::string filedatelen = string(1, '\0');
-    filedatelen = readstring(filedatelen, por, filedatelen.size());
+    filedatelen = readstring(filedatelen, por);
 
     std::string slash = string(1, '\0');
-    readstring(slash, por, slash.size());
+    readstring(slash, por);
 
     std::string filedate (std::stoi(filedatelen), '\0');
-    filedate = readstring(filedate, por, filedate.size());
+    filedate = readstring(filedate, por);
 
     // filetime is hhmmss should be 6
     std::string filetimelen = string(1, '\0');
-    filetimelen = readstring(filetimelen, por, filetimelen.size());
+    filetimelen = readstring(filetimelen, por);
 
-    readstring(slash, por, slash.size());
+    readstring(slash, por);
 
     std::string filetime (std::stoi(filetimelen), '\0');
-    filetime = readstring(filetime, por, filetime.size());
+    filetime = readstring(filetime, por);
 
 
     if (debug)
@@ -208,7 +208,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
     std::string varrec (1, '\0');
 
     // 1 : identification record
-    varrec = readstring(varrec, por, varrec.size());
+    varrec = readstring(varrec, por);
 
     // can be base-30 digit
     std::string prodlen;
@@ -216,7 +216,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
     // strtoi as in R
     std::string prod ( b30int(prodlen), '\0');
-    prod = readstring(prod, por, prod.size());
+    prod = readstring(prod, por);
 
     file_info.push_back(prod);
 
@@ -226,7 +226,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
     // optional
     // 2 or 3 : author and extra record
-    varrec = readstring(varrec, por, varrec.size());
+    varrec = readstring(varrec, por);
 
     // optional
     // 2 : author
@@ -238,14 +238,14 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
       // author name
       std::string author ( b30int(authorlen), '\0');
-      author = readstring(author, por, author.size());
+      author = readstring(author, por);
 
       file_info.push_back(author);
 
       if (debug)
         Rcout << author << std::endl;
 
-      varrec = readstring(varrec, por, varrec.size());
+      varrec = readstring(varrec, por);
     }
 
     // 3 : extra record
@@ -257,14 +257,14 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
       // extra information
       std::string extra ( b30int(extralen), '\0');
-      extra = readstring(extra, por, extra.size());
+      extra = readstring(extra, por);
 
       file_info.push_back(extra);
 
       if (debug)
         Rcout << extra << std::endl;
 
-      varrec = readstring(varrec, por, varrec.size());
+      varrec = readstring(varrec, por);
     }
 
     int vars = 0;
@@ -285,7 +285,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         if (debug)
           Rprintf("varsize: %d\n", vars);
 
-        varrec = readstring(varrec, por, varrec.size());
+        varrec = readstring(varrec, por);
       }
 
 
@@ -299,7 +299,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         prec = readtostring(por);
         prec = b30str(prec);
 
-        varrec = readstring(varrec, por, varrec.size());
+        varrec = readstring(varrec, por);
 
       }
 
@@ -314,10 +314,10 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         len = readtostring(por);
 
         std::string wvar( b30int(len), '\0');
-        wvar = readstring(wvar, por, wvar.size());
+        wvar = readstring(wvar, por);
         weightvars.push_back(wvar);
 
-        varrec = readstring(varrec, por, varrec.size());
+        varrec = readstring(varrec, por);
 
       }
 
@@ -340,7 +340,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         varnamelen = readtostring(por);
 
         std::string varname ( b30int(varnamelen), '\0' );
-        varname = readstring(varname, por, varname.size());
+        varname = readstring(varname, por);
 
         // varname
         varnames.push_back(varname);
@@ -392,7 +392,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         fmt.push_back(fmt_print_write);
 
         // varrec
-        varrec = readstring(varrec, por, varrec.size());
+        varrec = readstring(varrec, por);
 
 
         if (debug) {
@@ -424,7 +424,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
         if (vartyp > 0) {
           std::string miss( b30int(misslen), '\0' );
-          miss = readstring(miss, por, miss.size());
+          miss = readstring(miss, por);
 
           miss_val = miss;
         } else {
@@ -437,7 +437,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         missCV.attr("names") = miss_nam;
         missings.push_back(missCV);
 
-        varrec = readstring(varrec, por, varrec.size());
+        varrec = readstring(varrec, por);
 
       }
 
@@ -465,7 +465,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
         loThruX.push_back(res);
 
-        varrec = readstring(varrec, por, varrec.size());
+        varrec = readstring(varrec, por);
       }
 
 
@@ -492,7 +492,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
         xThruHi.push_back(res);
 
-        varrec = readstring(varrec, por, varrec.size());
+        varrec = readstring(varrec, por);
 
       }
 
@@ -527,7 +527,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         varrange.push_back(varrangCV);
         varrange.attr("names") = varrangnams;
 
-        varrec = readstring(varrec, por, varrec.size());
+        varrec = readstring(varrec, por);
 
       }
 
@@ -543,14 +543,14 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
         labellen = readtostring(por);
 
         std::string label( b30int(labellen), '\0');
-        label = readstring(label, por, label.size());
+        label = readstring(label, por);
 
         if (debug)
           Rcout << label << std::endl;
 
         varlabels.push_back(label);
 
-        varrec = readstring(varrec, por, varrec.size());
+        varrec = readstring(varrec, por);
 
       }
 
@@ -573,7 +573,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
           labelset = readtostring(por);
 
           std::string labelsetnam( b30int(labelset), '\0');
-          labelsetnam = readstring(labelsetnam, por, labelsetnam.size());
+          labelsetnam = readstring(labelsetnam, por);
 
           labelsetnams.push_back(labelsetnam);
           ++nlabelsetnams;
@@ -607,7 +607,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
             labtxtlen = readtostring(por);
 
             std::string labtxt ( b30int(labtxtlen), '\0');
-            labtxt = readstring(labtxt, por, labtxt.size());
+            labtxt = readstring(labtxt, por);
 
             labvals[i] = b30str(labval);
             labtxts[i] = labtxt;
@@ -622,13 +622,13 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
             labval_len = readtostring(por);
 
             std::string labval( b30int(labval_len), '\0');
-            labval = readstring(labval, por, labval.size());
+            labval = readstring(labval, por);
 
             std::string labtxtlen;
             labtxtlen = readtostring(por);
 
             std::string labtxt( b30int(labtxtlen), '\0');
-            labtxt = readstring(labtxt, por, labtxt.size());
+            labtxt = readstring(labtxt, por);
 
             labvals[i] = labval;
             labtxts[i] = labtxt;
@@ -649,7 +649,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
         labtab.attr("names") = labelsetnams;
 
-        varrec = readstring(varrec, por, varrec.size());
+        varrec = readstring(varrec, por);
 
       }
 
@@ -673,7 +673,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
           linelen = readtostring(por);
 
           std::string docline( b30int(linelen), '\0');
-          docline = readstring(docline, por, docline.size());
+          docline = readstring(docline, por);
 
           if (debug)
             Rcout << docline << std::endl;
@@ -681,7 +681,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
           doc.push_back(docline);
         }
 
-        varrec = readstring(varrec, por, varrec.size());
+        varrec = readstring(varrec, por);
 
       }
 
@@ -745,7 +745,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
             int val_s_len = b30int(val);
 
             std::string val_s (val_s_len, '\0');
-            val_s = readstring(val_s, por, val_s.size());
+            val_s = readstring(val_s, por);
 
             break;
           }
@@ -829,7 +829,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
             int val_s_len = b30int(val);
 
             std::string val_s (val_s_len, '\0');
-            val_s = readstring(val_s, por, val_s.size());
+            val_s = readstring(val_s, por);
 
             Rcpp::as<Rcpp::CharacterVector>(df[ii])[kk] = val_s;
 

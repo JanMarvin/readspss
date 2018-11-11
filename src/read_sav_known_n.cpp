@@ -151,7 +151,7 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
 
           // beginning of a new string
           std::string val_s (len, '\0');
-          val_s = readstring(val_s, sav, val_s.size());
+          val_s = readstring(val_s, sav);
           start.append( val_s );
 
           // if res_i == res_kk the full string was read and
@@ -231,7 +231,7 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
             len = 8;
 
           std::string val_s (len, '\0');
-          val_s = readstring(val_s, sav, val_s.size());
+          val_s = readstring(val_s, sav);
           start.append( val_s );
 
 
@@ -393,7 +393,7 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
         len = ceil(len/8) * 8;
 
         std::string val_s ((int32_t)len, '\0');
-        val_s = readstring(val_s, sav, val_s.size());
+        val_s = readstring(val_s, sav);
 
         // shorten the string to the actual size reported by SPSS
         val_s.erase(type, std::string::npos);

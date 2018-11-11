@@ -111,11 +111,21 @@ static const std::string codepage(int cp) {
 
 
 template <typename T>
-static std::string readstring(std::string mystring, T& sav,
-                              int nchar)
+static std::string readstring(std::string &mystring, T& sav)
 {
 
-  if (!sav.read(&mystring[0], nchar))
+  if (!sav.read(&mystring[0], mystring.size()))
+    Rcpp::warning("char: a binary read error occurred");
+
+  return(mystring);
+}
+
+
+template <typename T>
+static std::string readstringsize(std::string &mystring, T& sav, int size)
+{
+
+  if (!sav.read(&mystring[0], size))
     Rcpp::warning("char: a binary read error occurred");
 
   return(mystring);
@@ -126,14 +136,14 @@ static std::string readtostring(T& sav)
 {
 
   std::string res(1, '\0');
-  res = readstring(res, sav, res.size());
+  res = readstring(res, sav);
 
   // run until EOF is reached. file does not end on "/" but "Z"
   while (sav.peek() != EOF)
   {
 
     std::string next(1, '\0');
-    next = readstring(next, sav, next.size());
+    next = readstring(next, sav);
 
     if ( (res.compare("*") == 0) & (next.compare(".") == 0)) {
       // missing (combine so we can check for "*.")

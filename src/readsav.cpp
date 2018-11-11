@@ -72,7 +72,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
 
     std::string spss (8, '\0');
-    spss = readstring(spss, sav, spss.size());
+    spss = readstring(spss, sav);
 
     is_sav = std::regex_match(spss, std::regex("^\\$FL2@\\(#\\)$"));
     is_zsav = std::regex_match(spss, std::regex("^\\$FL3@\\(#\\)$"));
@@ -87,7 +87,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     //  OS
     //  (Software) Version?
     std::string datalabel (56, '\0');
-    datalabel = readstring(datalabel, sav, datalabel.size());
+    datalabel = readstring(datalabel, sav);
 
     // trim additional whitespaces
     datalabel = std::regex_replace(datalabel,
@@ -135,14 +135,14 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
     // creation date 9 dd_mmm_yy
     std::string datestamp (9, '\0');
-    datestamp = readstring(datestamp, sav, datestamp.size());
+    datestamp = readstring(datestamp, sav);
 
     // creation time 8 hh:mm:ss
     std::string timestamp (8, '\0');
-    timestamp = readstring(timestamp, sav, timestamp.size());
+    timestamp = readstring(timestamp, sav);
 
     std::string filelabel (67, '\0');
-    filelabel = readstring(filelabel, sav, filelabel.size());
+    filelabel = readstring(filelabel, sav);
 
 
     filelabel = std::regex_replace(filelabel,
@@ -257,7 +257,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
         std::string nvarname (8, '\0');
         // read variable name 8 bytes long upercase letters
-        nvarname = readstring(nvarname, sav, nvarname.size());
+        nvarname = readstring(nvarname, sav);
 
         // trim additional whitespaces
         nvarname = std::regex_replace(nvarname,
@@ -274,7 +274,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
           origlen = ceil((double)origlen/4) * 4;
 
           std::string vallabel (origlen, '\0');
-          vallabel = readstring(vallabel, sav, vallabel.size());
+          vallabel = readstring(vallabel, sav);
 
 
           // trim additional whitespaces on the right
@@ -320,7 +320,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
             if (noNum) {
               std::string mV (8, '\0');
-              mV = readstring(mV, sav, mV.size());
+              mV = readstring(mV, sav);
 
 
               mV = std::regex_replace(mV, std::regex("^ +| +$"), "$1");
@@ -367,7 +367,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
           // read string and compare to an empty string. if the string contains
           // binary data it will be empty
           std::string cV (8, ' ');
-          cV = readstring(cV, sav, cV.size());
+          cV = readstring(cV, sav);
 
           // check for characters in the string lets hope SPSS does not allow
           // characters starting with a numeric or special character
@@ -397,7 +397,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
             lablen = ( ceil((double)(lablen+1)/8) * 8 ) - 1;
 
             std::string lab (lablen, '\0');
-            lab = readstring(lab, sav, lab.size());
+            lab = readstring(lab, sav);
             lab = std::regex_replace(lab, std::regex("^ +| +$"), "$1");
 
             if (doenc) lab = Riconv(lab, encStr);
@@ -454,7 +454,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         // Rcout << " --- Documentation --- " << std::endl;
         for (int i = 0; i < nlines; ++i)
         {
-          std::string docline = readstring(document, sav, document.size());
+          std::string docline = readstring(document, sav);
 
           // if (doenc) docline = Riconv(docline, encStr);
 
@@ -539,7 +539,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         case 5:
         {
           // totals?
-          totals = readstring(data, sav, data.size());
+          totals = readstring(data, sav);
 
           break;
         }
@@ -554,7 +554,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
           // sav.seekg(size*count);
 
           // ignore this
-          readstring(data, sav, data.size());
+          readstring(data, sav);
 
           break;
         }
@@ -562,7 +562,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         case 10:
         {
 
-          extraproduct = readstring(data, sav, count);
+          extraproduct = readstringsize(data, sav, count);
 
           break;
         }
@@ -582,14 +582,14 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
         case 13:
         {
-          longvarname = readstring(data, sav, count);
+          longvarname = readstringsize(data, sav, count);
 
           break;
         }
 
         case 14:
         {
-          longstring = readstring(data, sav, count);
+          longstring = readstringsize(data, sav, count);
 
           break;
         }
@@ -612,7 +612,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
         case 20:
         {
-          encoding = readstring(data, sav, count);
+          encoding = readstringsize(data, sav, count);
 
           if ((!noenc) & (charcode == 2) &
               (encoding.compare("windows-1252") == 0)) {
@@ -635,7 +635,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
           len = readbin(len, sav, swapit);
           std::string vn (len, '\0');
 
-          vn = readstring(vn, sav, len);
+          vn = readstringsize(vn, sav, len);
 
           // Rprintf("vn %d \n", len);
           // Rcout << vn << std::endl;
@@ -657,14 +657,14 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
             len1 = readbin(len1, sav, swapit);
             std::string val (len1, '\0');
-            val = readstring(val, sav, len1);
+            val = readstringsize(val, sav, len1);
 
             val = std::regex_replace(val, std::regex(" +$"), "$1");
 
 
             len2 = readbin(len2, sav, swapit);
             std::string lab (len2, '\0');
-            lab = readstring(lab, sav, len2);
+            lab = readstringsize(lab, sav, len2);
 
             // Rcout << val << " : "<< lab << std::endl;
 
@@ -695,7 +695,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
             len = readbin(len, sav, swapit);
             std::string vn (len, '\0');
-            vn = readstring(vn, sav, len);
+            vn = readstringsize(vn, sav, len);
 
             int8_t mv = 0;
             mv = readbin(mv, sav, swapit);
@@ -710,7 +710,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
             for (int32_t mm = 0; mm < mv; ++mm) {
 
               std::string val (len, '\0');
-              val = readstring(val, sav, val.size());
+              val = readstring(val, sav);
 
               val = std::regex_replace(val, std::regex(" +$"), "$1");
 
@@ -731,7 +731,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
           // sav.seekg(size*count);
 
           // ignore this
-          dataview = readstring(data, sav, data.size());
+          dataview = readstring(data, sav);
 
           break;
         }
@@ -739,7 +739,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         default:
         {
           // ignore this
-          readstring(data, sav, data.size());
+          readstring(data, sav);
 
           Rcout << data << std::endl;
 
