@@ -19,7 +19,7 @@ T readbin( T t , std::istream& sav, bool swapit)
 }
 
 
-static const std::string codepage(int cp) {
+inline const std::string codepage(int cp) {
   std::string res;
 
   switch(cp) {
@@ -111,7 +111,7 @@ static const std::string codepage(int cp) {
 
 
 template <typename T>
-static std::string readstring(std::string &mystring, T& sav)
+inline std::string readstring(std::string &mystring, T& sav)
 {
 
   if (!sav.read(&mystring[0], mystring.size()))
@@ -122,7 +122,7 @@ static std::string readstring(std::string &mystring, T& sav)
 
 
 template <typename T>
-static std::string readstringsize(std::string &mystring, T& sav, int size)
+inline std::string readstringsize(std::string &mystring, T& sav, int size)
 {
 
   if (!sav.read(&mystring[0], size))
@@ -132,7 +132,7 @@ static std::string readstringsize(std::string &mystring, T& sav, int size)
 }
 
 template <typename T>
-static std::string readtostring(T& sav)
+inline std::string readtostring(T& sav)
 {
 
   std::string res(1, '\0');
@@ -169,7 +169,7 @@ static std::string readtostring(T& sav)
 
 // Part of TDA. Program for Transition Data Analysis, written by Goetz Rohwer.
 // Copyright (C) 1989,1991-97 Goetz Rohwer. GPL-2
-static int getdigit(char *p, int *err)
+inline int getdigit(char *p, int *err)
 {
   *err = 0;
   if (*p >= '0' && *p <= '9')
@@ -188,7 +188,7 @@ static int getdigit(char *p, int *err)
 
 // Part of TDA. Program for Transition Data Analysis, written by Goetz Rohwer.
 // Copyright (C) 1989,1991-97 Goetz Rohwer. GPL-2
-static
+inline
 int dnum(char *p, double &x, int *mv)
 {
   int err;
@@ -280,7 +280,7 @@ int dnum(char *p, double &x, int *mv)
 
 
 template <typename T>
-static T Riconv(T &mystring, std::string &encStr) {
+inline T Riconv(T &mystring, std::string &encStr) {
 
   std::string empty = "";
 
@@ -299,7 +299,7 @@ static T Riconv(T &mystring, std::string &encStr) {
 }
 
 template <typename T>
-static void writebin(T t, std::fstream& sav, bool swapit)
+inline void writebin(T t, std::fstream& sav, bool swapit)
 {
   if (swapit==1){
     T t_s = swap_endian(t);
@@ -312,7 +312,7 @@ static void writebin(T t, std::fstream& sav, bool swapit)
 
 
 template <typename T>
-static void writestr(std::string val_s, T len, std::fstream& sav)
+inline void writestr(std::string val_s, T len, std::fstream& sav)
 {
 
   std::stringstream val_stream;
@@ -323,11 +323,11 @@ static void writestr(std::string val_s, T len, std::fstream& sav)
 
 }
 
-static std::string b30str (std::string &val_s) {
+inline std::string b30str (std::string &val_s) {
   return std::to_string(std::strtol(val_s.c_str(), NULL, 30));
 }
 
-static int b30int (std::string &val_s) {
+inline int b30int (std::string &val_s) {
   return std::strtol(val_s.c_str(), NULL, 30);
 }
 
