@@ -431,7 +431,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
           miss_val = miss;
         } else {
           // same name as char
-          miss_val = misslen;
+          miss_val = std::to_string(std::strtol(misslen.c_str(), NULL, 30));
         }
 
         // create named char and push back
@@ -729,7 +729,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr)
 
           if (eof) {
             if (debug)
-              Rcout << "End of file found. n is" << n << std::endl;
+              Rcout << "End of file found. n is " << n << std::endl;
             break;
           }
 

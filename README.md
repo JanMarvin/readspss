@@ -14,7 +14,7 @@ Features of the package are
 
 * reading of sav-files
 * reading of zsav-files
-* reading of encrypted files
+* reading of encrypted sav files
 * reading of por-files
 
 Because of the R code wrapped Rcpp function the package is pretty fast. The 
