@@ -313,4 +313,13 @@ static void writestr(std::string val_s, T len, std::fstream& sav)
 
 }
 
+static std::string b30str (std::string &val_s) {
+  return std::to_string(std::strtol(val_s.c_str(), NULL, 30));
+}
+
+static int b30int (std::string &val_s) {
+  return std::strtol(val_s.c_str(), NULL, 30);
+}
+
+
 #endif
