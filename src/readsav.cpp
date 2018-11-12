@@ -79,8 +79,19 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     is_spss = (is_sav == true) || (is_zsav == true);
 
 
-    if (!is_spss)
+
+    if (!is_spss) {
+      std::string fileheader(28, '\0');
+      fileheader = readstring(fileheader, sav);
+
+      fileheader = spss + fileheader;
+
+      if (std::regex_search(fileheader, std::regex("ENCRYPTEDSAV")))
+        stop("The file header indicates that this file is encrypted. "
+              "A password is required to decode this file");
+
       throw std::range_error("Can not read this file. Is it no SPSS sav file?");
+    }
 
     // Textfield 1
     //  SPSS DATA FILE

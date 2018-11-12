@@ -21,6 +21,7 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
+#include <regex>
 
 #include <openssl/aes.h>
 #include <openssl/cmac.h>
@@ -48,9 +49,13 @@ int encryptfile (const char * filePath, std::string &outpath, std::string pass)
   std::ifstream sav(filePath, std::ios::in | std::ios::binary);
   if (sav) {
 
-    // skip the 36-byte header. read part of
-    // this header to make sure it is an sav file
-    sav.seekg(36, ios_base::beg);
+    std::string fileheader(36, '\0');
+    fileheader = readstring(fileheader, sav);
+
+    if (!std::regex_search(fileheader, std::regex("ENCRYPTEDSAV"))) {
+      stop("The file header indicates that it is not an SPSS sav file.");
+    }
+
 
 
     /* Read first ciphertext block and use it to verify the password.  Try the
