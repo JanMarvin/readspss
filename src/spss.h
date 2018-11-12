@@ -115,7 +115,7 @@ inline std::string readstring(std::string &mystring, T& sav)
 {
 
   if (!sav.read(&mystring[0], mystring.size()))
-    Rcpp::warning("char: a binary read error occurred");
+    Rcpp::stop("char: a binary read error occurred");
 
   return(mystring);
 }
@@ -126,7 +126,7 @@ inline std::string readstringsize(std::string &mystring, T& sav, int size)
 {
 
   if (!sav.read(&mystring[0], size))
-    Rcpp::warning("char: a binary read error occurred");
+    Rcpp::stop("char: a binary read error occurred");
 
   return(mystring);
 }
