@@ -20,13 +20,13 @@
  * IN THE SOFTWARE.
  */
 
-#include <assert.h>
 #include <stdint.h>
 #include <string.h>
 
 #include <openssl/aes.h>
 #include <openssl/cmac.h>
 
+#define Rf_assert(cond) if (!(cond)) Rcpp::stop(#cond);
 
 /* Initializes AES from PASSWORD.  Returns true if CIPHERTEXT is the first
  ciphertext block in an encrypted .sav file for PASSWORD, false if PASSWORD
@@ -78,28 +78,28 @@ init(const char *password, const uint8_t ciphertext[16], AES_KEY *aes)
 
   /* cmac = CMAC(padded_password, fixed). */
   ctx = CMAC_CTX_new ();
-  assert (ctx != NULL);
+  Rf_assert (ctx != NULL);
 
   retval = CMAC_Init (ctx, padded_password, sizeof padded_password,
                       EVP_aes_256_cbc (), NULL);
-  assert (retval == 1);
+  Rf_assert (retval == 1);
 
   retval = CMAC_Update (ctx, fixed, sizeof fixed);
-  assert (retval == 1);
+  Rf_assert (retval == 1);
 
   cmac_len = sizeof cmac;
   retval = CMAC_Final (ctx, cmac, &cmac_len);
-  assert (retval == 1);
-  assert (cmac_len == 16);
+  Rf_assert (retval == 1);
+  Rf_assert (cmac_len == 16);
 
   /* The key is the cmac repeated twice. */
   memcpy(key, cmac, 16);
   memcpy(key + 16, cmac, 16);
 
   /* Use key to initialize AES. */
-  assert (sizeof key == 32);
+  Rf_assert (sizeof key == 32);
   retval = AES_set_decrypt_key (key, sizeof key * 8, aes);
-  assert (retval >= 0);
+  Rf_assert (retval >= 0);
 
   /* Check for magic number "$FL" always present in SPSS .sav file. */
   AES_ecb_encrypt (ciphertext, plaintext, aes, AES_DECRYPT);
