@@ -102,7 +102,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
 
     if (!override){
       if (!std::regex_search(spss, std::regex("ASCII SPSS PORT FILE"))) {
-          stop("header indicates file is no spss por file");
+          stop("The file header indicates that it is SPSS por file. "
+               "Use 'override = TRUE' to ignore this check.");
       }
     }
 
