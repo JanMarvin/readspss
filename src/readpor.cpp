@@ -93,44 +93,18 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
 
     int nvarnames = 0, nlabelsetnams = 0;
 
-    // 5 x SPSS PORT FILE
+    // 10 x "ASCII SPSS PORT FILE" in different encodings or all in the same
     // EBCDIC, 7-bit ASCII, CDC 6-bit ASCII, 6-bit ASCII, Honeywell 6-bit
     // ASCII
-    std::string spss (20, '\0');
-    std::string espss1 (20, '\0');
-    std::string spss20 (20, '\0');
-    std::string spss40 (40, '\0');
 
-    // 1
+    std::string spss (200, '\0');
     spss = readstring(spss, por);
 
-    std::string ebcdic = "IBM037"; // EBCDIC
-    std::string cdc = "ASCII";
-
     if (!override){
-      if (spss.compare("ASCII SPSS PORT FILE") != 0) {
-
-        espss1 = Riconv(spss, ebcdic);
-
-        if (espss1.compare("ASCII SPSS PORT FILE") != 0)
+      if (!std::regex_search(spss, std::regex("ASCII SPSS PORT FILE"))) {
           stop("header indicates file is no spss por file");
       }
     }
-
-    spss20 = readstring(spss20, por);
-
-    // 2
-    spss40 = readstring(spss40, por);
-
-    // 3
-    spss40 = readstring(spss40, por);
-
-    // 4
-    spss40 = readstring(spss40, por);
-
-    // 5
-    spss40 = readstring(spss40, por);
-
 
     // Controll characters
     por.seekg(61, std::ios::cur);
