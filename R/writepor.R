@@ -15,14 +15,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-#' read.sav
+#' write.por
 #'
-#' Function to read a SPSS sav file into a data.frame().
-#' @param dat \emph{data.frame} a dat.aframe to strore as sav-file.
+#' !!! EXPERIMENTAL !!! Function to write an SPSS por file.
+#' @param dat \emph{data.frame} a data.frame to export as por-file.
 #' @param filepath \emph{string} full path where and how this file should be
 #'  stored
 #' @param label \emph{character} vector of labels. must be of size `ncol(dat)`
-#' @param compress \emph{logical} should compression be used
 #' @details For now stores data.frames containing numerics only. Nothing else
 #'  aside varnames and numerics are stored.
 #'  Missing values in character cols (<NA>) are written as empty ("").
@@ -30,7 +29,7 @@
 #' @return \code{readspss} returns nothing
 #'
 #' @export
-write.sav <- function(dat, filepath, label, compress = FALSE) {
+write.por <- function(dat, filepath, label) {
 
   filepath <- path.expand(filepath)
 
@@ -59,13 +58,13 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
 
   LONGVAR <- FALSE
 
-  if (all(nchar(nams)<=8) & (identical(toupper(nams), nams))) {
+  # if (all(nchar(nams)<=8) & (identical(toupper(nams), nams))) {
     nams <- toupper(nams)
     nvarnames <- substr(nams, 0, 8)
-  } else {
-    nvarnames <- paste0("VAR", seq_along(nams))
-    LONGVAR <- TRUE
-  }
+  # } else {
+  #   nvarnames <- paste0("VAR", seq_along(nams))
+  #   LONGVAR <- TRUE
+  # }
 
   vtyp <- as.integer(sapply(dat, is.character))
   vtyp[vtyp != 0] <- as.integer(sapply(dat[vtyp!=0],
@@ -129,31 +128,6 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
   nn <- sapply(dat, function(x){is.numeric(x) | is.factor(x)})
   itc <- rep(0, NCOL(dat))
 
-  if (compress) {
-    warning("Compression is not yet implemented")
-    # check if numerics can be stored as integers
-    numToCompress <- sapply(dat[nn], saveToExport)
-
-    if (any(numToCompress)) {
-      saveToConvert <- names(nn[names(numToCompress)])
-      # replace numerics as intergers
-      dat[saveToConvert] <- sapply(dat[saveToConvert], as.integer)
-    }
-
-    ii <- sapply(dat, is.integer)
-    gg <- sapply(dat[ii], function(x) {
-      is.integer(x) & (min(x, na.rm = TRUE) >= -100 &
-                         max(x, na.rm = TRUE) < 151)
-    })
-
-    checkll <- rbind(ii,gg)
-
-    itc <- as.logical(checkll)
-    if (length(gg) > 0)
-      itc <- apply(checkll, 2, all)
-
-  }
-
   cc <- sapply(dat, is.character)
   # ii <<- ii
   # gg <<- gg
@@ -164,7 +138,7 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
   # vtyp <<- vtyp
   # cc <<- cc
 
-  # isnum <- sapply(dat, function(x){is.numeric(x) & !is.integer(x)})
+  isint <- sapply(dat, function(x){is.numeric(x) & is.integer(x)})
 
   # vartypes[which(isnum == TRUE)] <- 253
 
@@ -180,9 +154,12 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
   attr(dat, "labtab") <- labtab
   attr(dat, "itc") <- itc
   attr(dat, "cc") <- cc
+  attr(dat, "isint") <- isint
 
 
-  writesav(filepath, dat, compress)
+  dat <<- dat
+
+  writepor(filepath, dat)
 }
 
 

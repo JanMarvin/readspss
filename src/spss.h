@@ -280,6 +280,126 @@ int dnum(char *p, double &x, int *mv)
 }
 
 
+/*--------------------------------------------------------------------------*/
+/*  pnum1(fd,n)     print integer n to fd (base 30). Update SPSSPtr.        */
+
+static char DIG30[] = {'0','1','2','3','4','5','6','7','8','9',
+                       'A','B','C','D','E','F','G','H','I','J',
+                       'K','L','M','N','O','P','Q','R','S','T'};
+
+inline std::string pnum1(int n)
+{
+  int m,r;
+  char *p;
+  char buf[100];
+
+  std::string val_s;
+
+  if (n < 0) {
+    val_s +="-";
+    n = -n;
+  }
+  p = buf;
+  while (n >= 30) {
+    m = (int) (n / 30);
+    r = n - 30 * m;
+    sprintf(p++,"%c",DIG30[r]);
+    n = m;
+  }
+  val_s += DIG30[n];
+  while (p > buf) {
+    val_s += *--p;
+  }
+
+  return(val_s);
+}
+
+/*--------------------------------------------------------------------------*/
+/*  pfnum(fd,x)     print floating point number x to fd (base 30).          */
+/*                  Update SPSSPtr. Note: x >= 0.0                          */
+
+inline std::string pfnum(double x)
+{
+  int i;
+  double a,b,c,d,e;
+  double EPSI = std::numeric_limits<double>::epsilon();
+
+  std::string val_s;
+
+  if (x == 0)
+    return ("0");
+
+  e = floor(log(x) / log(30.0));
+  b = x / pow(30.0,e);
+  c = floor(b);
+  if (c < 0.0 || c >= 30.0)
+    Rcpp::stop("74"); // no clue what this supposed be
+
+  val_s = DIG30[(int)c];
+  b -= c;
+  if (b > EPSI) {
+    val_s += ".";
+    c = 30.0;
+    for (i = 0; i < 10 ; ++i) {
+      a = b * c;
+      d = floor(a);
+      val_s += DIG30[(int)d];
+      b -= d / c;
+      if (b <= EPSI)
+        break;
+      c *= 30;
+    }
+  }
+  i = (int)e;
+  if (i) {
+    if (i < 0) {
+      val_s += "-";
+      i = -i;
+    }
+    else {
+      val_s += "+";
+    }
+    val_s += pnum1(i);
+  };
+
+  return(val_s);
+}
+
+inline std::string linebreak(const std::string &in)
+{
+  const size_t size = 80;
+
+  std::string out;
+  out.reserve(in.size() + in.size() / size);
+
+  for(std::string::size_type i = 0; i < in.size(); ++i) {
+
+    if (!(i % size) && i) {
+      out.push_back('\n');
+    }
+
+    out.push_back(in[i]);
+  }
+
+  return out;
+}
+
+inline std::string writestr(std::string mystring, bool slash) {
+
+  std::string val;
+
+  val += pnum1(mystring.size());
+  val += "/";
+  val += mystring;
+
+  if (slash)
+    val += "/";
+
+  return(val);
+
+}
+
+
 template <typename T>
 inline T Riconv(T &mystring, std::string &encStr) {
 

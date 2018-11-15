@@ -62,6 +62,16 @@ readsav <- function(filePath, debug, encStr, ownEnc) {
 #'
 #' @param filePath The full systempath to the dta file you want to import.
 #' @param dat the data frame
+#' @import Rcpp
+#' @export
+writepor <- function(filePath, dat) {
+    invisible(.Call(`_readspss_writepor`, filePath, dat))
+}
+
+#' writes the binary SPSS file
+#'
+#' @param filePath The full systempath to the dta file you want to import.
+#' @param dat the data frame
 #' @param compress the file
 #' @import Rcpp
 #' @export
