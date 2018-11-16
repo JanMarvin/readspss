@@ -17,7 +17,9 @@
 
 #' write.por
 #'
-#' !!! EXPERIMENTAL !!! Function to write an SPSS por file.
+#' !!! EXPERIMENTAL !!! Function to write an SPSS por file. Returns an por file
+#' that read.por can read as well as SPSS can. Other packages as foreign,
+#' memisc and haven might fail (fail reading or return wrong values).
 #' @param dat \emph{data.frame} a data.frame to export as por-file.
 #' @param filepath \emph{string} full path where and how this file should be
 #'  stored
