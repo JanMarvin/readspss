@@ -82,7 +82,7 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
     file += "/";
 
     file += "5"; // prec
-    file += "10";
+    file += pnum1(11);
     file += "/";
 
 
@@ -149,10 +149,12 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
     for (int64_t i = 0; i < n; ++i) {
       for (int32_t j = 0; j < k; ++j) {
 
+        Rcpp::checkUserInterrupt();
+
 
         int32_t const type = vtyp[j];
-        Rprintf("vtyp: %d\n", type);
-        Rprintf("k: %d; n: %d\n", j, i);
+        // Rprintf("vtyp: %d\n", type);
+        // Rprintf("k: %d; n: %d\n", j, i);
 
         switch(type)
         {
@@ -192,34 +194,10 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
     }
 
 
-    // double val_d = 0;
-    //
-    // std::string val_s;
-    // val_s = pfnum(val_d);
-    //
-    // Rcout << val_s << std::endl;
-    //
-    // double val_r = 0.0;
-    // int mv = 0;
-    //
-    // dnum(&val_s[0], val_r, &mv);
-    //
-    // Rcout << val_r << std::endl;
-    //
-    //
-    // int val_i = 251;
-    //
-    // val_s = "";
-    // val_s = pnum1(val_i);
-    //
-    // Rcout << val_s << std::endl;
-    //
-    // val_r = 0.0;
-    // mv = 0;
-    //
-    // dnum(&val_s[0], val_r, &mv);
-    //
-    // Rcout << val_r << std::endl;
+    // end with a "Z" even if the line is already
+    // 80 chars long
+    if ( file.size() % 80 == 0)
+      file += "Z";
 
     while ( file.size() % 80 != 0)
       file += "Z";
