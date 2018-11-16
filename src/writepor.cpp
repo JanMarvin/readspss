@@ -48,6 +48,8 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
     Rcpp::CharacterVector nvarnames = dat.attr("nvarnames");
     Rcpp::IntegerVector vartypes = dat.attr("vartypes");
     Rcpp::IntegerVector vtyp = dat.attr("vtyp");
+    std::string timestamp = Rcpp::as<std::string>(dat.attr("timestamp"));
+    std::string datestamp = Rcpp::as<std::string>(dat.attr("datestamp"));
 
 
     std::string file =
@@ -67,11 +69,9 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
 
     file += "A"; // vers
 
-    std::string date = "20181115";
-    file += writestr(date, 0);
+    file += writestr(datestamp, 0);
 
-    std::string time = "195700";
-    file += writestr(time, 0);
+    file += writestr(timestamp, 0);
 
     file += "1";
 

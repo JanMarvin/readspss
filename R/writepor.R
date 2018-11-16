@@ -120,8 +120,9 @@ write.por <- function(dat, filepath, label) {
       collapse = "\t")
 
   systime <- Sys.time()
-  timestamp <- substr(systime, 12, 19)
-  datestamp <- format(Sys.Date(), "%d %b %y")
+  timestamp <- gsub(pattern = ":", replacement = "",
+                    x = substr(systime, 12, 19))
+  datestamp <- format(Sys.Date(), "%Y%m%d")
 
 
   ii <- sapply(dat, is.integer)
