@@ -90,7 +90,7 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
 
       file += "7"; //var
 
-      int vartyp = vartypes(i);
+      int vartyp = vtyp(i);
 
       std::string nvarname = as<std::string>(nvarnames(i));
 
@@ -166,7 +166,7 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
           // Rcout << pfnum(val_d) << std::endl;
 
           if ( ISNA(val_d) ) {
-            file += "*./";
+            file += "*.";
           } else {
             file += pfnum(val_d);
             file += "/";
