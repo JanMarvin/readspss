@@ -110,8 +110,8 @@ write.por <- function(dat, filepath, label) {
 
   vartypes <- fun(vtyp)
 
-  nams <- vector("character", length(vartypes))
-  nams[vartypes > -1] <- nvarnames
+  # nams <- vector("character", length(vartypes))
+  # nams[vartypes > -1] <- nvarnames
 
   nvarnames <- nams
 
