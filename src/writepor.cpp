@@ -99,33 +99,39 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
 
       file += writestr(nvarname, 0);
 
-      int pfmt1 =0, wfmt1 =0;
+      int pfmt1 = 0, wfmt1 = 0;
+      int pfmt2 = 8, wfmt2 = 8;
+      int pfmt3 = 0, wfmt3 = 0;
 
-      // if (vartyp == 0) {
+      if (vartyp == 0) {
         pfmt1 = 5, wfmt1 = 5;
-      // } else {
-      //   pfmt1 = vartyp, wfmt1 = vartyp;
-      // }
+        pfmt2 = 8, wfmt2 = 8;
+        pfmt3 = 2, wfmt3 = 2;
+      } else {
+        pfmt1 = 1, wfmt1 = 1;
+        pfmt2 = 8, wfmt2 = 8;
+        pfmt3 = 0, wfmt3 = 0;
+      }
 
 
       // printfmt
       file += pnum1(pfmt1);
       file += "/";
 
-      file += pnum1(8);
+      file += pnum1(pfmt2);
       file += "/";
 
-      file += pnum1(2);
+      file += pnum1(pfmt3);
       file += "/";
 
       // writefmt
       file += pnum1(wfmt1);
       file += "/";
 
-      file += pnum1(8);
+      file += pnum1(wfmt2);
       file += "/";
 
-      file += pnum1(2);
+      file += pnum1(wfmt3);
       file += "/";
 
     }
