@@ -165,7 +165,7 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
 
           // Rcout << pfnum(val_d) << std::endl;
 
-          if (val_d == NA_REAL) {
+          if ( ISNA(val_d) ) {
             file += "*./";
           } else {
             file += pfnum(val_d);
