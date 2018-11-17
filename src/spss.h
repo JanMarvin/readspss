@@ -364,23 +364,12 @@ inline std::string pfnum(double x)
   return(val_s);
 }
 
-inline std::string linebreak(const std::string &in)
+inline std::string linebreak(std::string& str)
 {
-  const size_t size = 80;
+  for (size_t i = 80; i < str.size(); i += 81)
+    str.insert(i, "\n");
 
-  std::string out;
-  out.reserve(in.size() + in.size() / size);
-
-  for(std::string::size_type i = 0; i < in.size(); ++i) {
-
-    if (!(i % size) && i) {
-      out.push_back('\n');
-    }
-
-    out.push_back(in[i]);
-  }
-
-  return out;
+  return(str);
 }
 
 inline std::string writestr(std::string mystring, bool slash) {

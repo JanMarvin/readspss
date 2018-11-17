@@ -61,11 +61,11 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
 
 
     std::string file =
-      "ASCII SPSS PORT FILE                    "
-      "ASCII SPSS PORT FILE                    "
-      "ASCII SPSS PORT FILE                    "
-      "ASCII SPSS PORT FILE                    "
-      "ASCII SPSS PORT FILE                    "
+      "ASCII SPSS PORT FILE SCII SPSS PORT FILE"
+      "ASCII SPSS PORT FILE SCII SPSS PORT FILE"
+      "ASCII SPSS PORT FILE SCII SPSS PORT FILE"
+      "ASCII SPSS PORT FILE SCII SPSS PORT FILE"
+      "ASCII SPSS PORT FILE SCII SPSS PORT FILE"
       "0000000000000000000000000000000000000000"
       "0000000000000000000000000123456789ABCDEF"
       "GHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrst"
@@ -265,6 +265,7 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
       file += "Z";
 
     file = linebreak(file);
+    file += "\n";
 
     writestr(file, file.size(), por);
 

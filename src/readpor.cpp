@@ -51,9 +51,14 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
       // some EDCDIC file I found is shorter than 80 characters
       // and contains at least a single empty line. Not sure if
       // SPSS causes this or the file host
-      while (input.size() < 81){
+
+      // remove all newline characters \r and \n
+      input.erase( std::remove(input.begin(), input.end(), '\r'), input.end() );
+      input.erase( std::remove(input.begin(), input.end(), '\n'), input.end() );
+
+      while ((input.size() > 1) && (input.size() < 80)) {
         input += " ";
-    }
+      }
       file += input;
     }
 
@@ -62,9 +67,6 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
   }
   por_file.close();
 
-  // remove all newline characters \r and \n
-  file.erase( std::remove(file.begin(), file.end(), '\r'), file.end() );
-  file.erase( std::remove(file.begin(), file.end(), '\n'), file.end() );
 
   por << file;
 
@@ -108,7 +110,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
     spss = readstring(spss, por);
 
     if (!override){
-      if (!std::regex_search(spss, std::regex("ASCII SPSS PORT FILE"))) {
+      if (!std::regex_search(spss, std::regex("ASCII SPSS PORT FILE")) &&
+          !std::regex_search(spss, std::regex("EBCDIC SPSS PORT FILE"))) {
           stop("The file header indicates that it is not an SPSS por file. "
                "Use 'override = TRUE' to ignore this check.");
       }
