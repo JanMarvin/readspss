@@ -47,8 +47,15 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
   std::ifstream por_file(filePath, std::ios::in | std::ios::binary);
   if (por_file) {
 
-    while (getline(por_file, input))
+    while (getline(por_file, input)) {
+      // some EDCDIC file I found is shorter than 80 characters
+      // and contains at least a single empty line. Not sure if
+      // SPSS causes this or the file host
+      while (input.size() < 81){
+        input += " ";
+    }
       file += input;
+    }
 
   } else {
     stop ("No file was read.");

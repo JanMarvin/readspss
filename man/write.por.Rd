@@ -25,7 +25,7 @@ recoded.  Character which can not be mapped in Windows-1252 will be saved as
 hexcode.}
 
 \item{toEncoding}{encoding used for the por file. SPSS itself claims to
-have problems with unicode and por files, so "ISO8859-1" is the default.}
+have problems with unicode and por files, so "CP1252" is the default.}
 }
 \value{
 \code{readspss} returns nothing

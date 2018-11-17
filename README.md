@@ -4,11 +4,11 @@ R package using Rcpp to parse an SPSS file into a data.frame(). Currently
 `read.sav` and `read.por` are the main functions and feature of this package.
 
 It works. Testing is welcome though the package is still at an early stage. Its
-read function is extensively tested on approximately 600+ sav-files and a good
-dozen of por-files. The code is maturing and is frequently tested. The
-read functions imports everything into a data frame. Including long strings
-and labels. Various features such as importing of value label or missings are 
-tested and are working as intended.
+read function is extensively tested on approximately 600+ sav-files and ~100
+por-files. The code is maturing and is frequently tested. The read functions
+imports everything into a data frame. Including long strings and labels. Various
+features such as importing of value label or missings are tested and are working
+as intended.
 
 Features of the package are reading of
 
