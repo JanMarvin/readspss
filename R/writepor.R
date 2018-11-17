@@ -63,8 +63,8 @@ write.por <- function(dat, filepath, label) {
   # if (all(nchar(nams)<=8) & (identical(toupper(nams), nams))) {
     nams <- toupper(nams)
     nvarnames <- substr(nams, 0, 8)
+    names(dat) <- nvarnames
 
-    names(dat) <- nams
   # } else {
   #   nvarnames <- paste0("VAR", seq_along(nams))
   #   LONGVAR <- TRUE
@@ -115,17 +115,6 @@ write.por <- function(dat, filepath, label) {
 
   vartypes <- fun(vtyp)
 
-  # nams <- vector("character", length(vartypes))
-  # nams[vartypes > -1] <- nvarnames
-
-  nvarnames <- nams
-
-  longvarnames <- ""
-  if ((length(nvarnames) > length(names(dat))) | LONGVAR)
-    longvarnames <- paste(
-      paste0(nvarnames[nvarnames!=""], "=", names(dat)),
-      collapse = "\t")
-
   systime <- Sys.time()
   timestamp <- gsub(pattern = ":", replacement = "",
                     x = substr(systime, 12, 19))
@@ -137,14 +126,6 @@ write.por <- function(dat, filepath, label) {
   itc <- rep(0, NCOL(dat))
 
   cc <- sapply(dat, is.character)
-  # ii <<- ii
-  # gg <<- gg
-  #
-  # dat <<- dat
-  # itc <<- itc
-  # vartypes <<- vartypes
-  # vtyp <<- vtyp
-  # cc <<- cc
 
   isint <- sapply(dat, function(x){is.numeric(x) & is.integer(x)})
 
@@ -154,7 +135,6 @@ write.por <- function(dat, filepath, label) {
   attr(dat, "vtyp") <- vtyp
   attr(dat, "vartypes") <- vartypes
   attr(dat, "nvarnames") <- nvarnames
-  attr(dat, "longvarnames") <- longvarnames
   attr(dat, "timestamp") <- timestamp
   attr(dat, "datestamp") <- datestamp
   attr(dat, "label") <- label
