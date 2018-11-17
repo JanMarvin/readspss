@@ -10,12 +10,17 @@ read functions imports everything into a data frame. Including long strings
 and labels. Various features such as importing of value label or missings are 
 tested and are working as intended.
 
-Features of the package is reading of
+Features of the package are reading of
 
 * sav-files,
 * zsav-files,
 * encrypted sav-files and
-* por-files.
+* por-files
+
+and experimental writing support of uncompressed
+
+* sav files,
+* por files.
 
 Because of the R code wrapped Rcpp functions the package is pretty fast. The 
 R code for factor conversion slows things down a bit, changing the encoding a
@@ -32,6 +37,9 @@ itself `readspss` ships additional information provided in the files like the
 data label, date and timestamp.
 
 Reading of sav and por files is considered feature complete.
+
+Writing of uncompressed sav and por files is experimental. Writing compressed
+sav files is currently borked.
 
 ## Installation
 
