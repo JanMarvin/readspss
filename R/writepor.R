@@ -31,22 +31,25 @@
 #'  SPSS expects strings to be encoded as Windows-1252, so all levels will be
 #'  recoded.  Character which can not be mapped in Windows-1252 will be saved as
 #'  hexcode.
+#' @param toEncoding encoding used for the por file. SPSS itself claims to
+#'  have problems with unicode and por files, so "CP1252" is the default.
 #' @details For now stores data.frames containing numerics only. Nothing else
 #'  aside varnames and numerics are stored.
 #'  Missing values in character cols (<NA>) are written as empty ("").
+#'  File will be stored using "CP1252" encoding.
 #'
 #' @return \code{readspss} returns nothing
 #'
 #' @export
 write.por <- function(dat, filepath, label, add.rownames = FALSE,
-                      convert.factors = TRUE) {
+                      convert.factors = TRUE, toEncoding = "CP1252") {
 
   filepath <- path.expand(filepath)
 
   if (missing(filepath))
     stop("need a path")
 
-  attrlab <- attr(dat, "var.label")
+  attrlab <- attr(dat, "label")
 
   if (identical(attrlab, character(0)))
     attrlab <- NULL
@@ -64,29 +67,17 @@ write.por <- function(dat, filepath, label, add.rownames = FALSE,
   if (any(nchar(label))>255)
     stop("longlabels not yet implemented")
 
-
-  toEncoding <- "CP1252"
-
   if (add.rownames) {
-    rwn <- save.encoding(rownames(dat), toEncoding)
-
-    dat <- data.frame(rownames= rwn,
+    dat <- data.frame(rownames= rownames(dat),
                       dat, stringsAsFactors = FALSE)
   }
 
   nams <- names(dat)
 
-  LONGVAR <- FALSE
-
-  # if (all(nchar(nams)<=8) & (identical(toupper(nams), nams))) {
   nams <- toupper(nams)
   nvarnames <- substr(nams, 0, 8)
   names(dat) <- nvarnames
 
-  # } else {
-  #   nvarnames <- paste0("VAR", seq_along(nams))
-  #   LONGVAR <- TRUE
-  # }
 
   if (convert.factors) {
     # If our data.frame contains factors, we create a label.table
@@ -116,16 +107,6 @@ write.por <- function(dat, filepath, label, add.rownames = FALSE,
 
   ff <- which(sapply(dat, is.factor))
 
-  # labtab <- lapply(ff, function(x) {
-  #
-  #   ll <- levels(dat[[x]])
-  #
-  #   x <- as.integer(labels(ll))
-  #   names(x) <- ll
-  #
-  #   x
-  # })
-
   if (identical(unname(ff), integer(0)))
     ff <- unname(ff)
 
@@ -133,7 +114,7 @@ write.por <- function(dat, filepath, label, add.rownames = FALSE,
     stop("Strings longer than 255 characters not yet implemented")
   }
 
-  vtyp <- ceiling(vtyp/8) * 8;
+  vtyp <- ceiling(vtyp/8) * 8
 
   fun <- function(vec) {
 
@@ -169,7 +150,10 @@ write.por <- function(dat, filepath, label, add.rownames = FALSE,
 
   isint <- sapply(dat, function(x){is.numeric(x) & is.integer(x)})
 
-  # vartypes[which(isnum == TRUE)] <- 253
+  for(v in (1:ncol(dat))[vartypes > 0]) {
+    dat[, v] <- save.encoding(dat[, v], toEncoding)
+  }
+  label <- save.encoding(label, toEncoding)
 
 
   attr(dat, "vtyp") <- vtyp
@@ -179,15 +163,9 @@ write.por <- function(dat, filepath, label, add.rownames = FALSE,
   attr(dat, "datestamp") <- datestamp
   attr(dat, "label") <- label
   attr(dat, "haslabel") <- ff
-  # attr(dat, "labtab") <- labtab
   attr(dat, "itc") <- itc
   attr(dat, "cc") <- cc
   attr(dat, "isint") <- isint
 
-  dat <<- dat
-
   writepor(filepath, dat)
 }
-
-
-# write.sav(cars)

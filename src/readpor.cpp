@@ -843,7 +843,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
 
     df.attr("filetime") = ftime;
     df.attr("filedate") = fdate;
-    df.attr("labels") = varlabels;
+    df.attr("label") = varlabels;
     df.attr("missings") = missings;
     df.attr("labtab") = labtab;
     df.attr("vartypes") = vartypes;

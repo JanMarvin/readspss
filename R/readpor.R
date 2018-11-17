@@ -96,20 +96,15 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   }
 
 
-  label    <- attribs$labtab
-  labels   <- attribs$labels
-  labnames <- names(label)
+  labtab    <- attribs$labtab
+  label   <- attribs$label
+  labnames <- names(labtab)
   varnames <- attribs$names
   vartypes <- attribs$vartypes
   fmt      <- attribs$fmt
 
   fmt <- do.call(rbind, fmt)
   attr(data, "fmt") <- fmt
-
-
-  for(v in (1:ncol(data))[vartypes == "character"]) {
-    data[, v] <- save.encoding(data[, v], toEncoding)
-  }
 
 
   # convert NAs by missing information provided by SPSS.
@@ -192,25 +187,32 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     # print(encStr)
 
     # label
-    for (i in seq_along(label))
-      names(label[[i]]) <- read.encoding(names(label[[i]]),
+    for (i in seq_along(labtab))
+      names(labtab[[i]]) <- read.encoding(names(labtab[[i]]),
                                          fromEncoding = encStr,
                                          encoding = ownEnc)
 
-    labels <- read.encoding(labels,
-                            fromEncoding = encStr,
-                            encoding = ownEnc)
+    label <- read.encoding(label,
+                           fromEncoding = encStr,
+                           encoding = ownEnc)
+
+
+    for(v in (1:ncol(data))[vartypes > 0]) {
+      data[, v] <- read.encoding(data[, v],
+                                 fromEncoding = encStr,
+                                 encoding = ownEnc)
+    }
   }
 
 
   # FixME: unsure
   if (convert.factors) {
     # vnames <- names(data)
-    for (i in seq_along(label)) {
+    for (i in seq_along(labtab)) {
 
       labname <- labnames[[i]]
       # vartype <- types[i]
-      labtable <- label[[i]]
+      labtable <- labtab[[i]]
 
       for (j in labname) {
         vartype <- vartypes[which(varnames == j)]
@@ -288,8 +290,8 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   # }
 
 
-  attr(data, "labtab") <- label
-  attr(data, "labels") <- labels
+  attr(data, "labtab") <- labtab
+  attr(data, "label") <- label
 
   if (add.rownames) {
     rownames(data) <- data[[1]]

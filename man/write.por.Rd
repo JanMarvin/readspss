@@ -5,7 +5,7 @@
 \title{write.por}
 \usage{
 write.por(dat, filepath, label, add.rownames = FALSE,
-  convert.factors = TRUE)
+  convert.factors = TRUE, toEncoding = "CP1252")
 }
 \arguments{
 \item{dat}{\emph{data.frame} a data.frame to export as por-file.}
@@ -23,6 +23,9 @@ converted to SPSS variables with labels.
 SPSS expects strings to be encoded as Windows-1252, so all levels will be
 recoded.  Character which can not be mapped in Windows-1252 will be saved as
 hexcode.}
+
+\item{toEncoding}{encoding used for the por file. SPSS itself claims to
+have problems with unicode and por files, so "ISO8859-1" is the default.}
 }
 \value{
 \code{readspss} returns nothing
@@ -36,4 +39,5 @@ memisc and haven might fail (fail reading or return wrong values).
 For now stores data.frames containing numerics only. Nothing else
  aside varnames and numerics are stored.
  Missing values in character cols (<NA>) are written as empty ("").
+ File will be stored using "CP1252" encoding.
 }

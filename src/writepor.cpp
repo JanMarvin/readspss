@@ -146,7 +146,7 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
       file += "/";
 
 
-      if (!Rf_isNull(label) && (Rf_length(haslabel) == k )) {
+      if (!Rf_isNull(label) && (Rf_length(label) == k )) {
 
         if (debug)
           Rcout << "--- C ---" << std::endl;
@@ -254,6 +254,7 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
       }
     }
 
+    // file = Riconv(file, toEncoding);
 
     // end with a "Z" even if the line is already
     // 80 chars long
