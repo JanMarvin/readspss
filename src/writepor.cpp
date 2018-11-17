@@ -50,6 +50,10 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
     Rcpp::IntegerVector vtyp = dat.attr("vtyp");
     std::string timestamp = Rcpp::as<std::string>(dat.attr("timestamp"));
     std::string datestamp = Rcpp::as<std::string>(dat.attr("datestamp"));
+    Rcpp::CharacterVector label = dat.attr("label");
+
+    Rcpp::IntegerVector haslabel = dat.attr("haslabel");
+    Rcpp::List labtab = dat.attr("labtab");
 
 
     std::string file =
@@ -134,7 +138,20 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
       file += pnum1(wfmt3);
       file += "/";
 
+
+      if (!Rf_isNull(haslabel) && (Rf_length(haslabel) > 0)) {
+        file += "C"; //var
+
+        Rcout << Rf_isNull(haslabel) << std::endl;
+
+        std::string lab = as<std::string>(label(i));
+
+        file += writestr(lab,0);
+      }
+
     }
+
+
 
 
     // Rcout << n << " " << k << std::endl;
@@ -165,7 +182,7 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
 
           // Rcout << pfnum(val_d) << std::endl;
 
-          if ( ISNA(val_d) ) {
+          if ( (R_IsNA(val_d)) | R_IsNaN(val_d) | std::isinf(val_d) ) {
             file += "*.";
           } else {
             file += pfnum(val_d);

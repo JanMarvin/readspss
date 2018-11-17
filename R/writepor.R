@@ -84,6 +84,9 @@ write.por <- function(dat, filepath, label) {
     x
   })
 
+  if (identical(unname(ff), integer(0)))
+    ff <- unname(ff)
+
   if (any(vtyp>255)) {
     stop("Strings longer than 255 characters not yet implemented")
   }
