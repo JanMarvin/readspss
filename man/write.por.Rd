@@ -4,7 +4,8 @@
 \alias{write.por}
 \title{write.por}
 \usage{
-write.por(dat, filepath, label)
+write.por(dat, filepath, label, add.rownames = FALSE,
+  convert.factors = TRUE)
 }
 \arguments{
 \item{dat}{\emph{data.frame} a data.frame to export as por-file.}
@@ -13,6 +14,15 @@ write.por(dat, filepath, label)
 stored}
 
 \item{label}{\emph{character} vector of labels. must be of size `ncol(dat)`}
+
+\item{add.rownames}{\emph{logical.} If \code{TRUE}, a new variable rownames
+will be added to the por-file.}
+
+\item{convert.factors}{\emph{logical.} If \code{TRUE}, factors will be
+converted to SPSS variables with labels.
+SPSS expects strings to be encoded as Windows-1252, so all levels will be
+recoded.  Character which can not be mapped in Windows-1252 will be saved as
+hexcode.}
 }
 \value{
 \code{readspss} returns nothing
@@ -20,7 +30,7 @@ stored}
 \description{
 !!! EXPERIMENTAL !!! Function to write an SPSS por file. Returns an por file
 that read.por can read as well as SPSS can. Other packages as foreign,
-memisc and haven might fail (fail reading or return wrong values)
+memisc and haven might fail (fail reading or return wrong values).
 }
 \details{
 For now stores data.frames containing numerics only. Nothing else

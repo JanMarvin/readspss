@@ -190,8 +190,10 @@ inline int getdigit(char *p, int *err)
 // Part of TDA. Program for Transition Data Analysis, written by Goetz Rohwer.
 // Copyright (C) 1989,1991-97 Goetz Rohwer. GPL-2
 inline
-int dnum(char *p, double &x, int *mv)
+double dnum(std::string strng)
 {
+  char *p = &strng[0];
+  double x = 0.0;
   int err;
   int neg = 0;
   int pnt = 0;
@@ -209,13 +211,11 @@ int dnum(char *p, double &x, int *mv)
     p++;
   }
 
-  *mv = 0;
   if (*p == '*') {                /* check for internal missing value */
-    *mv = 1;
     RSPCnt -= 2;
     p += 2;
     x = NA_REAL;
-    return(1);                   // return(p);
+    return(x);
   }
 
   if (*p == '-') {
@@ -239,20 +239,20 @@ int dnum(char *p, double &x, int *mv)
         man += (double) getdigit(p, &err);
 
         if (err) {
-          Rprintf("Unk0: %d\n", q); // digit_err(q)
-          return(0);                // return(NULL);
+          Rcpp::stop("Unk0: %d\n", q);
+          return(0);
         }
         k++;
         if (k > 13)
-          Rprintf("Warning: found entry with %2d (base-30) digits.\n",k);
+          Rcpp::stop("Warning: found entry with %2d (base-30) digits.\n",k);
       }
       else {
         mex *= 30.0;
         mex += (double) getdigit(p, &err);
 
         if (err) {
-          Rprintf("Unk1: %d\n", q); // digit_err(q)
-          return(0);                // return(NULL);
+          Rcpp::stop("Unk1: %d\n", q);
+          return(0);
         }
       }
     }
@@ -274,9 +274,8 @@ int dnum(char *p, double &x, int *mv)
   x = man;
 
   RSPCnt--;
-  // return(++p);
 
-  return(1);
+  return(x);
 }
 
 

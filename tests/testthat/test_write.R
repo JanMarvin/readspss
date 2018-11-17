@@ -76,3 +76,45 @@ test_that("factor", {
 
 unlink("data", recursive = TRUE)
 
+#### test 5 ####
+if (dir.exists("data"))
+  unlink("data", recursive = TRUE)
+
+dir.create("data")
+
+dd <- mtcars
+
+write.por(dd, "data/mtcars.por", add.rownames = TRUE)
+df <- read.por("data/mtcars.por", add.rownames = TRUE)
+
+
+
+test_that("por", {
+  expect_true(all.equal(dd, df, check.attributes = FALSE))
+})
+
+unlink("data", recursive = TRUE)
+
+
+#### test 6 ####
+if (dir.exists("data"))
+  unlink("data", recursive = TRUE)
+
+dir.create("data")
+
+dd <- mtcars
+dd$am <- factor(x = dd$am, levels = c(0,1), labels = c("auto", "man"))
+
+write.por(dd, "data/mtcars1.por", convert.factors = TRUE)
+df1 <- read.por("data/mtcars1.por", convert.factors = TRUE)
+
+write.por(dd, "data/mtcars2.por", convert.factors = FALSE)
+df2 <- read.por("data/mtcars2.por", convert.factors = TRUE)
+df2$AM <- df2$AM -1 # was not stored as factor, but was a factor previous
+
+test_that("por", {
+  expect_true(all.equal(dd, df1, check.attributes = FALSE))
+  expect_true(all.equal(mtcars, df2, check.attributes = FALSE))
+})
+
+unlink("data", recursive = TRUE)

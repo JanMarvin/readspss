@@ -44,6 +44,8 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
   if (por.is_open())
   {
 
+    bool debug = false;
+
 
     Rcpp::CharacterVector nvarnames = dat.attr("nvarnames");
     Rcpp::IntegerVector vartypes = dat.attr("vartypes");
@@ -94,6 +96,9 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
 
     for (int i = 0; i < k; ++i) {
 
+      if (debug)
+        Rcout << "--- 7 ---" << std::endl;
+
       file += "7"; //var
 
       int vartyp = vtyp(i);
@@ -141,7 +146,10 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
       file += "/";
 
 
-      if (!Rf_isNull(haslabel) && (Rf_length(haslabel) > 0)) {
+      if (!Rf_isNull(label) && (Rf_length(haslabel) == k )) {
+
+        if (debug)
+          Rcout << "--- C ---" << std::endl;
 
         file += "C"; //var
 
@@ -153,6 +161,9 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
     }
 
     if (!Rf_isNull(labtabs) && (Rf_length(labtabs) > 0)) {
+
+      if (debug)
+        Rcout << "--- D ---" << std::endl;
 
       file += "D";
 
@@ -174,8 +185,10 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
       // numerics requires pnum1()
       for (int j = 0; j < labtab.size(); ++j) {
 
-        // Rcout << labtab(j) << std::endl; // val
-        // Rcout << labtn(j) << std::endl;  // lab
+        if (debug) {
+          Rcout << labtab(j) << std::endl; // val
+          Rcout << labtn(j) << std::endl;  // lab
+        }
 
         file += pnum1(labtab(j));
         file += "/";
@@ -186,11 +199,12 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
       ++nolabtab;
     }
 
-
-    // stop("debug");
-
     // start data part
     file += "F";
+
+
+    if (debug)
+      Rcout << "--- F ---" << std::endl;
 
 
     for (int64_t i = 0; i < n; ++i) {

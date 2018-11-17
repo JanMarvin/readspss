@@ -24,6 +24,13 @@
 #' @param filepath \emph{string} full path where and how this file should be
 #'  stored
 #' @param label \emph{character} vector of labels. must be of size `ncol(dat)`
+#' @param add.rownames \emph{logical.} If \code{TRUE}, a new variable rownames
+#'  will be added to the por-file.
+#' @param convert.factors \emph{logical.} If \code{TRUE}, factors will be
+#'  converted to SPSS variables with labels.
+#'  SPSS expects strings to be encoded as Windows-1252, so all levels will be
+#'  recoded.  Character which can not be mapped in Windows-1252 will be saved as
+#'  hexcode.
 #' @details For now stores data.frames containing numerics only. Nothing else
 #'  aside varnames and numerics are stored.
 #'  Missing values in character cols (<NA>) are written as empty ("").
@@ -31,7 +38,8 @@
 #' @return \code{readspss} returns nothing
 #'
 #' @export
-write.por <- function(dat, filepath, label) {
+write.por <- function(dat, filepath, label, add.rownames = FALSE,
+                      convert.factors = TRUE) {
 
   filepath <- path.expand(filepath)
 
@@ -56,19 +64,51 @@ write.por <- function(dat, filepath, label) {
   if (any(nchar(label))>255)
     stop("longlabels not yet implemented")
 
+
+  toEncoding <- "CP1252"
+
+  if (add.rownames) {
+    rwn <- save.encoding(rownames(dat), toEncoding)
+
+    dat <- data.frame(rownames= rwn,
+                      dat, stringsAsFactors = FALSE)
+  }
+
   nams <- names(dat)
 
   LONGVAR <- FALSE
 
   # if (all(nchar(nams)<=8) & (identical(toupper(nams), nams))) {
-    nams <- toupper(nams)
-    nvarnames <- substr(nams, 0, 8)
-    names(dat) <- nvarnames
+  nams <- toupper(nams)
+  nvarnames <- substr(nams, 0, 8)
+  names(dat) <- nvarnames
 
   # } else {
   #   nvarnames <- paste0("VAR", seq_along(nams))
   #   LONGVAR <- TRUE
   # }
+
+  if (convert.factors) {
+    # If our data.frame contains factors, we create a label.table
+    factors <- which(sapply(dat, is.factor))
+    f.names <- attr(factors,"names")
+
+    label.table <- vector("list", length(f.names))
+    names(label.table) <- f.names
+
+    i <- 0
+    for (v in factors)  {
+      i <- i + 1
+      f.levels <- save.encoding(levels(dat[[v]]), toEncoding)
+      f.labels <-  as.integer(labels(levels(dat[[v]])))
+      attr(f.labels, "names") <- f.levels
+      f.labels <- f.labels[names(f.labels) != ".."]
+      label.table[[ (f.names[i]) ]] <- f.labels
+    }
+    attr(dat, "labtab") <- rev(label.table)
+  } else {
+    attr(dat, "labtab") <- NULL
+  }
 
   vtyp <- as.integer(sapply(dat, is.character))
   vtyp[vtyp != 0] <- as.integer(sapply(dat[vtyp!=0],
@@ -76,15 +116,15 @@ write.por <- function(dat, filepath, label) {
 
   ff <- which(sapply(dat, is.factor))
 
-  labtab <- lapply(ff, function(x) {
-
-    ll <- levels(dat[[x]])
-
-    x <- as.integer(labels(ll))
-    names(x) <- ll
-
-    x
-  })
+  # labtab <- lapply(ff, function(x) {
+  #
+  #   ll <- levels(dat[[x]])
+  #
+  #   x <- as.integer(labels(ll))
+  #   names(x) <- ll
+  #
+  #   x
+  # })
 
   if (identical(unname(ff), integer(0)))
     ff <- unname(ff)
@@ -139,11 +179,12 @@ write.por <- function(dat, filepath, label) {
   attr(dat, "datestamp") <- datestamp
   attr(dat, "label") <- label
   attr(dat, "haslabel") <- ff
-  attr(dat, "labtab") <- labtab
+  # attr(dat, "labtab") <- labtab
   attr(dat, "itc") <- itc
   attr(dat, "cc") <- cc
   attr(dat, "isint") <- isint
 
+  dat <<- dat
 
   writepor(filepath, dat)
 }

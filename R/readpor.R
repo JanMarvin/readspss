@@ -24,6 +24,8 @@
 #' checked for the ending por. If the fileending is different, nothing is read.
 #' This option can be used to override this behavior.
 #'@param convert.dates \emph{logical}. Should dates be converted on the fly?
+#'@param add.rownames \emph{logical.} If \code{TRUE}, the first column will be
+#'  used as rownames. Variable will be dropped afterwards.
 #'
 #'@details SPSS files are widely available, though for R long time only foreign
 #' and memisc provided functions to import por-files. Lately haven joined.
@@ -44,7 +46,8 @@
 #' @export
 read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
                      encoding = TRUE, fromEncoding = NULL, use.missings = TRUE,
-                     debug = FALSE, override = FALSE, convert.dates = TRUE) {
+                     debug = FALSE, override = FALSE, convert.dates = TRUE,
+                     add.rownames = FALSE) {
 
 
   # Check if path is a url
@@ -84,7 +87,6 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   # import data using an rcpp routine
   data <- readpor(filepath, debug, encStr, override)
 
-
   attribs <- attributes(data)
 
   if (NROW(data) == 0) {
@@ -103,6 +105,11 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   fmt <- do.call(rbind, fmt)
   attr(data, "fmt") <- fmt
+
+
+  for(v in (1:ncol(data))[vartypes == "character"]) {
+    data[, v] <- save.encoding(data[, v], toEncoding)
+  }
 
 
   # convert NAs by missing information provided by SPSS.
@@ -283,6 +290,11 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   attr(data, "labtab") <- label
   attr(data, "labels") <- labels
+
+  if (add.rownames) {
+    rownames(data) <- data[[1]]
+    data[[1]] <- NULL
+  }
 
   # return
   return(data)
