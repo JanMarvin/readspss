@@ -555,6 +555,9 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
           std::string labelsetnam( b30int(labelset), '\0');
           labelsetnam = readstring(labelsetnam, por);
 
+          if (debug)
+            Rcout << labelsetnam << std::endl;
+
           labelsetnams.push_back(labelsetnam);
           ++nlabelsetnams;
 
@@ -562,6 +565,9 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
 
         std::string labelnum;
         labelnum = readtostring(por);
+
+        if (debug)
+          Rcout << labelnum << std::endl;
 
         int labnums = 0;
         labnums = b30int(labelnum);
@@ -585,6 +591,10 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
 
             labval = readtostring(por);
             labtxtlen = readtostring(por);
+
+            if (debug) {
+              Rcout << "l & t: " << labval << " " << labtxtlen << std::endl;
+            }
 
             std::string labtxt ( b30int(labtxtlen), '\0');
             labtxt = readstring(labtxt, por);

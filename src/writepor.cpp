@@ -53,7 +53,9 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
     Rcpp::CharacterVector label = dat.attr("label");
 
     Rcpp::IntegerVector haslabel = dat.attr("haslabel");
-    Rcpp::List labtab = dat.attr("labtab");
+    Rcpp::List labtabs = dat.attr("labtab");
+
+    int nolabtab = 0;
 
 
     std::string file =
@@ -140,9 +142,8 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
 
 
       if (!Rf_isNull(haslabel) && (Rf_length(haslabel) > 0)) {
-        file += "C"; //var
 
-        Rcout << Rf_isNull(haslabel) << std::endl;
+        file += "C"; //var
 
         std::string lab = as<std::string>(label(i));
 
@@ -151,10 +152,39 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
 
     }
 
+    if (!Rf_isNull(labtabs) && (Rf_length(labtabs) > 0)) {
+
+      file += "D";
+
+      // labtabnam
+      Rcpp::CharacterVector labtabnams = labtabs.attr("names");
+      Rcpp::IntegerVector   labtab     = labtabs[nolabtab];
+      Rcpp::CharacterVector labtn      = labtab.attr("names");
+
+      const std::string nlabs = as<std::string>(labtabnams[nolabtab]);
+
+      file += pnum1(1); // nolab
+      file += "/";
+      file += writestr(nlabs, 0); // labelsetnam
+
+      file += pnum1(labtab.size()); // labnums
+      file += "/";
 
 
+      // numerics requires pnum1()
+      for (int j = 0; j < labtab.size(); ++j) {
 
-    // Rcout << n << " " << k << std::endl;
+        // Rcout << labtab(j) << std::endl; // val
+        // Rcout << labtn(j) << std::endl;  // lab
+
+        file += pnum1(labtab(j));
+        file += "/";
+        file += writestr(as<std::string>(labtn(j)), 0);
+
+      }
+
+      ++nolabtab;
+    }
 
 
     // stop("debug");

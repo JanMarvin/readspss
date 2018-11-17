@@ -63,6 +63,8 @@ write.por <- function(dat, filepath, label) {
   # if (all(nchar(nams)<=8) & (identical(toupper(nams), nams))) {
     nams <- toupper(nams)
     nvarnames <- substr(nams, 0, 8)
+
+    names(dat) <- nams
   # } else {
   #   nvarnames <- paste0("VAR", seq_along(nams))
   #   LONGVAR <- TRUE
