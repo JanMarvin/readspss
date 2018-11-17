@@ -145,8 +145,6 @@ write.por <- function(dat, filepath, label) {
   attr(dat, "isint") <- isint
 
 
-  dat <<- dat
-
   writepor(filepath, dat)
 }
 
