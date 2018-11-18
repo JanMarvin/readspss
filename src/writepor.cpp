@@ -20,6 +20,7 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
+#include <locale>
 
 using namespace Rcpp;
 using namespace std;
@@ -40,7 +41,7 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
   int64_t n = dat.nrows();
 
 
-  fstream por (filePath, ios::out | ios::binary);
+  std::ofstream por(filePath, std::ofstream::out | std::ofstream::binary);
   if (por.is_open())
   {
 
@@ -52,6 +53,7 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
     Rcpp::IntegerVector vtyp = dat.attr("vtyp");
     std::string timestamp = Rcpp::as<std::string>(dat.attr("timestamp"));
     std::string datestamp = Rcpp::as<std::string>(dat.attr("datestamp"));
+    std::string toEncoding = Rcpp::as<std::string>(dat.attr("toEncoding"));
     Rcpp::CharacterVector label = dat.attr("label");
 
     Rcpp::IntegerVector haslabel = dat.attr("haslabel");
@@ -254,7 +256,7 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
       }
     }
 
-    // file = Riconv(file, toEncoding);
+    // file = Riconv2(file, toEncoding);
 
     // end with a "Z" even if the line is already
     // 80 chars long
@@ -264,10 +266,15 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
     while ( file.size() % 80 != 0)
       file += "Z";
 
+
     file = linebreak(file);
     file += "\n";
 
-    writestr(file, file.size(), por);
+    // std::locale mylocale("");
+    // por.imbue(mylocale);
+    por << file;
+
+    por.close();
 
   }
 }

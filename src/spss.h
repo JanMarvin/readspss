@@ -408,6 +408,26 @@ inline T Riconv(T &mystring, std::string &encStr) {
 }
 
 template <typename T>
+inline T Riconv2(T &mystring, std::string &encStr) {
+
+  std::string empty = "";
+
+  if (encStr.compare(empty) != 0) {
+
+    Rcpp::Environment base("package:base");
+    Rcpp::Function iconv = base["iconv"];
+
+    mystring = Rcpp::as<T>(
+      iconv(mystring, Rcpp::Named("from", ""), Rcpp::Named("to",encStr))
+    );
+  }
+
+  return(mystring);
+
+}
+
+
+template <typename T>
 inline void writebin(T t, std::fstream& sav, bool swapit)
 {
   if (swapit==1){

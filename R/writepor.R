@@ -90,7 +90,7 @@ write.por <- function(dat, filepath, label, add.rownames = FALSE,
     i <- 0
     for (v in factors)  {
       i <- i + 1
-      f.levels <- save.encoding(levels(dat[[v]]), toEncoding)
+      f.levels <- levels(dat[[v]])
       f.labels <-  as.integer(labels(levels(dat[[v]])))
       attr(f.labels, "names") <- f.levels
       f.labels <- f.labels[names(f.labels) != ".."]
@@ -150,11 +150,6 @@ write.por <- function(dat, filepath, label, add.rownames = FALSE,
 
   isint <- sapply(dat, function(x){is.numeric(x) & is.integer(x)})
 
-  for(v in (1:ncol(dat))[vartypes > 0]) {
-    dat[, v] <- save.encoding(dat[, v], toEncoding)
-  }
-  label <- save.encoding(label, toEncoding)
-
 
   attr(dat, "vtyp") <- vtyp
   attr(dat, "vartypes") <- vartypes
@@ -166,6 +161,7 @@ write.por <- function(dat, filepath, label, add.rownames = FALSE,
   attr(dat, "itc") <- itc
   attr(dat, "cc") <- cc
   attr(dat, "isint") <- isint
+  attr(dat, "toEncoding") <- toEncoding
 
   writepor(filepath, dat)
 }
