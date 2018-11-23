@@ -122,7 +122,6 @@ unlink("data", recursive = TRUE)
 
 #### test 7 ####
 
-
 ### locale test disabled. this breaks constantly on either windows and/or linux
 # if (dir.exists("data"))
 #   unlink("data", recursive = TRUE)
@@ -148,3 +147,18 @@ unlink("data", recursive = TRUE)
 #
 # unlink("data", recursive = TRUE)
 
+#### test 8 ####
+if (dir.exists("data"))
+  unlink("data", recursive = TRUE)
+
+dir.create("data")
+
+dd <- iris
+write.sav(dd, "data/iris.sav")
+df <- read.sav("data/iris.sav")
+
+test_that("factor", {
+  expect_true(all.equal(dd, df, check.attributes = FALSE))
+})
+
+unlink("data", recursive = TRUE)

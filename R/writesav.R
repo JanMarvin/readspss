@@ -84,6 +84,7 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
   })
 
   if (any(vtyp>255)) {
+    message("if you really need this, split the string into segments of 255")
     stop("Strings longer than 255 characters not yet implemented")
   }
 
@@ -130,23 +131,24 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
   itc <- rep(0, NCOL(dat))
 
   if (compress) {
-    warning("Compression is not yet implemented")
+    message("Compression is still experimentel. Testing is welcome!")
     # check if numerics can be stored as integers
     numToCompress <- sapply(dat[nn], saveToExport)
 
     if (any(numToCompress)) {
-      saveToConvert <- names(nn[names(numToCompress)])
+      saveToConvert <- names(numToCompress[numToCompress])
       # replace numerics as intergers
       dat[saveToConvert] <- sapply(dat[saveToConvert], as.integer)
     }
 
-    ii <- sapply(dat, is.integer)
+    ii <- sapply(dat, function(x) { !(is.integer(x) & all(is.na(x))) })
     gg <- sapply(dat[ii], function(x) {
-      is.integer(x) & (min(x, na.rm = TRUE) >= -100 &
-                         max(x, na.rm = TRUE) < 151)
+        is.integer(x) & (min(x, na.rm = TRUE) >= -100 &
+                           max(x, na.rm = TRUE) < 151)
     })
+    gg <- gg[names(ii)]
 
-    checkll <- rbind(ii,gg)
+    checkll <- rbind(ii, gg)
 
     itc <- as.logical(checkll)
     if (length(gg) > 0)
@@ -181,6 +183,8 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
   attr(dat, "itc") <- itc
   attr(dat, "cc") <- cc
 
+  # if (compress == 1)
+  #   dat <<- dat
 
   writesav(filepath, dat, compress)
 }
