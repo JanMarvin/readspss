@@ -119,7 +119,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
       writebin(nmiss, sav, swapit);
 
       int32_t var4;
-      char tmp1[4];
+      char tmp1[4] = "";
       if (subtyp == 0) {
         tmp1[0] = 2;
         tmp1[1] = 8;
@@ -142,7 +142,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
       writebin(var4, sav, 0);
 
       int32_t var5;
-      char tmp2[4];
+      char tmp2[4] = "";
       if (subtyp == 0) {
         tmp2[0] = 2;
         tmp2[1] = 8;
@@ -287,7 +287,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
 
       uint8_t val_b = 0;
       int32_t val_i = 0;
-      double val_d = 0.0;
+      // double val_d = 0.0;
 
 
       Rcpp::List buf;
