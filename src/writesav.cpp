@@ -336,15 +336,15 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
 
             ++iter;
 
-            Rprintf("type: %d\n", type);
+            // Rprintf("type: %d\n", type);
 
             int8_t fills = type/8 - 1;
 
 
             while (fills > 0) {
 
-              Rprintf("fills: %d\n", fills);
-              Rprintf("iter: %d\n", iter);
+              // Rprintf("fills: %d\n", fills);
+              // Rprintf("iter: %d\n", iter);
 
               // fill the chunk
               for (int8_t itr = iter; itr < 8; ++itr) {
@@ -355,16 +355,16 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
                 if (fills == 0)
                   break;
               }
-              Rprintf("fills: %d\n", fills);
+              // Rprintf("fills: %d\n", fills);
 
               // after a full cicle set iter to 0
               if (iter == 7) {
-                Rcout << "full chunk: writing" << std::endl;
+                // Rcout << "full chunk: writing" << std::endl;
                 std::memcpy(&chunk, chnk, sizeof(double));
                 writebin(chunk, sav, swapit);
                 iter = 0;
               } else {
-                Rcout << "unfull chunk: writing" << std::endl;
+                // Rcout << "unfull chunk: writing" << std::endl;
                 // reset chnk
                 for (int8_t itr = iter; itr < 8; ++itr) {
                   chnk[itr] = 0;
@@ -394,6 +394,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
 
           // compression val_b
           if ((type == 0) & (ITC == 1) & (CC == 0)) {
+
             val_i =  Rcpp::as<Rcpp::IntegerVector>(dat[j])[i];
 
             val_b = val_i + 100; // add bias
