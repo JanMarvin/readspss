@@ -345,7 +345,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
           if ((type >= 0)  & (ITC == 0) & (CC == 1)) {
             string val_s = as<string>(as<CharacterVector>(dat[j])[i]);
 
-            val_s.resize(type);
+            val_s.resize(type, ' ');
 
             // beginn: prior to writing a string: clear chunk
             if (iter > 0) {
@@ -405,7 +405,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
                 buf_s.push_back(val_s.substr(pos, 8));
 
 
-                Rprintf("itr: %d\n", itr);
+                // Rprintf("itr: %d\n", itr);
                 // if (itr == 0)
                   chnk[itr] = 253;
                 // else
@@ -418,18 +418,18 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
                 if (fills == 0)
                   break;
               }
-              Rprintf("fills: %d\n", fills);
-              Rprintf("iter: %d\n", iter);
+              // Rprintf("fills: %d\n", fills);
+              // Rprintf("iter: %d\n", iter);
 
               // after a full cicle set iter to 0
               if (iter == 7) {
-                Rcout << "full chunk: writing" << std::endl;
+                // Rcout << "full chunk: writing" << std::endl;
                 std::memcpy(&chunk, chnk, sizeof(double));
                 writebin(chunk, sav, swapit);
                 iter = 0;
 
               } else {
-                Rcout << "unfull chunk: writing" << std::endl;
+                // Rcout << "unfull chunk: writing" << std::endl;
                 // reset chnk
                 for (int8_t itr = iter; itr < 8; ++itr) {
                   chnk[itr] = 0;
@@ -444,7 +444,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
               if (buf_s_size>0) {
                 for (auto ib = 0; ib < buf_s_size; ++ib) {
                   std::string vs = buf_s[ib];
-                  Rcout << vs << std::endl;
+                  // Rcout << vs << std::endl;
                   writestr(vs, 8, sav);
                 }
                 buf_s.clear();
