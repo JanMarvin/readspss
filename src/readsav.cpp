@@ -292,7 +292,8 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
           vallabel = std::regex_replace(vallabel,
                                         std::regex("^ +| +$"), "$1");
 
-          vallabels.push_back(vallabel);
+          if (vtype > -1) // -1 is of no further useage
+            vallabels.push_back(vallabel);
         }
 
         // -----------------------------------------
