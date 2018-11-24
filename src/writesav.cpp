@@ -298,7 +298,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
 
       Rcpp::List buf;
       std::vector<double> buf_d;
-      // std::vector<std::string> buf_s;
+      std::vector<std::string> buf_s;
 
       for (int64_t i = 0; i < n; ++i) {
         for (int32_t j = 0; j < kk; ++j) {
@@ -345,8 +345,10 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
           if ((type >= 0)  & (ITC == 0) & (CC == 1)) {
             string val_s = as<string>(as<CharacterVector>(dat[j])[i]);
 
+            val_s.resize(type);
+
+            // beginn: prior to writing a string: clear chunk
             if (iter > 0) {
-              // beginn: prior to writing a string: clear chunk
               for (int8_t itr = iter; itr < 8; ++itr) {
                 chnk[itr] = 0;
               }
@@ -374,14 +376,20 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
 
             // end
 
-            chnk[iter] = 253;
+            // begin writing of the string
 
-            ++iter;
+            int8_t fills = type/8;
 
-            // Rcout << val_s << std::endl;
+            // Rprintf("type: %d\n", type);
+            // Rprintf("fills: %d\n", fills);
 
-            int8_t fills = type/8 - 1;
 
+            // chnk[iter] = 253;
+            //
+            // ++iter;
+            // --fills;
+
+            int totiter = 0;
 
             while (fills > 0) {
 
@@ -390,23 +398,38 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
 
               // fill the chunk
               for (int8_t itr = iter; itr < 8; ++itr) {
-                chnk[itr] = 253;
+
+                int pos = totiter * 8;
+
+
+                buf_s.push_back(val_s.substr(pos, 8));
+
+
+                Rprintf("itr: %d\n", itr);
+                // if (itr == 0)
+                  chnk[itr] = 253;
+                // else
+                //   chnk[itr] = 254;
+
                 ++iter;
+                ++totiter;
                 --fills;
 
                 if (fills == 0)
                   break;
               }
-              // Rprintf("fills: %d\n", fills);
+              Rprintf("fills: %d\n", fills);
+              Rprintf("iter: %d\n", iter);
 
               // after a full cicle set iter to 0
               if (iter == 7) {
-                // Rcout << "full chunk: writing" << std::endl;
+                Rcout << "full chunk: writing" << std::endl;
                 std::memcpy(&chunk, chnk, sizeof(double));
                 writebin(chunk, sav, swapit);
                 iter = 0;
+
               } else {
-                // Rcout << "unfull chunk: writing" << std::endl;
+                Rcout << "unfull chunk: writing" << std::endl;
                 // reset chnk
                 for (int8_t itr = iter; itr < 8; ++itr) {
                   chnk[itr] = 0;
@@ -416,20 +439,31 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
                 iter = 0;
               }
 
-            }
+              int buf_s_size = buf_s.size();
 
-            if (type == 8) {
-              std::memcpy(&chunk, chnk, sizeof(double));
-              writebin(chunk, sav, swapit);
-
-              // reset chnk
-              for (int8_t itr = 0; itr < 8; ++itr) {
-                chnk[itr] = 0;
+              if (buf_s_size>0) {
+                for (auto ib = 0; ib < buf_s_size; ++ib) {
+                  std::string vs = buf_s[ib];
+                  Rcout << vs << std::endl;
+                  writestr(vs, 8, sav);
+                }
+                buf_s.clear();
               }
+
             }
 
+            // if (type == 8) {
+            //   std::memcpy(&chunk, chnk, sizeof(double));
+            //   writebin(chunk, sav, swapit);
+            //
+            //   // reset chnk
+            //   for (int8_t itr = 0; itr < 8; ++itr) {
+            //     chnk[itr] = 0;
+            //   }
+            //   writestr(val_s, type, sav);
+            // }
 
-            writestr(val_s, type, sav);
+
 
             iter = 0;
           }
