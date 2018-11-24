@@ -57,6 +57,19 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
 
   nams <- names(dat)
 
+  # get labtab prior to any modification due to string sizes
+  ff <- which(sapply(dat, is.factor))
+
+  labtab <- lapply(ff, function(x) {
+
+    ll <- levels(dat[[x]])
+
+    x <- as.integer(labels(ll))
+    names(x) <- ll
+
+    x
+  })
+
   LONGVAR <- FALSE
 
   if (all(nchar(nams)<=8) & (identical(toupper(nams), nams))) {
@@ -71,17 +84,6 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
   vtyp[vtyp != 0] <- as.integer(sapply(dat[vtyp!=0],
                                        function(x) max(nchar(x), na.rm = TRUE)))
 
-  ff <- which(sapply(dat, is.factor))
-
-  labtab <- lapply(ff, function(x) {
-
-    ll <- levels(dat[[x]])
-
-    x <- as.integer(labels(ll))
-    names(x) <- ll
-
-    x
-  })
 
   if (any(vtyp>255)) {
     message("if you really need this, split the string into segments of 255")
@@ -114,6 +116,18 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
   nams[vartypes > -1] <- nvarnames
 
   nvarnames <- nams
+
+  # update factor position with new varnames
+  nvm <- nvarnames[nvarnames!=""]
+  pos <- which(nvarnames != "")
+
+  ff <- sapply(ff, function(x){
+    # newnam <- nvm[x]
+    x <- pos[x]
+    # names(x) <- newnam
+
+    x
+  })
 
   longvarnames <- ""
   if ((length(nvarnames) > length(names(dat))) | LONGVAR)
