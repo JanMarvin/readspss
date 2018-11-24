@@ -278,29 +278,29 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
           # else generate labels from codes
         } else {
-          if (generate.factors) {
-
-            names(varunique) <- as.character(varunique)
-
-            gen.lab  <-
-              sort(c(varunique[!varunique %in% labtable], labtable),
-                   na.last = TRUE)
-
-            if (isNum) {
-              nam <- names(gen.lab)
-              gen.lab <- as.numeric(gen.lab)
-              names(gen.lab) <- nam
-            }
-
-            data[[varname]] <- fast_factor(data[[varname]], y = gen.lab)
-          } else {
+          # if (generate.factors) {
+          #
+          #   names(varunique) <- as.character(varunique)
+          #
+          #   gen.lab  <-
+          #     sort(c(varunique[!varunique %in% labtable], labtable),
+          #          na.last = TRUE)
+          #
+          #   if (isNum) {
+          #     nam <- names(gen.lab)
+          #     gen.lab <- as.numeric(gen.lab)
+          #     names(gen.lab) <- nam
+          #   }
+          #
+          #   data[[varname]] <- fast_factor(data[[varname]], y = gen.lab)
+          # } else {
             warning(
               paste(
                 names(data)[i], "Missing factor labels - no labels assigned.
                 Set option generate.factors=T to generate labels."
               )
             )
-          }
+          # }
         }
       }
     }
