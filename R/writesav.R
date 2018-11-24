@@ -121,13 +121,15 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
   nvm <- nvarnames[nvarnames!=""]
   pos <- which(nvarnames != "")
 
-  ff <- sapply(ff, function(x){
-    # newnam <- nvm[x]
-    x <- pos[x]
-    # names(x) <- newnam
+  if (length(ff)>0)  {
+    ff <- sapply(ff, function(x){
+      # newnam <- nvm[x]
+      x <- pos[x]
+      # names(x) <- newnam
 
-    x
-  })
+      x
+    })
+  }
 
   longvarnames <- ""
   if ((length(nvarnames) > length(names(dat))) | LONGVAR)
