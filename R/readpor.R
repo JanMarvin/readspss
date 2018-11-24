@@ -249,7 +249,7 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
             if (isNum) {
               nam <- names(gen.lab)
-              gen.lab <- strtoi(gen.lab, 30)
+              gen.lab <- as.integer(gen.lab)
               names(gen.lab) <- nam
             }
 
