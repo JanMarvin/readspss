@@ -140,6 +140,9 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
 
           REAL(VECTOR_ELT(df,kk))[nn] = val_b - 100;
 
+          if (debug)
+            Rprintf("val_b: %d\n", val_b - 100);
+
           break;
         }
 
@@ -163,6 +166,9 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
                                        std::regex(" +$"), "$1");
 
             Rcpp::as<Rcpp::CharacterVector>(df[kk])[nn] = start;
+
+            if (debug)
+              Rcpp::Rcout << start << std::endl;
 
             // string completly written, reset start and res_i
             // and switch to next cell
@@ -208,7 +214,10 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
             val_d = NA_REAL;
 
           REAL(VECTOR_ELT(df,kk))[nn] = val_d;
-          // Rprintf("%f \n", val_d);
+
+          if (debug)
+            Rprintf("%f \n", val_d);
+
           break;
         }
 
@@ -242,6 +251,9 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
                                        std::regex(" +$"), "$1");
 
             Rcpp::as<Rcpp::CharacterVector>(df[kk])[nn] = start;
+
+            if (debug)
+              Rcpp::Rcout << start << std::endl;
 
             // reset
             start = "";
@@ -283,6 +295,9 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
                                      std::regex(" +$"), "$1");
 
           Rcpp::as<Rcpp::CharacterVector>(df[kk])[nn] = start;
+
+          if (debug)
+            Rcpp::Rcout << start << std::endl;
 
           // reset start
           start = "";
