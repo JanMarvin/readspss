@@ -332,15 +332,18 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
 
           // write compressed
           if ((type == 0)  & (ITC == 0) & (CC == 0)) {
-            flush_type[iter] = 1;
 
             const double val_d = Rcpp::as<Rcpp::NumericVector>(dat[j])[i];
 
-            buf_d.push_back(val_d);
 
-            // Rprintf("val_d: %f\n", val_d);
+            flush_type[iter] = 0;
+            chnk[iter] = 255;
 
-            chnk[iter] = 253;
+            if (!( (R_IsNA(val_d)) | R_IsNaN(val_d) | std::isinf(val_d) )) {
+              buf_d.push_back(val_d);
+              flush_type[iter] = 1;
+              chnk[iter] = 253;
+            }
 
             ++iter;
           }
@@ -373,11 +376,19 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
 
                 int pos = totiter * 8;
 
+                int strt = 253, strl = 8;
 
-                buf_s.push_back(val_s.substr(pos, 8));
+                if (pos == 248)
+                  strl = 7;
+
+                // if (pos == 256)
+                //   strt = 254;
+
+
+                buf_s.push_back(val_s.substr(pos, strl));
                 flush_type[iter] = 2;
 
-                chnk[iter] = 253;
+                chnk[iter] = strt;
 
                 ++iter;
                 ++totiter;

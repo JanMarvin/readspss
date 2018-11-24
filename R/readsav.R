@@ -24,6 +24,8 @@
 #' checked for the ending sav. If the fileending is different, nothing is read.
 #' This option can be used to override this behavior.
 #'@param convert.dates \emph{logical}. Should dates be converted on the fly?
+#'@param add.rownames \emph{logical.} If \code{TRUE}, the first column will be
+#'  used as rownames. Variable will be dropped afterwards.
 #'@param pass \emph{character}. If encrypted sav should be imported, this is a
 #' maximum of ten character encryption key.
 #'
@@ -92,7 +94,7 @@
 read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
                      encoding = TRUE, fromEncoding = NULL, use.missings = TRUE,
                      debug = FALSE, override = FALSE, convert.dates = TRUE,
-                     pass) {
+                     add.rownames = FALSE, pass) {
 
   # Check if path is a url
   if (length(grep("^(http|ftp|https)://", file))) {
@@ -278,29 +280,29 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
           # else generate labels from codes
         } else {
-          # if (generate.factors) {
-          #
-          #   names(varunique) <- as.character(varunique)
-          #
-          #   gen.lab  <-
-          #     sort(c(varunique[!varunique %in% labtable], labtable),
-          #          na.last = TRUE)
-          #
-          #   if (isNum) {
-          #     nam <- names(gen.lab)
-          #     gen.lab <- as.numeric(gen.lab)
-          #     names(gen.lab) <- nam
-          #   }
-          #
-          #   data[[varname]] <- fast_factor(data[[varname]], y = gen.lab)
-          # } else {
+          if (generate.factors) {
+
+            names(varunique) <- as.character(varunique)
+
+            gen.lab  <-
+              sort(c(varunique[!varunique %in% labtable], labtable),
+                   na.last = TRUE)
+
+            if (isNum) {
+              nam <- names(gen.lab)
+              gen.lab <- as.numeric(gen.lab)
+              names(gen.lab) <- nam
+            }
+
+            data[[varname]] <- fast_factor(data[[varname]], y = gen.lab)
+          } else {
             warning(
               paste(
                 names(data)[i], "Missing factor labels - no labels assigned.
                 Set option generate.factors=T to generate labels."
               )
             )
-          # }
+          }
         }
       }
     }
@@ -527,6 +529,11 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   attr(data, "autoenc")   <- attribs$autoenc
   attr(data, "doenc")     <- attribs$doenc
 
+
+  if (add.rownames) {
+    rownames(data) <- data[[1]]
+    data[[1]] <- NULL
+  }
 
   # return
   return(data)

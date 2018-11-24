@@ -2,9 +2,9 @@
 % Please edit documentation in R/writesav.R
 \name{write.sav}
 \alias{write.sav}
-\title{read.sav}
+\title{write.sav}
 \usage{
-write.sav(dat, filepath, label, compress = FALSE)
+write.sav(dat, filepath, label, add.rownames = FALSE, compress = FALSE)
 }
 \arguments{
 \item{dat}{\emph{data.frame} a dat.aframe to strore as sav-file.}
@@ -12,18 +12,22 @@ write.sav(dat, filepath, label, compress = FALSE)
 \item{filepath}{\emph{string} full path where and how this file should be
 stored}
 
-\item{label}{\emph{character} vector of labels. must be of size `ncol(dat)`}
+\item{label}{\emph{character} if any provided this must be a vector of
+labels. It must be of size `ncol(dat)`}
 
-\item{compress}{\emph{logical} should compression be used}
+\item{add.rownames}{\emph{logical.} If \code{TRUE}, a new variable rownames
+will be added to the por-file.}
+
+\item{compress}{\emph{logical} should compression be used. If TRUE some
+integers will be stored more efficiently. Everything will be stored in
+chunks of 8 chars. Reduces memory size of sav-file.}
 }
 \value{
 \code{readspss} returns nothing
 }
 \description{
-Function to read a SPSS sav file into a data.frame().
+Function to write an SPSS sav file from a data.frame().
 }
 \details{
-For now stores data.frames containing numerics only. Nothing else
- aside varnames and numerics are stored.
- Missing values in character cols (<NA>) are written as empty ("").
+Strings longer than 255 chars are not provided.
 }

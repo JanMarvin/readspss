@@ -154,7 +154,7 @@ if (dir.exists("data"))
 dir.create("data")
 
 dd <- iris
-write.sav(dd, "data/iris.sav")
+write.sav(dd, "data/iris.sav", compress = TRUE)
 df <- read.sav("data/iris.sav")
 
 test_that("factor", {

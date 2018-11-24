@@ -33,9 +33,7 @@
 #'  hexcode.
 #' @param toEncoding encoding used for the por file. SPSS itself claims to
 #'  have problems with unicode and por files, so "CP1252" is the default.
-#' @details For now stores data.frames containing numerics only. Nothing else
-#'  aside varnames and numerics are stored.
-#'  Missing values in character cols (<NA>) are written as empty ("").
+#' @details Strings longer than 255 chars are not provided.
 #'  File will be stored using "CP1252" encoding.
 #'
 #' @return \code{readspss} returns nothing

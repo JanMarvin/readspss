@@ -15,22 +15,26 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-#' read.sav
+#' write.sav
 #'
-#' Function to read a SPSS sav file into a data.frame().
+#' Function to write an SPSS sav file from a data.frame().
 #' @param dat \emph{data.frame} a dat.aframe to strore as sav-file.
 #' @param filepath \emph{string} full path where and how this file should be
 #'  stored
-#' @param label \emph{character} vector of labels. must be of size `ncol(dat)`
-#' @param compress \emph{logical} should compression be used
-#' @details For now stores data.frames containing numerics only. Nothing else
-#'  aside varnames and numerics are stored.
-#'  Missing values in character cols (<NA>) are written as empty ("").
+#' @param label \emph{character} if any provided this must be a vector of
+#'  labels. It must be of size `ncol(dat)`
+#' @param add.rownames \emph{logical.} If \code{TRUE}, a new variable rownames
+#'  will be added to the por-file.
+#' @param compress \emph{logical} should compression be used. If TRUE some
+#'  integers will be stored more efficiently. Everything will be stored in
+#'  chunks of 8 chars. Reduces memory size of sav-file.
+#' @details Strings longer than 255 chars are not provided.
 #'
 #' @return \code{readspss} returns nothing
 #'
 #' @export
-write.sav <- function(dat, filepath, label, compress = FALSE) {
+write.sav <- function(dat, filepath, label, add.rownames = FALSE,
+                      compress = FALSE) {
 
   filepath <- path.expand(filepath)
 
@@ -54,6 +58,11 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
 
   if (any(nchar(label))>255)
     stop("longlabels not yet implemented")
+
+  if (add.rownames) {
+    dat <- data.frame(rownames= rownames(dat),
+                      dat, stringsAsFactors = FALSE)
+  }
 
   nams <- names(dat)
 
@@ -92,6 +101,8 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
 
   vtyp <- ceiling(vtyp/8) * 8;
 
+  vtyp[vtyp > 255] <- 255
+
   fun <- function(vec) {
 
     vartypes <- NULL
@@ -111,6 +122,8 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
   }
 
   vartypes <- fun(vtyp)
+
+  vartypes[vartypes > 255] <- 255
 
   nams <- vector("character", length(vartypes))
   nams[vartypes > -1] <- nvarnames

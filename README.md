@@ -2,6 +2,8 @@
 
 R package using Rcpp to parse an SPSS file into a data.frame(). Currently 
 `read.sav` and `read.por` are the main functions and feature of this package.
+Writing of SPSS files is provided by `write.por` and `write.sav`. Writing is
+limited to uncompressed por and sav files and to compressed sav file.
 
 It works. Testing is welcome though the package is still at an early stage. Its
 read function is extensively tested on approximately 600+ sav-files and ~100
@@ -17,7 +19,7 @@ Features of the package are reading of
 * encrypted sav-files and
 * por-files
 
-and experimental writing support of uncompressed
+and experimental writing support of (un)compressed
 
 * sav files,
 * por files.
@@ -38,8 +40,9 @@ data label, date and timestamp.
 
 Reading of sav and por files is considered feature complete.
 
-Writing of uncompressed sav and por files is experimental. Writing compressed
-sav files is currently borked.
+Writing of (un)compressed sav and por files is experimental. Unsupported 
+features are reading and writing of dates, writing of long strings and zsav
+files.
 
 ## Installation
 

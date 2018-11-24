@@ -6,7 +6,8 @@
 \usage{
 read.sav(file, convert.factors = TRUE, generate.factors = TRUE,
   encoding = TRUE, fromEncoding = NULL, use.missings = TRUE,
-  debug = FALSE, override = FALSE, convert.dates = TRUE, pass)
+  debug = FALSE, override = FALSE, convert.dates = TRUE,
+  add.rownames = FALSE, pass)
 }
 \arguments{
 \item{file}{\emph{string} a sav-file to import. can be a file on a computer
@@ -40,6 +41,9 @@ checked for the ending sav. If the fileending is different, nothing is read.
 This option can be used to override this behavior.}
 
 \item{convert.dates}{\emph{logical}. Should dates be converted on the fly?}
+
+\item{add.rownames}{\emph{logical.} If \code{TRUE}, the first column will be
+used as rownames. Variable will be dropped afterwards.}
 
 \item{pass}{\emph{character}. If encrypted sav should be imported, this is a
 maximum of ten character encryption key.}

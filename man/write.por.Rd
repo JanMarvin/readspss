@@ -36,8 +36,6 @@ that read.por can read as well as SPSS can. Other packages as foreign,
 memisc and haven might fail (fail reading or return wrong values).
 }
 \details{
-For now stores data.frames containing numerics only. Nothing else
- aside varnames and numerics are stored.
- Missing values in character cols (<NA>) are written as empty ("").
+Strings longer than 255 chars are not provided.
  File will be stored using "CP1252" encoding.
 }
