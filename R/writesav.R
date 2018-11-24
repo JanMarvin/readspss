@@ -131,7 +131,7 @@ write.sav <- function(dat, filepath, label, compress = FALSE) {
   itc <- rep(0, NCOL(dat))
 
   if (compress) {
-    message("Compression is still experimentel. Testing is welcome!")
+    message("Compression is still experimental. Testing is welcome!")
     # check if numerics can be stored as integers
     numToCompress <- sapply(dat[nn], saveToExport)
 
