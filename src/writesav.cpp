@@ -36,7 +36,7 @@ using namespace std;
 // [[Rcpp::export]]
 void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
 {
-  int32_t k = dat.size();
+  int32_t kk = dat.size(), k = 0;
   int64_t n = dat.nrows();
 
 
@@ -64,12 +64,18 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
     std::string datestamp = Rcpp::as<std::string>(dat.attr("datestamp"));
     std::string longvarname = Rcpp::as<std::string>(dat.attr("longvarnames"));
 
+    // write correct k for string variables with nchar() > 8
+    if (nvarnames.size() > kk)
+      k = nvarnames.size();
+    else
+      k = kk;
 
+    // Rprintf("k is: %d - kk is: %d\n", k, kk);
 
     std::string spss = "$FL2@(#)";
     writestr(spss, spss.size(), sav);
 
-    std::string datalabel = "readspss 0.3.5";
+    std::string datalabel = "readspss 0.8.1";
     writestr(datalabel, 56, sav);
 
     int32_t arch = 2;
@@ -294,7 +300,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
       std::vector<double> buf_d;
 
       for (int64_t i = 0; i < n; ++i) {
-        for (int32_t j = 0; j < k; ++j) {
+        for (int32_t j = 0; j < kk; ++j) {
 
 
           int32_t const type = vtyp[j];
@@ -468,7 +474,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
           }
 
           // write end of file
-          if ((i == n-1) & (j == k -1)) {
+          if ((i == n-1) & (j == kk -1)) {
 
 
             // write final doubles
@@ -518,7 +524,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
     } else {
 
       for (int64_t i = 0; i < n; ++i) {
-        for (int32_t j = 0; j < k; ++j) {
+        for (int32_t j = 0; j < kk; ++j) {
 
           int32_t const type = vtyp[j];
 
