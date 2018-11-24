@@ -358,6 +358,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
               for (int8_t itr = 0; itr < 8; ++itr) {
                 chnk[itr] = 0;
               }
+              iter = 0;
             }
 
             // check if any doubles need to be written
