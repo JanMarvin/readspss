@@ -62,20 +62,7 @@ std::string read_sav_uncompress (std::istream& sav,
     c_ofs[i]     = readbin(compr_ofs, sav, swapit);
     u_size[i]  = readbin(uncompr_size, sav, swapit);
     c_size[i]    = readbin(compr_size, sav, swapit);
-
-    // // debug
-    // Rprintf("1: %d\n", zheader_ofs);
-    // Rprintf("2: %d\n", ztrailer_ofs);
-    // Rprintf("3: %d\n", ztrailer_len);
-    // Rprintf("4: %d\n", n_blocks);
-    //
-    // Rprintf("1: %d\n", uncompr_ofs);
-    // Rprintf("2: %d\n", compr_ofs);
-    // Rprintf("3: %d\n", uncompr_size);
-    // Rprintf("4: %d\n", compr_size);
-
   }
-  // Rcpp::stop("stop");
 
 
   // write to temporary file
@@ -87,8 +74,6 @@ std::string read_sav_uncompress (std::istream& sav,
     sav.seekg(c_ofs[i], std::ios_base::beg);
 
     // Bytef is unsigned char *
-    // Bytef compr_block[c_size[i]];
-    // Bytef uncompr_block[u_size[i]];
     std::vector<unsigned char>   compr_block(c_size[i]);
     std::vector<unsigned char> uncompr_block(u_size[i]);
 
