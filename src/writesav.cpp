@@ -124,6 +124,8 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
       int32_t nmiss = 0;
       writebin(nmiss, sav, swapit);
 
+      int_chars c;
+
       int32_t var4;
       char tmp1[4] = "";
       if (subtyp == 0) {
@@ -143,8 +145,12 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
         tmp1[3] = 0;
       }
 
-      var4 = ((int8_t)tmp1[3] << 24) | ((int8_t)tmp1[2] << 16) |
-        ((int8_t)tmp1[1] << 8) | (int8_t)tmp1[0];
+      c.b[0] = tmp1[0];
+      c.b[1] = tmp1[1];
+      c.b[2] = tmp1[2];
+      c.b[3] = tmp1[3];
+
+      var4 = c.a;
       writebin(var4, sav, 0);
 
       int32_t var5;
@@ -166,8 +172,12 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
         tmp2[3] = 0;
       }
 
-      var5 = ((int8_t)tmp2[3] << 24) | ((int8_t)tmp2[2] << 16) |
-        ((int8_t)tmp2[1] << 8) | (int8_t)tmp2[0];
+      c.b[0] = tmp2[0];
+      c.b[1] = tmp2[1];
+      c.b[2] = tmp2[2];
+      c.b[3] = tmp2[3];
+
+      var5 = c.a;
       writebin(var5, sav, 0);
 
       std::string nvarname = Rcpp::as<std::string>(nvarnames[i]);

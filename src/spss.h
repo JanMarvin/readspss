@@ -460,5 +460,10 @@ inline int b30int (std::string &val_s) {
   return std::strtol(val_s.c_str(), NULL, 30);
 }
 
+union int_chars {
+  int a;
+  char b[4];
+};
+
 
 #endif
