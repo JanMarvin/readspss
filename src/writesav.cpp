@@ -139,9 +139,9 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
         tmp1[2] = 1;
         tmp1[3] = 0;
       } else if (subtyp == -1) {
-        tmp1[0] = 0;
-        tmp1[1] = 0;
-        tmp1[2] = 0;
+        tmp1[0] = 1;
+        tmp1[1] = 29;
+        tmp1[2] = 1;
         tmp1[3] = 0;
       }
 
@@ -166,9 +166,9 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
         tmp2[2] = 1;
         tmp2[3] = 0;
       } else if (subtyp == -1) {
-        tmp2[0] = 0;
-        tmp2[1] = 0;
-        tmp2[2] = 0;
+        tmp2[0] = 1;
+        tmp2[1] = 29;
+        tmp2[2] = 1;
         tmp2[3] = 0;
       }
 
@@ -306,7 +306,6 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
       // double val_d = 0.0;
 
 
-      Rcpp::List buf;
       std::vector<double> buf_d;
       std::vector<std::string> buf_s;
       std::vector<int> flush_type(8);
@@ -365,11 +364,15 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
 
             string val_s = as<string>(as<CharacterVector>(dat[j])[i]);
 
-            val_s.resize(type, ' ');
+            int strlen = type;
+            if (strlen == 255) strlen = 256;
+
+
+            val_s.resize(strlen, ' ');
 
             // begin writing of the string
 
-            int8_t fills = type/8;
+            int8_t fills = strlen/8;
 
             // Rprintf("type: %d\n", type);
             // Rprintf("fills: %d\n", fills);
@@ -387,13 +390,6 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
                 int pos = totiter * 8;
 
                 int strt = 253, strl = 8;
-
-                if (pos == 248)
-                  strl = 7;
-
-                // if (pos == 256)
-                //   strt = 254;
-
 
                 buf_s.push_back(val_s.substr(pos, strl));
                 flush_type[iter] = 2;
@@ -490,10 +486,24 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
           if ((i == n-1) & (j == kk -1)) {
 
             // Rcout << "--- EOF ---" << std::endl;
+            // Rprintf("buf_s.size() = %d\n", buf_s.size());
+            // Rprintf("buf_d.size() = %d\n", buf_d.size());
 
-            std::memcpy(&chunk, chnk, sizeof(double));
-            writebin(chunk, sav, swapit);
-            iter = 0;
+
+            // Rprintf("iter: %d\n", iter);
+
+            // chunk is not yet completely written.
+            if (iter > 0) {
+
+              for (int8_t itr = iter; itr < 8; ++itr) {
+                chnk[itr] = 0;
+              }
+
+              std::memcpy(&chunk, chnk, sizeof(double));
+              writebin(chunk, sav, swapit);
+
+              iter = 0;
+            }
 
 
             int di = 0, ds = 0;
