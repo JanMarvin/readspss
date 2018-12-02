@@ -188,18 +188,6 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
   }
 
   cc <- sapply(dat, is.character)
-  # ii <<- ii
-  # gg <<- gg
-  #
-  # dat <<- dat
-  # itc <<- itc
-  # vartypes <<- vartypes
-  # vtyp <<- vtyp
-  # cc <<- cc
-
-  # isnum <- sapply(dat, function(x){is.numeric(x) & !is.integer(x)})
-
-  # vartypes[which(isnum == TRUE)] <- 253
 
 
   attr(dat, "vtyp") <- vtyp
