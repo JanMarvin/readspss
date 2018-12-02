@@ -113,7 +113,7 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
       if (val <= 8) {
         vartypes <- c(vartypes, val)
       } else {
-        vartypes <- c(vartypes, c(val, rep(-1, (val/8 - 1)) ) )
+        vartypes <- c(vartypes, c(val, rep(-1, (ceiling(val/8) -1) ) ) )
       }
     }
 
