@@ -152,7 +152,9 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
 
   systime <- Sys.time()
   timestamp <- substr(systime, 12, 19)
+  lct <- Sys.getlocale("LC_TIME"); Sys.setlocale("LC_TIME", "C")
   datestamp <- format(Sys.Date(), "%d %b %y")
+  Sys.setlocale("LC_TIME", lct)
 
 
   ii <- sapply(dat, is.integer)
