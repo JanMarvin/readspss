@@ -439,9 +439,7 @@ inline void writebin(T t, std::fstream& sav, bool swapit)
 }
 
 
-
-template <typename T>
-inline void writestr(std::string val_s, T len, std::fstream& sav)
+inline void writestr(std::string val_s, int32_t len, std::fstream& sav)
 {
 
   std::stringstream val_stream;

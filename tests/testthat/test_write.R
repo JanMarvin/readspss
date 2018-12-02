@@ -162,3 +162,44 @@ test_that("factor", {
 })
 
 unlink("data", recursive = TRUE)
+
+#### test 9 ####
+if (dir.exists("data"))
+  unlink("data", recursive = TRUE)
+
+dir.create("data")
+
+dd <- data.frame(
+  N     = 1:2,
+  A25  = c(paste0("a1", paste(rep("A", 22), collapse = ""), "a"),
+           paste0("a2", paste(rep("X", 10), collapse = ""))),
+  A255  = c(paste0("a1", paste(rep("A", 252), collapse = ""), "a"),
+            paste0("a2", paste(rep("X", 10), collapse = ""))),
+  # A258  = c(paste0("b1", paste(rep("B", 256), collapse = "")),
+  #           paste0("b2", paste(rep("Y", 256), collapse = ""))),
+  # A2000 = c(paste0("c1", paste(rep("C", 1998), collapse = "")),
+  #           paste0("c2", paste(rep("Z", 1998), collapse = ""))),
+  stringsAsFactors = FALSE
+)
+
+write.sav(dd, "data/dd_u.sav", compress = FALSE)
+write.sav(dd, "data/dd_c.sav", compress = TRUE)
+
+write.por(dd, "data/dd_p.por")
+
+df_u <- read.sav("data/dd_u.sav")
+df_c <- read.sav("data/dd_c.sav")
+df_p <- read.por("data/dd_p.por")
+
+
+test_that("strings", {
+  expect_true(all.equal(dd, df_u, check.attributes = FALSE))
+  expect_true(all.equal(dd, df_c, check.attributes = FALSE))
+  expect_true(all.equal(dd, df_p, check.attributes = FALSE))
+})
+
+unlink("data", recursive = TRUE)
+
+
+
+

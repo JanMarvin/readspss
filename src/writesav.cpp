@@ -549,7 +549,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
       for (int64_t i = 0; i < n; ++i) {
         for (int32_t j = 0; j < kk; ++j) {
 
-          int32_t const type = vtyp[j];
+          const int32_t type = vtyp[j];
 
           // Rprintf("k: %d; n: %d\n", j, i);
           //
@@ -577,7 +577,13 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
             if (cv_s[0] != NA_STRING)
               val_s = as<string>(cv_s);
 
-            writestr(val_s, type, sav);
+            int size = type;
+            if (size == 255)
+              size += 1;
+
+            val_s.resize(size, ' ');
+
+            writestr(val_s, val_s.size(), sav);
             break;
           }
 
