@@ -12,16 +12,16 @@ imports everything into a data frame. Including long strings and labels. Various
 features such as importing of value label or missings are tested and are working
 as intended.
 
-Features of the package are reading of
-
-* sav-files,
-* zsav-files,
-* encrypted sav-files and
-* por-files
-
-and experimental writing support of (un)compressed
+The package features reading of
 
 * sav files,
+* zsav files,
+* encrypted sav files and
+* por files
+
+and (experimental) writing support of (un)compressed
+
+* sav files and
 * por files.
 
 Because of the R code wrapped Rcpp functions the package is pretty fast. The 
@@ -34,15 +34,15 @@ reads more files than each of its predecessors, some are only readable using
 
 Focus was not so much on winning every benchmark, but reading all features of
 an SPSS file and to be as exactly as possible. So some benchmarks are
-won and others are lost. It is entirely up to the task. In addition to the data
-itself `readspss` ships additional information provided in the files like the
-data label, date and timestamp.
+won and others are lost. It is entirely up to the task. Besides the data
+itself `readspss` ships additional information provided by the SPSS files like
+the data label, documentation, date and timestamp.
 
 Reading of sav and por files is considered feature complete.
 
-Writing of (un)compressed sav and por files is experimental. Unsupported 
-features are reading and writing of dates, writing of long strings and zsav
-files.
+Writing of (un)compressed sav and por files is implemented and considered 
+working. Unsupported features are reading and writing of dates, writing of long
+strings and zsav files.
 
 ## Installation
 
@@ -62,4 +62,3 @@ df_p <- read.por(flp)
 
 all.equal(df_s, df_p, check.attributes = FALSE)
 ```
-
