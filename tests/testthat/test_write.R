@@ -200,6 +200,20 @@ test_that("strings", {
 
 unlink("data", recursive = TRUE)
 
+#### dates ####
+if (dir.exists("data"))
+  unlink("data", recursive = TRUE)
+
+dir.create("data")
+
+dd <- data.frame( dat = Sys.Date() )
+
+write.sav(dd, "data/dd.sav", compress = TRUE)
+df <- read.sav("data/dd.sav")
 
 
+test_that("dates", {
+  expect_true(all.equal(dd, df, check.attributes = FALSE))
+})
 
+unlink("data", recursive = TRUE)

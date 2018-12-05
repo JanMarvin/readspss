@@ -28,13 +28,15 @@
 #' @param compress \emph{logical} should compression be used. If TRUE some
 #'  integers will be stored more efficiently. Everything will be stored in
 #'  chunks of 8 chars. Reduces memory size of sav-file.
+#' @param convert.dates \emph{logical} should dates be converted to SPSS format
+#' @param tz \emph{character.} The name of the timezone convert.dates will use.
 #' @details Strings longer than 255 chars are not provided.
 #'
 #' @return \code{readspss} returns nothing
 #'
 #' @export
 write.sav <- function(dat, filepath, label, add.rownames = FALSE,
-                      compress = FALSE) {
+                      compress = FALSE, convert.dates = TRUE, tz="GMT") {
 
   filepath <- path.expand(filepath)
 
@@ -190,7 +192,34 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
   cc <- sapply(dat, is.character)
 
 
+  vartypen <- sapply(dat, function(x)class(x)[[1]])
+  vartyp <- NA
+  vartyp[vartypen == "numeric" | vartypen == "integer" |
+           vartypen == "factor"] <- 0
+  vartyp[vartypen == "character"] <- 1
+  vartyp[vartypen == "Date"] <- 20
+  vartyp[vartypen == "POSIXct"] <- 22
+
+  if (convert.dates) {
+    dates <- which(sapply(dat,
+                          function(x) inherits(x, "Date"))
+    )
+    for (v in dates)
+      dat[[v]] <- as.vector(
+        julian(dat[[v]],as.Date("1582-10-14", tz = "GMT"))*24*60*60
+      )
+    dates <- which(
+      sapply(dat, function(x) inherits(x,"POSIXt"))
+    )
+    for (v in dates)
+      dat[[v]] <- as.vector(
+        round(julian(dat[[v]], ISOdate(1582, 10, 14, tz = tz)))*24*60*60
+      )
+  }
+
+
   attr(dat, "vtyp") <- vtyp
+  attr(dat, "vartyp") <- vartyp
   attr(dat, "vartypes") <- vartypes
   attr(dat, "nvarnames") <- nvarnames
   attr(dat, "longvarnames") <- longvarnames

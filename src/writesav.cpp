@@ -53,6 +53,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
     Rcpp::IntegerVector cc = dat.attr("cc");
     Rcpp::IntegerVector itc = dat.attr("itc");
     Rcpp::IntegerVector vartypes = dat.attr("vartypes");
+    Rcpp::IntegerVector vartyp = dat.attr("vartyp");
 
     Rcpp::CharacterVector nvarnames = dat.attr("nvarnames");
     Rcpp::CharacterVector label = dat.attr("label");
@@ -111,6 +112,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
       rtype = 2;
       writebin(rtype, sav, swapit);
 
+      int32_t isdate = vartyp[i];
       int32_t subtyp = vartypes[i];
       writebin(subtyp, sav, swapit);
 
@@ -131,7 +133,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
       if (subtyp == 0) {
         tmp1[0] = 2;
         tmp1[1] = 8;
-        tmp1[2] = 5;
+        tmp1[2] = isdate;
         tmp1[3] = 0;
       } else if (subtyp > 0) {
         tmp1[0] = 0;

@@ -4,7 +4,8 @@
 \alias{write.sav}
 \title{write.sav}
 \usage{
-write.sav(dat, filepath, label, add.rownames = FALSE, compress = FALSE)
+write.sav(dat, filepath, label, add.rownames = FALSE, compress = FALSE,
+  convert.dates = TRUE, tz = "GMT")
 }
 \arguments{
 \item{dat}{\emph{data.frame} a dat.aframe to strore as sav-file.}
@@ -21,6 +22,10 @@ will be added to the por-file.}
 \item{compress}{\emph{logical} should compression be used. If TRUE some
 integers will be stored more efficiently. Everything will be stored in
 chunks of 8 chars. Reduces memory size of sav-file.}
+
+\item{convert.dates}{\emph{logical} should dates be converted to SPSS format}
+
+\item{tz}{\emph{character.} The name of the timezone convert.dates will use.}
 }
 \value{
 \code{readspss} returns nothing
