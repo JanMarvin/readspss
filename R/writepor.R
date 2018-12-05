@@ -33,6 +33,8 @@
 #'  hexcode.
 #' @param toEncoding encoding used for the por file. SPSS itself claims to
 #'  have problems with unicode and por files, so "CP1252" is the default.
+#' @param convert.dates \emph{logical} should dates be converted to SPSS format
+#' @param tz \emph{character.} The name of the timezone convert.dates will use.
 #' @details Strings longer than 255 chars are not provided.
 #'  File will be stored using "CP1252" encoding.
 #'
@@ -40,7 +42,8 @@
 #'
 #' @export
 write.por <- function(dat, filepath, label, add.rownames = FALSE,
-                      convert.factors = TRUE, toEncoding = "CP1252") {
+                      convert.factors = TRUE, toEncoding = "CP1252",
+                      convert.dates = TRUE, tz="GMT") {
 
   filepath <- path.expand(filepath)
 
@@ -148,8 +151,35 @@ write.por <- function(dat, filepath, label, add.rownames = FALSE,
 
   isint <- sapply(dat, function(x){is.numeric(x) & is.integer(x)})
 
+  vartypen <- sapply(dat, function(x)class(x)[[1]])
+  vartyp <- NA
+  vartyp[vartypen == "numeric" | vartypen == "integer" |
+           vartypen == "factor"] <- 0
+  vartyp[vartypen == "character"] <- 1
+  vartyp[vartypen == "Date"] <- 20
+  vartyp[vartypen == "POSIXct"] <- 22
+
+  if (convert.dates) {
+    dates <- which(sapply(dat,
+                          function(x) inherits(x, "Date"))
+    )
+    for (v in dates)
+      dat[[v]] <- as.vector(
+        julian(dat[[v]],as.Date("1582-10-14", tz = "GMT"))*24*60*60
+      )
+    dates <- which(
+      sapply(dat, function(x) inherits(x,"POSIXt"))
+    )
+    for (v in dates)
+      dat[[v]] <- as.vector(
+        round(julian(dat[[v]], ISOdate(1582, 10, 14, tz = tz)))*24*60*60
+      )
+  }
+
+
 
   attr(dat, "vtyp") <- vtyp
+  attr(dat, "vartyp") <- vartyp
   attr(dat, "vartypes") <- vartypes
   attr(dat, "nvarnames") <- nvarnames
   attr(dat, "timestamp") <- timestamp

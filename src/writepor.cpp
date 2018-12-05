@@ -49,6 +49,7 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
 
 
     Rcpp::CharacterVector nvarnames = dat.attr("nvarnames");
+    Rcpp::IntegerVector vartyp = dat.attr("vartyp");
     Rcpp::IntegerVector vartypes = dat.attr("vartypes");
     Rcpp::IntegerVector vtyp = dat.attr("vtyp");
     std::string timestamp = Rcpp::as<std::string>(dat.attr("timestamp"));
@@ -103,11 +104,12 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
 
       file += "7"; //var
 
-      int vartyp = vtyp(i);
+      int vartypi = vtyp(i);
+      int isdate = vartyp(i);
 
       std::string nvarname = as<std::string>(nvarnames(i));
 
-      file += pnum1(vartyp);
+      file += pnum1(vartypi);
       file += "/";
 
       file += writestr(nvarname, 0);
@@ -116,8 +118,8 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
       int pfmt2 = 8, wfmt2 = 8;
       int pfmt3 = 0, wfmt3 = 0;
 
-      if (vartyp == 0) {
-        pfmt1 = 5, wfmt1 = 5;
+      if (vartypi == 0) {
+        pfmt1 = isdate, wfmt1 = isdate;
         pfmt2 = 8, wfmt2 = 8;
         pfmt3 = 2, wfmt3 = 2;
       } else {

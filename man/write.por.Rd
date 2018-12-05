@@ -5,7 +5,8 @@
 \title{write.por}
 \usage{
 write.por(dat, filepath, label, add.rownames = FALSE,
-  convert.factors = TRUE, toEncoding = "CP1252")
+  convert.factors = TRUE, toEncoding = "CP1252",
+  convert.dates = TRUE, tz = "GMT")
 }
 \arguments{
 \item{dat}{\emph{data.frame} a data.frame to export as por-file.}
@@ -26,6 +27,10 @@ hexcode.}
 
 \item{toEncoding}{encoding used for the por file. SPSS itself claims to
 have problems with unicode and por files, so "CP1252" is the default.}
+
+\item{convert.dates}{\emph{logical} should dates be converted to SPSS format}
+
+\item{tz}{\emph{character.} The name of the timezone convert.dates will use.}
 }
 \value{
 \code{readspss} returns nothing

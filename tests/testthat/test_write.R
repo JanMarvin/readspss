@@ -209,11 +209,14 @@ dir.create("data")
 dd <- data.frame( dat = Sys.Date() )
 
 write.sav(dd, "data/dd.sav", compress = TRUE)
-df <- read.sav("data/dd.sav")
+write.por(dd, "data/dd.por")
+ds <- read.sav("data/dd.sav")
+dp <- read.por("data/dd.por")
 
 
 test_that("dates", {
-  expect_true(all.equal(dd, df, check.attributes = FALSE))
+  expect_true(all.equal(dd, ds, check.attributes = FALSE))
+  expect_true(all.equal(dd, dp, check.attributes = FALSE))
 })
 
 unlink("data", recursive = TRUE)
