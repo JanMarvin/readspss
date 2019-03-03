@@ -43,12 +43,12 @@ matrix:
 
 
 before_install:
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then |
-  mkdir ~/.R
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+  mkdir ~/.R &&
   cat <<EOF > ~/.R/Makevars
   CXX11=g++-8
   CXX11STD=-std=c++11
-; fi
+  EOF; fi
 
 sudo: false
 cache: packages
