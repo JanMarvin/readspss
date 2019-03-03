@@ -37,14 +37,18 @@ matrix:
         - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
     - os: osx
       r: release
+      brew_packages: openssl@1.1
+      before_install: brew uninstall --ignore-dependencies openssl
+      env: PKG_CONFIG_PATH="/usr/local/opt/openssl@1.1/lib/pkgconfig"
 
 
 before_install:
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then |
   mkdir ~/.R
   cat <<EOF > ~/.R/Makevars
   CXX11=g++-8
-  CXX11STD=-std=c++11; fi
+  CXX11STD=-std=c++11
+  ; fi
 
 sudo: false
 cache: packages
