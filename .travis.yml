@@ -20,7 +20,7 @@ matrix:
         cat <<EOF > ~/.R/Makevars
         CXX11=g++-8
         CXX11STD=-std=c++11
-        EOF
+
     - os: linux
       r: release
       addons:
@@ -36,7 +36,7 @@ matrix:
         cat <<EOF > ~/.R/Makevars
         CXX11=g++-8
         CXX11STD=-std=c++11
-        EOF
+
     - os: linux
       r: oldrel
       addons:
@@ -52,7 +52,7 @@ matrix:
         cat <<EOF > ~/.R/Makevars
         CXX11=g++-8
         CXX11STD=-std=c++11
-        EOF
+
     - os: osx
       r: release
       brew_packages: openssl@1.1
