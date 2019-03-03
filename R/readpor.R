@@ -270,13 +270,18 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   if (convert.dates) {
 
+
     nams   <- names(data)
     isdate <- fmt[,1] %in% c(20,22,23,24,38,39)
     istime <- fmt[,1] %in% c(21,25)
 
     if (any(isdate)) {
       for (nam in nams[isdate]) {
-        data[[nam]] <- as.Date(as.POSIXct(data[[nam]], origin="1582-10-14"))
+        # the tda function does not always provide integers. in rare cases the
+        # date conversion might be off by a day e.g. "13770950400". This is
+        # avoided by rounding the value first
+        data[[nam]] <- as.Date(as.POSIXct(
+          round(data[[nam]]), origin="1582-10-14"))
       }
     }
     if (any(istime)) {

@@ -316,7 +316,8 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
     if (any(isdate)) {
       for (nam in nams[isdate]) {
-        data[[nam]] <- as.Date(as.POSIXct(data[[nam]], origin="1582-10-14"))
+        data[[nam]] <- as.Date(as.POSIXct(
+          round(data[[nam]]),origin="1582-10-14"))
       }
     }
     if (any(istime)) {
