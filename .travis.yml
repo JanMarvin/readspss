@@ -49,6 +49,7 @@ before_install:
     cat <<EOF > ~/.R/Makevars
     CXX11=g++-8
     CXX11STD=-std=c++11
+    EOF
   fi
 
 sudo: false
