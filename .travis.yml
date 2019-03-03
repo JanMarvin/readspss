@@ -35,13 +35,16 @@ matrix:
             - g++-8
       env:
         - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
+    - os: osx
+      r: release
 
 
-before_install: |
+before_install:
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
   mkdir ~/.R
   cat <<EOF > ~/.R/Makevars
   CXX11=g++-8
-  CXX11STD=-std=c++11
+  CXX11STD=-std=c++11; fi
 
 sudo: false
 cache: packages
