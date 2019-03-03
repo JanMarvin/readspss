@@ -15,6 +15,12 @@ matrix:
             - g++-8
       env:
         - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
+      before_install: |
+        mkdir ~/.R
+        cat <<EOF > ~/.R/Makevars
+        CXX11=g++-8
+        CXX11STD=-std=c++11
+        EOF
     - os: linux
       r: release
       addons:
@@ -25,6 +31,12 @@ matrix:
             - g++-8
       env:
         - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
+      before_install: |
+        mkdir ~/.R
+        cat <<EOF > ~/.R/Makevars
+        CXX11=g++-8
+        CXX11STD=-std=c++11
+        EOF
     - os: linux
       r: oldrel
       addons:
@@ -35,6 +47,12 @@ matrix:
             - g++-8
       env:
         - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
+      before_install: |
+        mkdir ~/.R
+        cat <<EOF > ~/.R/Makevars
+        CXX11=g++-8
+        CXX11STD=-std=c++11
+        EOF
     - os: osx
       r: release
       brew_packages: openssl@1.1
@@ -42,16 +60,7 @@ matrix:
       env: PKG_CONFIG_PATH="/usr/local/opt/openssl@1.1/lib/pkgconfig"
 
 
-before_install:
-- |
-  if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-    mkdir ~/.R
-    cat <<EOF > ~/.R/Makevars
-    CXX11=g++-8
-    CXX11STD=-std=c++11
-    EOF
-    ;
-  fi
+
 
 sudo: false
 cache: packages
