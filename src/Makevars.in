@@ -1,5 +1,5 @@
-PKG_CPPFLAGS=@cflags@
-PKG_LIBS=@libs@
+PKG_CPPFLAGS = @cflags@
+PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` -lz  @libs@
 
 all: clean
 
