@@ -49,7 +49,9 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
   std::ifstream sav(filePath, std::ios::in | std::ios::binary);
   if (sav) {
 
-    bool is_spss = false, is_sav = false, is_zsav = false, swapit = false, autoenc = false;
+    bool is_spss = false, is_sav = false, is_zsav = false,
+      ml_sav = false, ml_zsav = false,
+      swapit = false, autoenc = false;
 
     int64_t n = 0;
     int32_t k = 0;
@@ -76,7 +78,11 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
     is_sav = std::regex_match(spss, std::regex("^\\$FL2@\\(#\\)$"));
     is_zsav = std::regex_match(spss, std::regex("^\\$FL3@\\(#\\)$"));
-    is_spss = (is_sav == true) || (is_zsav == true);
+    ml_sav = std::regex_match(spss.substr(0,4), std::regex("^\\$FL2$"));
+    ml_zsav = std::regex_match(spss.substr(0,4), std::regex("^\\$FL3$"));
+    // most likely: "$FL2" can be followed by "SPSS"
+    is_spss = (is_sav == true) || (is_zsav == true) ||
+      (ml_sav == true) || (ml_zsav == true);
 
 
 
@@ -139,10 +145,12 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     if (debug)
       Rprintf("N: %d \n", n);
 
-    double bias = 0; // 100: compression bias
-    bias = readbin(bias, sav, swapit);
+    int bias = 0; double biasd = 0; // 100: compression bias
+    bias = readbin(biasd, sav, swapit);
 
-    if (bias!=100) Rcpp::stop("bias != 100. Stop.");
+    if ((cflag == 1) & (bias!=100))
+      Rcpp::warning("Cflag = 1. Found bias = %d. Using this. Expected 100.",
+                    bias);
 
     // creation date 9 dd_mmm_yy
     std::string datestamp (9, '\0');
@@ -868,7 +876,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
     if (n > 0)
       df = read_sav_known_n(df, sav, swapit, cflag, debug,
-                            n, kv, vtyp, res, vartype, lowest, highest);
+                            n, kv, vtyp, res, vartype, lowest, highest, bias);
 
 
     // close file

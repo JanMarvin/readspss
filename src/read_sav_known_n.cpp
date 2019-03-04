@@ -30,7 +30,8 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
                Rcpp::NumericVector res,
                std::vector<int> vartype,
                const double lowest,
-               const double highest) {
+               const double highest,
+               const int bias) {
 
   // final position
   auto curpos = sav.tellg();
@@ -138,10 +139,10 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
           if (val_b < lowest || val_b > highest)
             val_b = NA_REAL;
 
-          REAL(VECTOR_ELT(df,kk))[nn] = val_b - 100;
+          REAL(VECTOR_ELT(df,kk))[nn] = val_b - bias;
 
           if (debug)
-            Rprintf("val_b: %d\n", val_b - 100);
+            Rprintf("val_b: %d\n", val_b - bias);
 
           break;
         }
@@ -393,7 +394,8 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
       {
         val_d = readbin(val_d, sav, swapit);
 
-        if (val_d < lowest || val_d > highest)
+        // Not sure why, but -DBL_MAX is a missing in some sav-files
+        if (val_d < lowest || val_d > highest || val_d == -DBL_MAX)
           val_d = NA_REAL;
 
         REAL(VECTOR_ELT(df,kk))[nn] = val_d;
