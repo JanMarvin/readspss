@@ -46,7 +46,13 @@ strings and zsav files.
 
 ## Installation
 
-master:
+With `drat`:
+```R
+drat::addRepo("JanMarvin")
+install.packages("readspss")
+```
+
+With `devtools`:
 ```R
 devtools::install_git("https://github.com/JanMarvin/readspss.git")
 ```
