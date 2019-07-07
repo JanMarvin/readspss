@@ -27,7 +27,6 @@
 #include <openssl/cmac.h>
 
 using namespace Rcpp;
-using namespace std;
 
 #include "spss.h"
 #include "read_sav_encrypted.h"
@@ -70,7 +69,7 @@ int encryptfile (const char * filePath, std::string &outpath, std::string pass)
       return (1);
     } else {
       // rewind so that a full sav file is returned
-      sav.seekg(36, ios_base::beg);
+      sav.seekg(36, std::ios_base::beg);
     }
 
     // file is written into a temp file

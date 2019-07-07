@@ -22,7 +22,6 @@
 #include <streambuf>
 
 using namespace Rcpp;
-using namespace std;
 
 #include "spss.h"
 
@@ -107,7 +106,7 @@ void write_data(Rcpp::DataFrame dat, int32_t cflag,
           // Rcout << "--- string ---" << std::endl;
 
 
-          string val_s = as<string>(as<CharacterVector>(dat[j])[i]);
+          std::string val_s = as<std::string>(as<CharacterVector>(dat[j])[i]);
 
           int strlen = type;
           if (strlen == 255) strlen = 256;
@@ -319,10 +318,10 @@ void write_data(Rcpp::DataFrame dat, int32_t cflag,
           CharacterVector cv_s = NA_STRING;
           cv_s = as<CharacterVector>(dat[j])[i];
 
-          string val_s = "";
+          std::string val_s = "";
 
           if (cv_s[0] != NA_STRING)
-            val_s = as<string>(cv_s);
+            val_s = as<std::string>(cv_s);
 
           int size = type;
           if (size == 255)

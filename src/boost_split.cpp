@@ -21,8 +21,6 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 
-using namespace std;
-
 //' split character vector at "="
 //'
 //' @param val_s CharacterVector
