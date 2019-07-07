@@ -22,7 +22,6 @@
 #include <streambuf>
 
 using namespace Rcpp;
-using namespace std;
 
 #include "spss.h"
 #include "write_data.h"
@@ -41,7 +40,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
   int64_t n = dat.nrows();
 
 
-  fstream sav (filePath, ios::out | ios::binary);
+  std::fstream sav (filePath, std::ios::out | std::ios::binary);
   if (sav.is_open())
   {
 
