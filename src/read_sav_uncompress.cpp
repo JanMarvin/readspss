@@ -106,8 +106,7 @@ std::string read_sav_uncompress (std::istream& sav,
     status = uncompress(&uncompr_block[0], &uncompr_block_len,
                         &compr_block[0], compr_block_len);
 
-    if (status != 0)
-      Rcpp::stop("uncompress failed.");
+    if (status != 0) Rcpp::stop("uncompress failed.");
 
 
     outfile.write((char *)(&uncompr_block[0]), uncompr_block_len);

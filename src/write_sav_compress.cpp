@@ -80,20 +80,20 @@ void write_sav_compress (std::fstream& sav, std::fstream& tmp,
       compr_ofs = sav.tellg();
 
       // Bytef is unsigned char *
-      static std::vector<unsigned char> uncompr_block(uncompr_size);
-      static std::vector<unsigned char>   compr_block(  compr_size);
-
-      // read the uncompr data part
-      tmp.read((char*)(&uncompr_block[0]), uncompr_size);
+      std::vector<unsigned char> uncompr_block(block_size);
+      std::vector<unsigned char>   compr_block(block_size);
 
       int32_t status = 0;
       uLong uncompr_block_len = uncompr_size;
       uLong compr_block_len   = compr_size;
 
+      // read the uncompr data part
+      tmp.read((char*)(&uncompr_block[0]), uncompr_block_len);
+
       // uncompress should be 0
       status = compress2(&compr_block[0], &compr_block_len,
                          &uncompr_block[0], uncompr_block_len,
-                         1); /* zlib header 78 01 */
+                         0); /* zlib header 78 01 */
 
       if (status != 0) Rcpp::stop("compression failed.");
 
