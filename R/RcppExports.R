@@ -75,7 +75,7 @@ writepor <- function(filePath, dat) {
 #' @param compress the file
 #' @import Rcpp
 #' @export
-writesav <- function(filePath, dat, compress) {
-    invisible(.Call(`_readspss_writesav`, filePath, dat, compress))
+writesav <- function(filePath, dat, compress, debug, is_zsav) {
+    invisible(.Call(`_readspss_writesav`, filePath, dat, compress, debug, is_zsav))
 }
 

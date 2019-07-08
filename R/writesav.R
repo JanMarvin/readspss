@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018 Jan Marvin Garbuszus
+# Copyright (C) 2018-2019 Jan Marvin Garbuszus
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the
@@ -30,13 +30,16 @@
 #'  chunks of 8 chars. Reduces memory size of sav-file.
 #' @param convert.dates \emph{logical} should dates be converted to SPSS format
 #' @param tz \emph{character.} The name of the timezone convert.dates will use.
+#' @param debug \emph{logical} print debug information.
+#' @param is_zsav \emph{logical} create zsav file.
 #' @details Strings longer than 255 chars are not provided.
 #'
 #' @return \code{readspss} returns nothing
 #'
 #' @export
 write.sav <- function(dat, filepath, label, add.rownames = FALSE,
-                      compress = FALSE, convert.dates = TRUE, tz="GMT") {
+                      compress = FALSE, convert.dates = TRUE, tz="GMT",
+                      debug = FALSE, is_zsav = FALSE) {
 
   filepath <- path.expand(filepath)
 
@@ -234,7 +237,7 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
   # if (compress == 1)
   #   dat <<- dat
 
-  writesav(filepath, dat, compress)
+  writesav(filepath, dat, compress, debug, is_zsav)
 }
 
 

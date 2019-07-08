@@ -5,7 +5,7 @@
 \title{write.sav}
 \usage{
 write.sav(dat, filepath, label, add.rownames = FALSE, compress = FALSE,
-  convert.dates = TRUE, tz = "GMT")
+  convert.dates = TRUE, tz = "GMT", debug = FALSE, is_zsav = FALSE)
 }
 \arguments{
 \item{dat}{\emph{data.frame} a dat.aframe to strore as sav-file.}
@@ -26,6 +26,10 @@ chunks of 8 chars. Reduces memory size of sav-file.}
 \item{convert.dates}{\emph{logical} should dates be converted to SPSS format}
 
 \item{tz}{\emph{character.} The name of the timezone convert.dates will use.}
+
+\item{debug}{\emph{logical} print debug information.}
+
+\item{is_zsav}{\emph{logical} create zsav file.}
 }
 \value{
 \code{readspss} returns nothing

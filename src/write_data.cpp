@@ -26,7 +26,7 @@ using namespace std;
 
 #include "spss.h"
 
-void write_data(Rcpp::DataFrame dat, bool cflag,
+void write_data(Rcpp::DataFrame dat, int32_t cflag,
                 int64_t n, int32_t kk,
                 Rcpp::IntegerVector vtyp, Rcpp::IntegerVector itc,
                 Rcpp::IntegerVector cc, std::fstream& sav, bool swapit) {
@@ -276,13 +276,15 @@ void write_data(Rcpp::DataFrame dat, bool cflag,
           chnk[iter] = val_b;
           ++iter;
 
-          for (int8_t itr = iter; itr < 8; ++itr) {
-            chnk[itr] = 0;
+          if (cflag != 2) /* not for zsav */ {
+            for (int8_t itr = iter; itr < 8; ++itr) {
+              chnk[itr] = 0;
+            }
+
+            std::memcpy(&chunk, chnk, sizeof(double));
+
+            writebin(chunk, sav, swapit);
           }
-
-          std::memcpy(&chunk, chnk, sizeof(double));
-
-          writebin(chunk, sav, swapit);
         }
 
       }

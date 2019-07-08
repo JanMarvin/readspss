@@ -25,6 +25,7 @@ using namespace Rcpp;
 
 #include "spss.h"
 #include "write_data.h"
+#include "write_sav_compress.h"
 
 //' writes the binary SPSS file
 //'
@@ -34,7 +35,8 @@ using namespace Rcpp;
 //' @import Rcpp
 //' @export
 // [[Rcpp::export]]
-void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
+void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
+              bool debug, bool is_zsav)
 {
   int32_t kk = dat.size(), k = 0;
   int64_t n = dat.nrows();
@@ -74,9 +76,11 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
     // Rprintf("k is: %d - kk is: %d\n", k, kk);
 
     std::string spss = "$FL2@(#)";
+    if (is_zsav)
+      spss = "$FL3@(#)";
     writestr(spss, spss.size(), sav);
 
-    std::string datalabel = "readspss 0.8.1";
+    std::string datalabel = "readspss 0.13";
     writestr(datalabel, 56, sav);
 
     int32_t arch = 2;
@@ -89,6 +93,8 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
 
     if (compress)
       cflag = 1;
+    if (is_zsav)
+      cflag = 2;
 
     writebin(cflag, sav, swapit);
     writebin(cwvariables, sav, swapit);
@@ -288,7 +294,28 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress)
     int32_t unk8 = 0;
     writebin(unk8, sav, swapit);
 
-    write_data(dat, cflag,n, kk, vtyp, itc, cc, sav, swapit);
+    if (is_zsav) {
+
+      // write to temporary file
+      // in this logic outfile = sav and sav = zsav
+      const std::string tempstr = std::tmpnam(nullptr);
+      std::fstream outfile (tempstr, std::ios::out | std::ios::binary);
+
+      // write data part to tmp file
+      write_data(dat, cflag,n, kk, vtyp, itc, cc, outfile, swapit);
+
+      // write zsav body
+      write_sav_compress(sav, outfile, swapit, debug);
+
+      outfile.close();
+
+      // remove tempfile
+      std::remove(tempstr.c_str());
+
+    } else {
+      // write data part
+      write_data(dat, cflag,n, kk, vtyp, itc, cc, sav, swapit);
+    }
 
     sav.close();
   }
