@@ -301,15 +301,15 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
       // write to temporary file
       // in this logic outfile = sav and sav = zsav
       const std::string tempstr = std::tmpnam(nullptr);
-      std::fstream outfile (tempstr, std::ios::out | std::ios::binary);
+      std::fstream tmp (tempstr, std::ios::out | std::ios::binary);
 
       // write data part to tmp file
-      write_data(dat, cflag,n, kk, vtyp, itc, cc, outfile, swapit);
+      write_data(dat, cflag,n, kk, vtyp, itc, cc, tmp, swapit);
 
       // write zsav body
-      write_sav_compress(sav, outfile, swapit, debug);
+      write_sav_compress(sav, tmp, swapit, debug);
 
-      outfile.close();
+      tmp.close();
 
       // remove tempfile
       std::remove(tempstr.c_str());

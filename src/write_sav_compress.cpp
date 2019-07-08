@@ -1,7 +1,5 @@
 /*
- * Copyright (C) 2018 Jan Marvin Garbuszus
- *
- * zlib header information by Evan Miller
+ * Copyright (C) 2019 Jan Marvin Garbuszus
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -28,11 +26,11 @@
 #include "spss.h"
 
 
-void write_sav_compress (std::fstream& zsav, std::fstream& sav,
+void write_sav_compress (std::fstream& sav, std::fstream& tmp,
                          const bool swapit, bool debug) {
 
   // open zsav destination
-  if (zsav.is_open())
+  if (sav.is_open())
   {
 
     // offset positions
@@ -40,11 +38,11 @@ void write_sav_compress (std::fstream& zsav, std::fstream& sav,
 
     // temporary sav file to be removed afterwards
 
-    sav.seekg(0, sav.beg);
-    auto curpos = sav.tellg();
-    sav.seekg(0, sav.end);
-    auto savlen = sav.tellg();
-    sav.seekg(0, sav.beg);
+    tmp.seekg(0, tmp.beg);
+    auto curpos = tmp.tellg();
+    tmp.seekg(0, tmp.end);
+    auto savlen = tmp.tellg();
+    tmp.seekg(0, tmp.beg);
 
     int64_t bias = -100, zero = 0;
     int32_t block_size = 4190208;
@@ -57,33 +55,36 @@ void write_sav_compress (std::fstream& zsav, std::fstream& sav,
     int64_t uncompr_ofs = 0, compr_ofs = 0;
     int32_t uncompr_size = 0, compr_size = 0;
 
-    uncompr_size = savlen; compr_size = compressBound(savlen);
+    uncompr_size = savlen;
+    compr_size = compressBound(savlen);
 
     std::vector<int64_t> u_ofs(n_blocks), c_ofs(n_blocks);
-    std::vector<int32_t> u_size(n_blocks, uncompr_size), c_size(n_blocks, compr_size);
+    std::vector<int32_t> u_size(n_blocks, uncompr_size),
+                         c_size(n_blocks, compr_size);
 
     // zlib header
 
     // write zheader will be replaced with  actual values once they are
     // known after writing the entire file.
-    zhead_ofs = zsav.tellg(); // is initial u_ofs
+    zhead_ofs = sav.tellg(); // is initial u_ofs
 
-    writebin(zhead_ofs, zsav, swapit);
-    writebin(ztail_ofs, zsav, swapit);
-    writebin(ztail_len, zsav, swapit);
+    writebin(zhead_ofs, sav, swapit);
+    writebin(ztail_ofs, sav, swapit);
+    writebin(ztail_len, sav, swapit);
+
 
     // compress sav
-    // for (int i = 0; i < n_blocks; ++i) {
-      // seek to compr ofset
+    for (int i = 0; i < n_blocks; ++i) {
+
       uncompr_ofs = zhead_ofs;
-      compr_ofs = zsav.tellg();
+      compr_ofs = sav.tellg();
 
       // Bytef is unsigned char *
-      std::vector<unsigned char> uncompr_block(uncompr_size, 0);
-      std::vector<unsigned char>   compr_block(  compr_size, 0);
+      static std::vector<unsigned char> uncompr_block(uncompr_size);
+      static std::vector<unsigned char>   compr_block(  compr_size);
 
       // read the uncompr data part
-      sav.read((char*)(&uncompr_block[0]), uncompr_size);
+      tmp.read((char*)(&uncompr_block[0]), uncompr_size);
 
       int32_t status = 0;
       uLong uncompr_block_len = uncompr_size;
@@ -94,42 +95,45 @@ void write_sav_compress (std::fstream& zsav, std::fstream& sav,
                          &uncompr_block[0], uncompr_block_len,
                          1); /* zlib header 78 01 */
 
-      if (status != 0)
-        Rcpp::stop("compression failed.");
+      if (status != 0) Rcpp::stop("compression failed.");
 
       Rcpp::Rcout << compr_size << " vs " << compr_block_len << std::endl;
 
-      zsav.write((char *)(&compr_block[0]), compr_block_len);
-    // }
+      sav.write((char *)(&compr_block[0]), compr_block_len);
+
+      // export
+      u_ofs[i] = uncompr_ofs;
+      c_ofs[i] = compr_ofs;
+      u_size[i] = uncompr_block_len;
+      c_size[i] = compr_block_len;
+    }
 
     // zlib trailer
 
-    ztail_ofs = zsav.tellg();
+    ztail_ofs = sav.tellg();
 
-    writebin(bias, zsav, swapit);
-    writebin(zero, zsav, swapit);
-    writebin(block_size, zsav, swapit);
-    writebin(n_blocks, zsav, swapit);
+    writebin(bias, sav, swapit);
+    writebin(zero, sav, swapit);
+    writebin(block_size, sav, swapit);
+    writebin(n_blocks, sav, swapit);
 
     // write uncompr and compr ofset and size
-    // for (int i = 0; i < n_blocks; ++i) {
-      writebin(uncompr_ofs, zsav, swapit);
-      writebin(compr_ofs, zsav, swapit);
-      writebin((int32_t)uncompr_block_len, zsav, swapit);
-      writebin((int32_t)compr_block_len, zsav, swapit);
-    // }
+    for (int i = 0; i < n_blocks; ++i) {
+      writebin(u_ofs[i], sav, swapit);
+      writebin(c_ofs[i], sav, swapit);
+      writebin(u_size[i], sav, swapit);
+      writebin(c_size[i], sav, swapit);
+    }
 
     /* get ztail_len */
-    uint64_t ztail_end = zsav.tellg();
+    uint64_t ztail_end = sav.tellg();
     ztail_len = ztail_end - ztail_ofs;
 
-    Rcpp::Rcout << ztail_end << std::endl;
-
     /* write ztail_ofs and ztail_len */
-    zsav.seekg(zhead_ofs, zsav.beg);
-    writebin(zhead_ofs, zsav, swapit);
-    writebin(ztail_ofs, zsav, swapit);
-    writebin(ztail_len, zsav, swapit);
+    sav.seekg(zhead_ofs, sav.beg);
+    writebin(zhead_ofs, sav, swapit);
+    writebin(ztail_ofs, sav, swapit);
+    writebin(ztail_len, sav, swapit);
 
 
     if(debug) {
@@ -138,8 +142,8 @@ void write_sav_compress (std::fstream& zsav, std::fstream& sav,
           "ztail_len " << ztail_len << "\n" << std::endl;
     }
 
-    // zsav file is complete
-    // zsav.close();
+    // sav file is complete
+    // sav.close();
   }
 
 }
