@@ -12,6 +12,10 @@ writesav(filePath, dat, compress, debug, is_zsav)
 \item{dat}{the data frame}
 
 \item{compress}{the file}
+
+\item{debug}{print debug information}
+
+\item{is_zsav}{write zsav}
 }
 \description{
 writes the binary SPSS file
