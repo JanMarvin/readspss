@@ -308,6 +308,10 @@ void write_data(Rcpp::DataFrame dat, int32_t cflag,
         case 0:
         {
           double val_d = Rcpp::as<Rcpp::NumericVector>(dat[j])[i];
+
+          if ( (val_d == NA_REAL) | R_IsNA(val_d) | R_IsNaN(val_d) | std::isinf(val_d) )
+            val_d = -DBL_MAX;
+
           writebin(val_d, sav, swapit);
           break;
         }
