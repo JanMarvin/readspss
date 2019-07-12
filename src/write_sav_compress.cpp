@@ -57,14 +57,10 @@ void write_sav_compress (std::fstream& sav, std::string tempstr,
         " " << savlen << " " << n_blocks << std::endl;
 
     int64_t uncompr_ofs = 0, compr_ofs = 0;
-    int32_t uncompr_size = 0, compr_size = 0;
-
-    uncompr_size = savlen;
-    compr_size = compressBound(savlen);
+    int32_t uncompr_size = block_size, compr_size = compressBound(uncompr_size);
 
     std::vector<int64_t> u_ofs(n_blocks), c_ofs(n_blocks);
-    std::vector<int32_t> u_size(n_blocks, uncompr_size),
-                         c_size(n_blocks, compr_size);
+    std::vector<int32_t> u_size(n_blocks), c_size(n_blocks);
 
     // zlib header
 
@@ -76,20 +72,28 @@ void write_sav_compress (std::fstream& sav, std::string tempstr,
     writebin(ztail_ofs, sav, swapit);
     writebin(ztail_len, sav, swapit);
 
-
     // compress sav
-    for (int i = 0; i < n_blocks; ++i) {
+    for (auto i = 0; i < n_blocks; ++i) {
+
+      // modify chunk size for last chunk
+      if (i == (n_blocks-1)) {
+        auto len = savlen - (block_size * (n_blocks -1));
+
+        uncompr_size = len;
+        compr_size = compressBound(uncompr_size);
+      }
 
       uncompr_ofs = zhead_ofs;
+      if (i > 0) uncompr_ofs = u_ofs[i-1] + u_size[i-1];
       compr_ofs = sav.tellg();
 
-      // Bytef is unsigned char *
-      std::vector<unsigned char> uncompr_block(block_size);
-      std::vector<unsigned char>   compr_block(block_size);
-
-      int32_t status = 0;
+      auto status = 0;
       uLong uncompr_block_len = uncompr_size;
       uLong compr_block_len   = compr_size;
+
+      // Bytef is unsigned char *
+      std::vector<unsigned char> uncompr_block(uncompr_size);
+      std::vector<unsigned char>   compr_block(compr_size);
 
       // read the uncompr data part
       tmp.read((char*)(&uncompr_block[0]), block_size);
@@ -99,7 +103,7 @@ void write_sav_compress (std::fstream& sav, std::string tempstr,
                          &uncompr_block[0], uncompr_block_len,
                          Z_DEFAULT_COMPRESSION);
 
-      if (status != 0) Rcpp::stop("compression failed.");
+      if (status != Z_OK) Rcpp::stop("compression failed.");
 
 
       if (debug)
@@ -125,7 +129,7 @@ void write_sav_compress (std::fstream& sav, std::string tempstr,
     writebin(n_blocks, sav, swapit);
 
     // write uncompr and compr ofset and size
-    for (int i = 0; i < n_blocks; ++i) {
+    for (auto i = 0; i < n_blocks; ++i) {
       writebin(u_ofs[i], sav, swapit);
       writebin(c_ofs[i], sav, swapit);
       writebin(u_size[i], sav, swapit);
