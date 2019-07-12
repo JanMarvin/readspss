@@ -220,3 +220,24 @@ test_that("dates", {
 })
 
 unlink("data", recursive = TRUE)
+
+
+
+#### zsav ####
+
+if (dir.exists("data"))
+  unlink("data", recursive = TRUE)
+
+dir.create("data")
+
+dd <- cars
+
+write.sav(dd, "data/dd.zsav", compress = TRUE, is_zsav = TRUE)
+ds <- read.sav("data/dd.zsav")
+
+
+test_that("zsav", {
+  expect_true(all.equal(dd, ds, check.attributes = FALSE))
+})
+
+unlink("data", recursive = TRUE)
