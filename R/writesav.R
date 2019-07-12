@@ -237,6 +237,12 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
   # if (compress == 1)
   #   dat <<- dat
 
+  if (file_ext(filepath) == "zsav")
+    is_zsav <- TRUE
+
+  if (is_zsav)
+    message("Zsav compression is still experimental. Testing is welcome!")
+
   writesav(filepath, dat, compress, debug, is_zsav)
 }
 

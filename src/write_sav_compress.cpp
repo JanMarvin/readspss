@@ -101,7 +101,10 @@ void write_sav_compress (std::fstream& sav, std::string tempstr,
 
       if (status != 0) Rcpp::stop("compression failed.");
 
-      Rcpp::Rcout << compr_size << " vs " << compr_block_len << std::endl;
+
+      if (debug)
+        Rcpp::Rcout << "uncompressed: " << uncompr_block_len <<
+          "\ncompressed: " << compr_block_len << std::endl;
 
       sav.write((char *)(&compr_block[0]), compr_block_len);
 
