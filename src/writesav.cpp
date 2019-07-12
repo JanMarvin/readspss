@@ -300,8 +300,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
 
       // write to temporary file
       // in this logic outfile = sav and sav = zsav
-      Rcpp::Function Rf_tempfile("tempfile");
-      const std::string tempstr = Rcpp::as<std::string>(Rf_tempfile());
+      const std::string tempstr = std::tmpnam(nullptr);
       std::fstream tmp (tempstr, std::ios::out | std::ios::binary);
 
       // write data part to tmp file

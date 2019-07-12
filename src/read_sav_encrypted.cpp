@@ -73,8 +73,7 @@ int encryptfile (const char * filePath, std::string &outpath, std::string pass)
     }
 
     // file is written into a temp file
-    Rcpp::Function Rf_tempfile("tempfile");
-    const std::string tempstr = Rcpp::as<std::string>(Rf_tempfile());
+    const std::string tempstr = std::tmpnam(nullptr);
     std::fstream outfile (tempstr, std::ios::out | std::ios::binary);
 
     /* Decrypt entire input. */

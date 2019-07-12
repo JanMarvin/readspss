@@ -84,8 +84,7 @@ std::string read_sav_uncompress (std::istream& sav,
 
 
   // write to temporary file
-  Rcpp::Function Rf_tempfile("tempfile");
-  const std::string tempstr = Rcpp::as<std::string>(Rf_tempfile());
+  const std::string tempstr = std::tmpnam(nullptr);
   std::fstream outfile (tempstr, std::ios::out | std::ios::binary);
 
   for (int i = 0; i < n_blocks; ++i) {
