@@ -43,9 +43,9 @@ void write_sav_compress (std::fstream& sav, std::string tempstr,
     // temporary sav file to be removed afterwards
 
     tmp.seekg(0, tmp.beg);
-    auto curpos = tmp.tellg();
+    int64_t curpos = tmp.tellg();
     tmp.seekg(0, tmp.end);
-    auto savlen = tmp.tellg();
+    int64_t savlen = tmp.tellg();
     tmp.seekg(0, tmp.beg);
 
     int64_t bias = -100, zero = 0;
