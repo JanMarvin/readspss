@@ -1,4 +1,4 @@
-VERSION=1.1.0f
+VERSION=1.1.1
 PKG_CPPFLAGS= -I../windows/openssl-$(VERSION)/include
 PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` -L../windows/openssl-$(VERSION)/lib${R_ARCH} -lz -lcrypto -lws2_32 -lcrypt32
 
