@@ -26,8 +26,12 @@
 #include "spss.h"
 
 
-void write_sav_compress (std::fstream& sav, std::fstream& tmp,
+void write_sav_compress (std::fstream& sav, std::string tempstr,
                          const bool swapit, bool debug) {
+
+
+
+  std::fstream tmp (tempstr, std::ios::in | std::ios::binary);
 
   // open zsav destination
   if (sav.is_open())
@@ -45,7 +49,7 @@ void write_sav_compress (std::fstream& sav, std::fstream& tmp,
     tmp.seekg(0, tmp.beg);
 
     int64_t bias = -100, zero = 0;
-    int32_t block_size = 4190208;
+    int32_t block_size = 4190208; // bytes
     int32_t n_blocks = ceil((double)savlen/block_size);
 
     if (debug)
@@ -88,12 +92,12 @@ void write_sav_compress (std::fstream& sav, std::fstream& tmp,
       uLong compr_block_len   = compr_size;
 
       // read the uncompr data part
-      tmp.read((char*)(&uncompr_block[0]), uncompr_block_len);
+      tmp.read((char*)(&uncompr_block[0]), block_size);
 
       // uncompress should be 0
       status = compress2(&compr_block[0], &compr_block_len,
                          &uncompr_block[0], uncompr_block_len,
-                         0); /* zlib header 78 01 */
+                         Z_DEFAULT_COMPRESSION);
 
       if (status != 0) Rcpp::stop("compression failed.");
 
@@ -143,7 +147,7 @@ void write_sav_compress (std::fstream& sav, std::fstream& tmp,
     }
 
     // sav file is complete
-    // sav.close();
+    tmp.close();
   }
 
 }

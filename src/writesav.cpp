@@ -306,10 +306,10 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
       // write data part to tmp file
       write_data(dat, cflag,n, kk, vtyp, itc, cc, tmp, swapit);
 
-      // write zsav body
-      write_sav_compress(sav, tmp, swapit, debug);
-
       tmp.close();
+
+      // write zsav body
+      write_sav_compress(sav, tempstr, swapit, debug);
 
       // remove tempfile
       std::remove(tempstr.c_str());
