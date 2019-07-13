@@ -43,6 +43,7 @@ std::string read_sav_uncompress (std::istream& sav,
   ztail_ofs = readbin(ztail_ofs, sav, swapit);
   ztail_len = readbin(ztail_len, sav, swapit);
 
+
   sav.seekg(ztail_ofs, std::ios_base::beg);
 
   // read ztrailer
@@ -50,7 +51,6 @@ std::string read_sav_uncompress (std::istream& sav,
   zero = readbin(zero, sav, swapit);
   block_size = readbin(block_size, sav, swapit);
   n_blocks = readbin(n_blocks, sav, swapit);
-
 
   std::vector<int64_t> u_ofs(n_blocks), c_ofs(n_blocks);
   std::vector<int32_t> u_size(n_blocks), c_size(n_blocks);
@@ -62,11 +62,29 @@ std::string read_sav_uncompress (std::istream& sav,
     c_ofs[i]     = readbin(compr_ofs, sav, swapit);
     u_size[i]  = readbin(uncompr_size, sav, swapit);
     c_size[i]    = readbin(compr_size, sav, swapit);
+
+    if(debug) {
+      Rcpp::Rcout << "uofs " << u_ofs[i] << std::endl;
+      Rcpp::Rcout << "cofs " << c_ofs[i] << std::endl;
+      Rcpp::Rcout << "usize " << u_size[i] << std::endl;
+      Rcpp::Rcout << "csize " << c_size[i] << std::endl;
+    }
+  }
+
+  if(debug) {
+    Rcpp::Rcout << "zhead_ofs " << zhead_ofs <<
+      "\nztail_ofs " << ztail_ofs <<
+        "\nztail_len " << ztail_len <<
+          "\nbias " << bias <<
+            "\nzero " << zero <<
+              "\nblock_size " << block_size <<
+                "\nn_blocks " << n_blocks <<
+                  std::endl;
   }
 
 
   // write to temporary file
-  const std::string tempstr = std::tmpnam(nullptr);
+  const std::string tempstr = ".readspss_unc_tmp_file";
   std::fstream outfile (tempstr, std::ios::out | std::ios::binary);
 
   for (int i = 0; i < n_blocks; ++i) {
@@ -74,8 +92,8 @@ std::string read_sav_uncompress (std::istream& sav,
     sav.seekg(c_ofs[i], std::ios_base::beg);
 
     // Bytef is unsigned char *
-    std::vector<unsigned char>   compr_block(c_size[i]);
-    std::vector<unsigned char> uncompr_block(u_size[i]);
+    std::vector<unsigned char>   compr_block(c_size[i], 0);
+    std::vector<unsigned char> uncompr_block(u_size[i], 0);
 
     // read the complete compr data part
     sav.read((char*)&compr_block[0], c_size[i]);
@@ -88,8 +106,7 @@ std::string read_sav_uncompress (std::istream& sav,
     status = uncompress(&uncompr_block[0], &uncompr_block_len,
                         &compr_block[0], compr_block_len);
 
-    if (status != 0)
-      Rcpp::stop("uncompress failed.");
+    if (status != 0) Rcpp::stop("uncompress failed.");
 
 
     outfile.write((char *)(&uncompr_block[0]), uncompr_block_len);

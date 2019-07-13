@@ -23,7 +23,6 @@
 #include <regex>
 
 using namespace Rcpp;
-using namespace std;
 
 #include "spss.h"
 
@@ -42,7 +41,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
 
   std::string input;
   std::string file;
-  stringstream por;
+  std::stringstream por;
 
   std::ifstream por_file(filePath, std::ios::in | std::ios::binary);
   if (por_file) {
@@ -173,17 +172,17 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
     vers = readstring(vers, por);
 
     // filedate is yyyymmdd should be 8
-    std::string filedatelen = string(1, '\0');
+    std::string filedatelen = std::string(1, '\0');
     filedatelen = readtostring(por);
 
-    std::string slash = string(1, '\0');
+    std::string slash = std::string(1, '\0');
 
     std::string filedate (std::stoi(filedatelen), '\0');
     filedate = readstring(filedate, por);
     fdate.push_back(filedate);
 
     // filetime is hhmmss should be 6
-    std::string filetimelen = string(1, '\0');
+    std::string filetimelen = std::string(1, '\0');
     filetimelen = readtostring(por);
 
     std::string filetime (std::stoi(filetimelen), '\0');
@@ -727,7 +726,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
 
           // check that eof is really reached and not only a string "Z"
           // if (por.peek() == EOF)
-          eof = val.find_first_not_of("Z") == string::npos;
+          eof = val.find_first_not_of("Z") == std::string::npos;
 
           if (eof) {
             if (debug)

@@ -23,7 +23,6 @@
 #include <locale>
 
 using namespace Rcpp;
-using namespace std;
 
 #include "spss.h"
 
@@ -246,10 +245,10 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
             CharacterVector cv_s = NA_STRING;
             cv_s = as<CharacterVector>(dat[j])[i];
 
-            string val_s = "";
+            std::string val_s = "";
 
             if (cv_s[0] != NA_STRING)
-              val_s = as<string>(cv_s);
+              val_s = as<std::string>(cv_s);
 
             file += writestr(val_s, 0);
             break;

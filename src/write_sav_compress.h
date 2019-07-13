@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Jan Marvin Garbuszus
+ * Copyright (C) 2019 Jan Marvin Garbuszus
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,24 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Rcpp.h>
-#include <string>
+#ifndef WRITE_SAV_UNCOMPRESS_H
+#define WRITE_SAV_UNCOMPRESS_H
 
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/algorithm/string/split.hpp>
+void write_sav_compress (std::fstream& sav, std::fstream& tmp,
+                         const bool swapit, bool debug);
 
-//' split character vector at "="
-//'
-//' @param val_s CharacterVector
-//' @import Rcpp
-//' @export
-// [[Rcpp::export]]
-Rcpp::CharacterVector boost_split(std::string val_s) {
-
-  std::vector<std::string> vec_r;
-
-  boost::split(vec_r, val_s,
-               boost::is_any_of("="), boost::token_compress_on);
-
-  return(Rcpp::wrap(vec_r));
-}
+#endif

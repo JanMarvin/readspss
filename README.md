@@ -22,6 +22,7 @@ The package features reading of
 and (experimental) writing support of (un)compressed
 
 * sav files and
+* zsav files and
 * por files.
 
 Because of the R code wrapped Rcpp functions the package is pretty fast. The 
@@ -41,8 +42,8 @@ the data label, documentation, date and timestamp.
 Reading of sav and por files is considered feature complete.
 
 Writing of (un)compressed sav and por files is implemented and considered 
-working. Unsupported features are reading and writing of dates, writing of long
-strings and zsav files.
+working. Unsupported features are reading and writing of dates and writing of
+long strings.
 
 ## Installation
 
