@@ -14,7 +14,7 @@ matrix:
           packages:
             - g++-9
       env:
-        - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
+        - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
       before_install: |
         mkdir ~/.R
         cat <<EOF > ~/.R/Makevars
@@ -30,7 +30,7 @@ matrix:
           packages:
             - g++-9
       env:
-        - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
+        - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
       before_install: |
         mkdir ~/.R
         cat <<EOF > ~/.R/Makevars
@@ -46,7 +46,7 @@ matrix:
           packages:
             - g++-9
       env:
-        - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
+        - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
       before_install: |
         mkdir ~/.R
         cat <<EOF > ~/.R/Makevars
