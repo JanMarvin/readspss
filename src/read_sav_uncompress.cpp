@@ -72,19 +72,19 @@ std::string read_sav_uncompress (std::istream& sav,
   }
 
   if(debug) {
-    Rcpp::Rcout << "zhead_ofs " << zhead_ofs << "\n" <<
-      "ztail_ofs " << ztail_ofs << "\n" <<
-        "ztail_len " << ztail_len << "\n" <<
-          "bias " << bias << "\n" <<
-            "zero " << zero << "\n" <<
-              "block_size " << block_size << "\n" <<
-                "n_blocks " << n_blocks << "\n" <<
+    Rcpp::Rcout << "zhead_ofs " << zhead_ofs <<
+      "\nztail_ofs " << ztail_ofs <<
+        "\nztail_len " << ztail_len <<
+          "\nbias " << bias <<
+            "\nzero " << zero <<
+              "\nblock_size " << block_size <<
+                "\nn_blocks " << n_blocks <<
                   std::endl;
   }
 
 
   // write to temporary file
-  const std::string tempstr = std::tmpnam(nullptr);
+  const std::string tempstr = ".readspss_unc_tmp_file";
   std::fstream outfile (tempstr, std::ios::out | std::ios::binary);
 
   for (int i = 0; i < n_blocks; ++i) {

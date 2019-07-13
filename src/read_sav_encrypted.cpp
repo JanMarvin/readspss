@@ -73,7 +73,7 @@ int encryptfile (const char * filePath, std::string &outpath, std::string pass)
     }
 
     // file is written into a temp file
-    const std::string tempstr = std::tmpnam(nullptr);
+    const std::string tempstr = ".readspss_enc_tmp_file";
     std::fstream outfile (tempstr, std::ios::out | std::ios::binary);
 
     /* Decrypt entire input. */

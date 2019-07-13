@@ -26,12 +26,8 @@
 #include "spss.h"
 
 
-void write_sav_compress (std::fstream& sav, std::string tempstr,
+void write_sav_compress (std::fstream& sav, std::fstream& tmp,
                          const bool swapit, bool debug) {
-
-
-
-  std::fstream tmp (tempstr, std::ios::in | std::ios::binary);
 
   // open zsav destination
   if (sav.is_open())
@@ -53,8 +49,7 @@ void write_sav_compress (std::fstream& sav, std::string tempstr,
     int32_t n_blocks = ceil((double)savlen/block_size);
 
     if (debug)
-      Rcpp::Rcout << savlen << " " << curpos <<
-        " " << savlen << " " << n_blocks << std::endl;
+      Rcpp::Rcout << savlen << " " << curpos << " " << n_blocks << std::endl;
 
     int64_t uncompr_ofs = 0, compr_ofs = 0;
     int32_t uncompr_size = block_size, compr_size = compressBound(uncompr_size);
@@ -73,11 +68,11 @@ void write_sav_compress (std::fstream& sav, std::string tempstr,
     writebin(ztail_len, sav, swapit);
 
     // compress sav
-    for (auto i = 0; i < n_blocks; ++i) {
+    for (int32_t i = 0; i < n_blocks; ++i) {
 
       // modify chunk size for last chunk
       if (i == (n_blocks-1)) {
-        auto len = savlen - (block_size * (n_blocks -1));
+        int64_t len = savlen - (block_size * (n_blocks -1));
 
         uncompr_size = len;
         compr_size = compressBound(uncompr_size);
@@ -87,16 +82,16 @@ void write_sav_compress (std::fstream& sav, std::string tempstr,
       if (i > 0) uncompr_ofs = u_ofs[i-1] + u_size[i-1];
       compr_ofs = sav.tellg();
 
-      auto status = 0;
+      int32_t status = 0;
       uLong uncompr_block_len = uncompr_size;
       uLong compr_block_len   = compr_size;
 
       // Bytef is unsigned char *
       std::vector<unsigned char> uncompr_block(uncompr_size);
-      std::vector<unsigned char>   compr_block(compr_size);
+      std::vector<unsigned char> compr_block(compr_size);
 
       // read the uncompr data part
-      tmp.read((char*)(&uncompr_block[0]), block_size);
+      tmp.read((char*)(&uncompr_block[0]), uncompr_size);
 
       // uncompress should be 0
       status = compress2(&compr_block[0], &compr_block_len,
@@ -129,7 +124,7 @@ void write_sav_compress (std::fstream& sav, std::string tempstr,
     writebin(n_blocks, sav, swapit);
 
     // write uncompr and compr ofset and size
-    for (auto i = 0; i < n_blocks; ++i) {
+    for (int32_t i = 0; i < n_blocks; ++i) {
       writebin(u_ofs[i], sav, swapit);
       writebin(c_ofs[i], sav, swapit);
       writebin(u_size[i], sav, swapit);
@@ -152,9 +147,6 @@ void write_sav_compress (std::fstream& sav, std::string tempstr,
         "ztail_ofs " << ztail_ofs << "\n" <<
           "ztail_len " << ztail_len << "\n" << std::endl;
     }
-
-    // sav file is complete
-    tmp.close();
   }
 
 }
