@@ -26,7 +26,6 @@
 #include <boost/algorithm/string/split.hpp>
 
 using namespace Rcpp;
-using namespace std;
 
 #include "spss.h"
 #include "read_sav_known_n.h"
@@ -548,7 +547,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
           }
 
           // TODO: is this correct?
-          if ( isnan(sysmiss) ) {
+          if ( std::isnan(sysmiss) ) {
             lowest = highest;
             highest = R_PosInf;
           }

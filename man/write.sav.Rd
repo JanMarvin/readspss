@@ -5,10 +5,10 @@
 \title{write.sav}
 \usage{
 write.sav(dat, filepath, label, add.rownames = FALSE, compress = FALSE,
-  convert.dates = TRUE, tz = "GMT")
+  convert.dates = TRUE, tz = "GMT", debug = FALSE, is_zsav = FALSE)
 }
 \arguments{
-\item{dat}{\emph{data.frame} a dat.aframe to strore as sav-file.}
+\item{dat}{\emph{data.frame} a data.frame to strore as SPSS file.}
 
 \item{filepath}{\emph{string} full path where and how this file should be
 stored}
@@ -17,21 +17,26 @@ stored}
 labels. It must be of size `ncol(dat)`}
 
 \item{add.rownames}{\emph{logical.} If \code{TRUE}, a new variable rownames
-will be added to the por-file.}
+will be added to the sav-file.}
 
 \item{compress}{\emph{logical} should compression be used. If TRUE some
 integers will be stored more efficiently. Everything will be stored in
 chunks of 8 chars. Reduces memory size of sav-file.}
 
-\item{convert.dates}{\emph{logical} should dates be converted to SPSS format}
+\item{convert.dates}{\emph{logical} should dates be converted to SPSS format.}
 
 \item{tz}{\emph{character.} The name of the timezone convert.dates will use.}
+
+\item{debug}{\emph{logical} print debug information.}
+
+\item{is_zsav}{\emph{logical} explicitly create a zsav file. If the file
+ending zsav is used, this is selected as default.}
 }
 \value{
 \code{readspss} returns nothing
 }
 \description{
-Function to write an SPSS sav file from a data.frame().
+Function to write an SPSS sav or zsav file from a data.frame().
 }
 \details{
 Strings longer than 255 chars are not provided.

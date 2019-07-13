@@ -73,9 +73,11 @@ writepor <- function(filePath, dat) {
 #' @param filePath The full systempath to the dta file you want to import.
 #' @param dat the data frame
 #' @param compress the file
+#' @param debug print debug information
+#' @param is_zsav write zsav
 #' @import Rcpp
 #' @export
-writesav <- function(filePath, dat, compress) {
-    invisible(.Call(`_readspss_writesav`, filePath, dat, compress))
+writesav <- function(filePath, dat, compress, debug, is_zsav) {
+    invisible(.Call(`_readspss_writesav`, filePath, dat, compress, debug, is_zsav))
 }
 

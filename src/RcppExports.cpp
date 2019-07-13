@@ -83,14 +83,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // writesav
-void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress);
-RcppExport SEXP _readspss_writesav(SEXP filePathSEXP, SEXP datSEXP, SEXP compressSEXP) {
+void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress, bool debug, bool is_zsav);
+RcppExport SEXP _readspss_writesav(SEXP filePathSEXP, SEXP datSEXP, SEXP compressSEXP, SEXP debugSEXP, SEXP is_zsavSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const char * >::type filePath(filePathSEXP);
     Rcpp::traits::input_parameter< Rcpp::DataFrame >::type dat(datSEXP);
     Rcpp::traits::input_parameter< uint8_t >::type compress(compressSEXP);
-    writesav(filePath, dat, compress);
+    Rcpp::traits::input_parameter< bool >::type debug(debugSEXP);
+    Rcpp::traits::input_parameter< bool >::type is_zsav(is_zsavSEXP);
+    writesav(filePath, dat, compress, debug, is_zsav);
     return R_NilValue;
 END_RCPP
 }
@@ -102,7 +104,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_readspss_readpor", (DL_FUNC) &_readspss_readpor, 4},
     {"_readspss_readsav", (DL_FUNC) &_readspss_readsav, 4},
     {"_readspss_writepor", (DL_FUNC) &_readspss_writepor, 2},
-    {"_readspss_writesav", (DL_FUNC) &_readspss_writesav, 3},
+    {"_readspss_writesav", (DL_FUNC) &_readspss_writesav, 5},
     {NULL, NULL, 0}
 };
 
