@@ -19,8 +19,7 @@
 #define WRITE_DATA_H
 
 void write_data(Rcpp::DataFrame dat, int32_t cflag,
-                int64_t n, int32_t kk,
-                Rcpp::IntegerVector vtyp, Rcpp::IntegerVector itc,
-                Rcpp::IntegerVector cc, std::fstream& sav, bool swapit);
+                int64_t n, int32_t kk, info_t *infos,
+                std::fstream& sav, bool swapit);
 
 #endif

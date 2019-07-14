@@ -26,9 +26,8 @@ using namespace Rcpp;
 #include "spss.h"
 
 void write_data(Rcpp::DataFrame dat, int32_t cflag,
-                int64_t n, int32_t kk,
-                Rcpp::IntegerVector vtyp, Rcpp::IntegerVector itc,
-                Rcpp::IntegerVector cc, std::fstream& sav, bool swapit) {
+                int64_t n, int32_t kk, info_t *infos,
+                std::fstream& sav, bool swapit) {
 
   if (cflag) {
 
@@ -58,9 +57,9 @@ void write_data(Rcpp::DataFrame dat, int32_t cflag,
       for (int32_t j = 0; j < kk; ++j) {
 
 
-        int32_t const type = vtyp[j];
-        int32_t const ITC = itc[j];
-        int32_t const CC = cc[j];
+        int32_t const type = infos->vtyp[j];
+        int32_t const ITC = infos->itc[j];
+        int32_t const CC = infos->cc[j];
 
         // Rprintf("n %d & k %d\n", i, j);
         // Rprintf("iter: %d\n", iter);
@@ -295,7 +294,7 @@ void write_data(Rcpp::DataFrame dat, int32_t cflag,
     for (int64_t i = 0; i < n; ++i) {
       for (int32_t j = 0; j < kk; ++j) {
 
-        const int32_t type = vtyp[j];
+        const int32_t type = infos->vtyp[j];
 
         // Rprintf("k: %d; n: %d\n", j, i);
         //

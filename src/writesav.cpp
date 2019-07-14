@@ -53,25 +53,27 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
     int32_t rtype = 0, subtyp = 0, size = 0, count = 0;
     std::string empty = "";
 
-    Rcpp::IntegerVector vtyp = dat.attr("vtyp");
-    Rcpp::IntegerVector cc = dat.attr("cc");
-    Rcpp::IntegerVector itc = dat.attr("itc");
-    Rcpp::IntegerVector vartypes = dat.attr("vartypes");
-    Rcpp::IntegerVector vartyp = dat.attr("vartyp");
+    info_t* infos = new info_t;
 
-    Rcpp::CharacterVector nvarnames = dat.attr("nvarnames");
-    Rcpp::CharacterVector label = dat.attr("label");
+    infos->vtyp = dat.attr("vtyp");
+    infos->cc = dat.attr("cc");
+    infos->itc = dat.attr("itc");
+    infos->vartypes = dat.attr("vartypes");
+    infos->vartyp = dat.attr("vartyp");
 
-    Rcpp::IntegerVector haslabel = dat.attr("haslabel");
-    Rcpp::List labtab = dat.attr("labtab");
+    infos->nvarnames = dat.attr("nvarnames");
+    infos->label = dat.attr("label");
+
+    infos->haslabel = dat.attr("haslabel");
+    infos->labtab = dat.attr("labtab");
 
     std::string timestamp = Rcpp::as<std::string>(dat.attr("timestamp"));
     std::string datestamp = Rcpp::as<std::string>(dat.attr("datestamp"));
     std::string longvarname = Rcpp::as<std::string>(dat.attr("longvarnames"));
 
     // write correct k for string variables with nchar() > 8
-    if (nvarnames.size() > kk)
-      k = nvarnames.size();
+    if (infos->nvarnames.size() > kk)
+      k = infos->nvarnames.size();
     else
       k = kk;
 
@@ -116,17 +118,17 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
 
     // rtype 2 -----------------------------------------------------------------
     // start variable part
-    for (int i = 0; i < vartypes.size(); ++i) {
+    for (int i = 0; i < infos->vartypes.size(); ++i) {
       rtype = 2;
       writebin(rtype, sav, swapit);
 
-      int32_t isdate = vartyp[i];
-      int32_t subtyp = vartypes[i];
+      int32_t isdate = infos->vartyp[i];
+      int32_t subtyp = infos->vartypes[i];
       writebin(subtyp, sav, swapit);
 
       int32_t vlflag = 0;
 
-      if (k == label.size())
+      if (k == infos->label.size())
         vlflag = 1;
 
       writebin(vlflag, sav, swapit);    // Label flag
@@ -190,12 +192,12 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
       var5 = c.a;
       writebin(var5, sav, 0);
 
-      std::string nvarname = Rcpp::as<std::string>(nvarnames[i]);
+      std::string nvarname = Rcpp::as<std::string>(infos->nvarnames[i]);
       writestr(nvarname, 8, sav);
 
       if (vlflag == 1) {
 
-        std::string lab = Rcpp::as<std::string>(label[i]);
+        std::string lab = Rcpp::as<std::string>(infos->label[i]);
 
         int32_t origlen = 0;
         origlen = lab.size();
@@ -207,19 +209,19 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
 
     }
 
-    if(!Rf_isNull(haslabel))
+    if(!Rf_isNull(infos->haslabel))
     {
 
       // rtype 3 ---------------------------------------------------------------
 
-      int32_t nolabels = haslabel.size();
+      int32_t nolabels = infos->haslabel.size();
 
       for (int i = 0; i < nolabels; ++i) {
 
         rtype = 3;
         writebin(rtype, sav, swapit);
 
-        Rcpp::IntegerVector code = labtab(i);
+        Rcpp::IntegerVector code = infos->labtab(i);
 
         std::vector<std::string> labs = code.attr("names");
 
@@ -260,7 +262,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
 
         int32_t lab_id = 0;
 
-        lab_id = haslabel[i];
+        lab_id = infos->haslabel[i];
 
         writebin(lab_id, sav, swapit);
       }
@@ -304,7 +306,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
       std::fstream tmp (tempstr, std::ios::out | std::ios::binary);
 
       // write data part to tmp file
-      write_data(dat, cflag,n, kk, vtyp, itc, cc, tmp, swapit);
+      write_data(dat, cflag,n, kk, infos, tmp, swapit);
       tmp.close();
 
       tmp.open(tempstr);
@@ -318,7 +320,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
 
     } else {
       // write data part
-      write_data(dat, cflag,n, kk, vtyp, itc, cc, sav, swapit);
+      write_data(dat, cflag,n, kk, infos, sav, swapit);
     }
 
     sav.close();

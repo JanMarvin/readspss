@@ -7,6 +7,18 @@
 #include <string>
 #include "swap_endian.h"
 
+struct info_t {
+  Rcpp::IntegerVector vtyp;
+  Rcpp::IntegerVector cc;
+  Rcpp::IntegerVector itc;
+  Rcpp::IntegerVector vartypes;
+  Rcpp::IntegerVector vartyp;
+  Rcpp::CharacterVector nvarnames;
+  Rcpp::CharacterVector label;
+  Rcpp::IntegerVector haslabel;
+  Rcpp::List labtab;
+};
+
 template <typename T>
 T readbin( T t , std::istream& sav, bool swapit)
 {
