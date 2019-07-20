@@ -185,46 +185,33 @@ inline std::string readtostring(T& sav)
 inline int getdigit(char *p, int *err)
 {
   *err = 0;
+  int32_t z = 0;
   if (*p >= '0' && *p <= '9')
-    return((int)(*p - '0'));
+    z = (int32_t)(*p - '0');
   else if (*p >= 'A' && *p <= 'T')
-    return((int)(10 + *p - 'A'));
+    z = (int32_t)(10 + *p - 'A');
   else
     *err = 1;
 
-  /* for debugging */
-  // Rcpp::Rcout << *p << std::endl;
-
-  return(0);
+  return(z);
 }
 
 
-// Part of TDA. Program for Transition Data Analysis, written by Goetz Rohwer.
+// modified Part of TDA. Program for Transition Data Analysis, written by Goetz
+// Rohwer.
 // Copyright (C) 1989,1991-97 Goetz Rohwer. GPL-2
-inline
-double dnum(std::string strng)
+inline double dnum(std::string strng)
 {
-  char *p = &strng[0];
-  double x = 0.0;
-  int err;
-  int neg = 0;
-  int pnt = 0;
-  int ex  = 0;
-  int k = 0;
-  int n = 0;
-  double man = 0.0;
-  double mex = 0.0;
-  char *q;
-  int RSPCnt = 0;
+  double x = 0.0, man = 0.0, mex = 0.0; /* result, mantissa and exponent */
+  int32_t err,  neg = 0, pnt = 0, ex  = 0, k = 0,  n = 0;
+  char *p = &strng[0], *q;
 
   q = p;
   while (*p && *p == ' ') {
-    RSPCnt--;
     p++;
   }
 
   if (*p == '*') {                /* check for internal missing value */
-    RSPCnt -= 2;
     p += 2;
     x = NA_REAL;
     return(x);
@@ -232,7 +219,6 @@ double dnum(std::string strng)
 
   if (*p == '-') {
     neg = 1;
-    RSPCnt--;
     p++;
   }
   while (*p && *p != '/') {
@@ -268,7 +254,6 @@ double dnum(std::string strng)
         }
       }
     }
-    RSPCnt--;
     p++;
   }
   if (neg)
@@ -280,12 +265,10 @@ double dnum(std::string strng)
       man /= 30.0;
   }
   if (ex == 1)
-    man *= pow(30.0,mex);
+    man *= pow(30.0, mex);
   else if (ex == -1)
-    man /= pow(30.0,mex);
+    man /= pow(30.0, mex);
   x = man;
-
-  RSPCnt--;
 
   return(x);
 }
@@ -298,12 +281,10 @@ static char DIG30[] = {'0','1','2','3','4','5','6','7','8','9',
                        'A','B','C','D','E','F','G','H','I','J',
                        'K','L','M','N','O','P','Q','R','S','T'};
 
-inline std::string pnum1(int n)
+inline std::string pnum1(int32_t n)
 {
-  int m,r;
-  char *p;
-  char buf[100];
-
+  int32_t m, r;
+  char *p, buf[100];
   std::string val_s;
 
   if (n < 0) {
@@ -312,7 +293,7 @@ inline std::string pnum1(int n)
   }
   p = buf;
   while (n >= 30) {
-    m = (int) (n / 30);
+    m = (int32_t) (n / 30);
     r = n - 30 * m;
     sprintf(p++,"%c",DIG30[r]);
     n = m;
@@ -331,8 +312,8 @@ inline std::string pnum1(int n)
 
 inline std::string pfnum(double x)
 {
-  int i;
-  double a,b,c,d,e;
+  int32_t i;
+  double a, b, c, d, e;
   double EPSI = std::numeric_limits<double>::epsilon();
 
   std::string val_s;
@@ -341,12 +322,12 @@ inline std::string pfnum(double x)
     return ("0");
 
   e = floor(log(x) / log(30.0));
-  b = x / pow(30.0,e);
+  b = x / pow(30.0, e);
   c = floor(b);
   if (c < 0.0 || c >= 30.0)
     Rcpp::stop("74"); // no clue what this supposed be
 
-  val_s = DIG30[(int)c];
+  val_s = DIG30[(int32_t)c];
   b -= c;
   if (b > EPSI) {
     val_s += ".";
@@ -354,14 +335,14 @@ inline std::string pfnum(double x)
     for (i = 0; i < 10 ; ++i) {
       a = b * c;
       d = floor(a);
-      val_s += DIG30[(int)d];
+      val_s += DIG30[(int32_t)d];
       b -= d / c;
       if (b <= EPSI)
         break;
       c *= 30;
     }
   }
-  i = (int)e;
+  i = (int32_t)e;
   if (i) {
     if (i < 0) {
       val_s += "-";
@@ -466,12 +447,12 @@ inline std::string b30str (std::string &val_s) {
   return std::to_string(std::strtol(val_s.c_str(), NULL, 30));
 }
 
-inline int b30int (std::string &val_s) {
+inline int32_t b30int (std::string &val_s) {
   return std::strtol(val_s.c_str(), NULL, 30);
 }
 
 union int_chars {
-  int a;
+  int32_t a;
   char b[4];
 };
 

@@ -232,40 +232,25 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         // bits of int32_t define digits, width and type
         var4 = readbin(var4, sav, swapit);
 
-        // print
-        int8_t var41, var42, var43, var44;
-
-        var41 = (int8_t)var4;
-        var42 = (var4 >> 8);
-        var43 = (var4 >> 16);
-        var44 = (var4 >> 24);
-
         // 4 and 5 are most likely identical
         var5 = readbin(var5, sav, swapit);
 
-        // write
-        int8_t var51, var52, var53, var54;
-
-        var51 = (int8_t)var5;
-        var52 = (var5 >> 8);
-        var53 = (var5 >> 16);
-        var54 = (var5 >> 24);
-
-
-        Rcpp::NumericMatrix varmat(1,11);
 
         // Store vars in matrix export as attr varmat
+        Rcpp::NumericMatrix varmat(1,11);
+
         varmat(0,0)  = vtype;
         varmat(0,1)  = vlflag;
         varmat(0,2)  = nmiss; // 1, 2, 3 or -1, -2, -3 (range)
-        varmat(0,3)  = var41; // digits print format?
-        varmat(0,4)  = var42; // field width
-        varmat(0,5)  = var43; // format type
-        varmat(0,6)  = var44; // not used
-        varmat(0,7)  = var51; // digits write format?
-        varmat(0,8)  = var52; // field width
-        varmat(0,9)  = var53; // format type
-        varmat(0,10) = var54; // not used
+        varmat(0,3)  = (int8_t)var4; // digits print format?
+        varmat(0,4)  = (var4 >> 8); // field width
+        varmat(0,5)  = (var4 >> 16); // format type
+        varmat(0,6)  = (var4 >> 24); // not used
+        // write
+        varmat(0,7)  = (int8_t)var5; // digits write format?
+        varmat(0,8)  = (var5 >> 8); // field width
+        varmat(0,9)  = (var5 >> 16); // format type
+        varmat(0,10) = (var5 >> 24); // not used
 
         if (vtype > -1) // -1 is of no further useage
           varlist.push_back(varmat);
