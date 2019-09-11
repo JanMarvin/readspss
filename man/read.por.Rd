@@ -11,7 +11,7 @@ read.por(file, convert.factors = TRUE, generate.factors = TRUE,
 }
 \arguments{
 \item{file}{\emph{string} a por-file to import. can be a file on a computer
-or an url. in this case the file will be downloaded and read befor it is
+or an url. in this case the file will be downloaded and read before it is
 used.}
 
 \item{convert.factors}{\emph{logical} if true numeric or character variables
@@ -28,16 +28,16 @@ available, fromEncoding can be used to change encoding.}
 
 \item{fromEncoding}{\emph{character.} encoding of the imported file. This
 information is stored inside the por-file, but is currently unused. Still
-this option can be used to define the inital encoding by hand.}
+this option can be used to define the initial encoding by hand.}
 
 \item{use.missings}{\emph{logical} should missing values be converted.
 Defaults to TRUE.}
 
 \item{debug}{\emph{logical} provides additional debug information. Most
-likely not usefull to any user.}
+likely not useful to any user.}
 
 \item{override}{\emph{logical}. The filename provided in \code{file} is
-checked for the ending por. If the fileending is different, nothing is read.
+checked for the ending por. If the file ending is different, nothing is read.
 This option can be used to override this behavior.}
 
 \item{convert.dates}{\emph{logical}. Should dates be converted on the fly?}

@@ -18,7 +18,7 @@
 #' write.sav
 #'
 #' Function to write an SPSS sav or zsav file from a data.frame().
-#' @param dat \emph{data.frame} a data.frame to strore as SPSS file.
+#' @param dat \emph{data.frame} a data.frame to store as SPSS file.
 #' @param filepath \emph{string} full path where and how this file should be
 #'  stored
 #' @param label \emph{character} if any provided this must be a vector of

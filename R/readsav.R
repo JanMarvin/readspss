@@ -2,7 +2,7 @@
 #'
 #' Function to read a SPSS sav file into a data.frame().
 #'@param file \emph{string} a sav-file to import. can be a file on a computer
-#' or an url. in this case the file will be downloaded and read befor it is
+#' or an url. in this case the file will be downloaded and read before it is
 #' used.
 #'@param convert.factors \emph{logical} if true numeric or character variables
 #' will be converted into a factor in R.
@@ -15,13 +15,13 @@
 #' available, fromEncoding can be used to change encoding.
 #'@param fromEncoding \emph{character.} encoding of the imported file. This
 #' information is stored inside the sav-file, but is currently unused. Still
-#' this option can be used to define the inital encoding by hand.
+#' this option can be used to define the initial encoding by hand.
 #'@param use.missings \emph{logical} should missing values be converted.
 #' Defaults to TRUE.
 #' @param debug \emph{logical} provides additional debug information. Most
-#' likely not usefull to any user.
+#' likely not useful to any user.
 #'@param override \emph{logical}. The filename provided in \code{file} is
-#' checked for the ending sav. If the fileending is different, nothing is read.
+#' checked for the ending sav. If the file ending is different, nothing is read.
 #' This option can be used to override this behavior.
 #'@param convert.dates \emph{logical}. Should dates be converted on the fly?
 #'@param add.rownames \emph{logical.} If \code{TRUE}, the first column will be
@@ -52,7 +52,7 @@
 #'\item{vtype}{SPSS type 0 is usually a numeric/integer}
 #'\item{val.label}{value labels}
 #'\item{disppar}{matrix of display parameters if available}
-#'\item{missings}{a list containg information about the missing variables. if
+#'\item{missings}{a list containing information about the missing variables. if
 #' \code{use.missings=TRUE} this Information will be used to generate missings.}
 #'\item{haslabel}{list of variables that contain labels}
 #'\item{longstring}{character vector of long strings if any in file}
@@ -111,7 +111,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   file <- file_ext(basename(filepath))
 
-  if ((file != "sav" & file != "SAV" & file != "zsav" & file != "ZSAV") &
+  if ((tolower(file) != "sav" & tolower(file) != "zsav") &
       !isTRUE(override) ){
     warning ("Filending is not sav.
              Use Override if this check should be ignored.")

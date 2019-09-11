@@ -2,7 +2,7 @@
 #'
 #' Function to read a SPSS por file into a data.frame().
 #'@param file \emph{string} a por-file to import. can be a file on a computer
-#' or an url. in this case the file will be downloaded and read befor it is
+#' or an url. in this case the file will be downloaded and read before it is
 #' used.
 #'@param convert.factors \emph{logical} if true numeric or character variables
 #' will be converted into a factor in R.
@@ -15,13 +15,13 @@
 #' available, fromEncoding can be used to change encoding.
 #'@param fromEncoding \emph{character.} encoding of the imported file. This
 #' information is stored inside the por-file, but is currently unused. Still
-#' this option can be used to define the inital encoding by hand.
+#' this option can be used to define the initial encoding by hand.
 #'@param use.missings \emph{logical} should missing values be converted.
 #' Defaults to TRUE.
 #' @param debug \emph{logical} provides additional debug information. Most
-#' likely not usefull to any user.
+#' likely not useful to any user.
 #'@param override \emph{logical}. The filename provided in \code{file} is
-#' checked for the ending por. If the fileending is different, nothing is read.
+#' checked for the ending por. If the file ending is different, nothing is read.
 #' This option can be used to override this behavior.
 #'@param convert.dates \emph{logical}. Should dates be converted on the fly?
 #'@param add.rownames \emph{logical.} If \code{TRUE}, the first column will be
@@ -65,7 +65,7 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   file <- file_ext(basename(filepath))
 
-  if ((file != "por" & file != "POR") &
+  if ((tolower(file) != "por") &
       !isTRUE(override) ){
     warning ("Filending is not por.
              Use Override if this check should be ignored.")

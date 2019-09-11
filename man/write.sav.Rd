@@ -8,7 +8,7 @@ write.sav(dat, filepath, label, add.rownames = FALSE, compress = FALSE,
   convert.dates = TRUE, tz = "GMT", debug = FALSE, is_zsav = FALSE)
 }
 \arguments{
-\item{dat}{\emph{data.frame} a data.frame to strore as SPSS file.}
+\item{dat}{\emph{data.frame} a data.frame to store as SPSS file.}
 
 \item{filepath}{\emph{string} full path where and how this file should be
 stored}
