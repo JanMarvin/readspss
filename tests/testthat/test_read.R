@@ -14,8 +14,8 @@ df <- system.file("extdata", "electric.sav", package="readspss")
 
 df_r <- read.sav(df, convert.factors = FALSE, use.missings = FALSE)
 
-df_f <- read.spss(df, to.data.frame = TRUE, use.value.labels = FALSE,
-                  use.missings = FALSE, stringsAsFactors=FALSE)
+df_f <- foreign::read.spss(df, to.data.frame = TRUE, use.value.labels = FALSE,
+                           use.missings = FALSE, stringsAsFactors=FALSE)
 
 test_that( "electric", {
   expect_true(all.equal(df_r, df_f, check.attributes = FALSE) )
@@ -31,9 +31,9 @@ df_r <- read.sav(df, convert.factors = FALSE, use.missings = FALSE,
                  convert.dates = FALSE)
 
 suppressWarnings( # caused by foreign
-  df_f <- read.spss(df, to.data.frame = TRUE, use.value.labels = FALSE,
-                    use.missings = FALSE, stringsAsFactors=FALSE,
-                    trim_values = TRUE, trim.factor.names = TRUE)
+  df_f <- foreign::read.spss(df, to.data.frame = TRUE, use.value.labels = FALSE,
+                             use.missings = FALSE, stringsAsFactors=FALSE,
+                             trim_values = TRUE, trim.factor.names = TRUE)
 )
 
 
@@ -201,4 +201,15 @@ test_that("por_vs_sav", {
   expect_true(all.equal(df_sav, df_por, check.attributes = FALSE))
 })
 
+#### read.spps test ####
 
+f_sav <- system.file("extdata", "electric.sav", package="readspss")
+f_por <- system.file("extdata", "electric.por", package="readspss")
+
+df_sav <- readspss::read.spss(f_sav)
+df_por <- readspss::read.spss(f_por)
+
+
+test_that("por_vs_sav", {
+  expect_true(all.equal(df_sav, df_por, check.attributes = FALSE))
+})
