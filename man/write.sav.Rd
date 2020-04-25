@@ -4,8 +4,17 @@
 \alias{write.sav}
 \title{write.sav}
 \usage{
-write.sav(dat, filepath, label, add.rownames = FALSE, compress = FALSE,
-  convert.dates = TRUE, tz = "GMT", debug = FALSE, is_zsav = FALSE)
+write.sav(
+  dat,
+  filepath,
+  label,
+  add.rownames = FALSE,
+  compress = FALSE,
+  convert.dates = TRUE,
+  tz = "GMT",
+  debug = FALSE,
+  is_zsav = FALSE
+)
 }
 \arguments{
 \item{dat}{\emph{data.frame} a data.frame to store as SPSS file.}

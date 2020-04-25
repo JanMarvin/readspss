@@ -1,6 +1,6 @@
 Package: readspss
 Type: Package
-Title: Importing SPSS Files
+Title: Importing and Exporting SPSS Files
 Version: 0.14
 Authors@R: c(
     person("Jan Marvin", "Garbuszus",
@@ -14,7 +14,7 @@ Authors@R: c(
     person("Goetz", "Rohwer", role="cph")
     )
 Maintainer: Jan Marvin Garbuszus <jan.garbuszus@ruhr-uni-bochum.de>
-Description: Experimental function to read the SPSS file format.
+Description: Package to read and write the SPSS file formats.
 License: GPL-2 | file LICENSE
 LazyData: TRUE
 Imports:
@@ -23,4 +23,4 @@ Suggests: testthat, foreign, datasets
 LinkingTo: Rcpp, BH
 SystemRequirements: C++11, OpenSSL >= 1.0.1
 ByteCompile: yes
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0

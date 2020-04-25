@@ -4,9 +4,16 @@
 \alias{write.por}
 \title{write.por}
 \usage{
-write.por(dat, filepath, label, add.rownames = FALSE,
-  convert.factors = TRUE, toEncoding = "CP1252",
-  convert.dates = TRUE, tz = "GMT")
+write.por(
+  dat,
+  filepath,
+  label,
+  add.rownames = FALSE,
+  convert.factors = TRUE,
+  toEncoding = "CP1252",
+  convert.dates = TRUE,
+  tz = "GMT"
+)
 }
 \arguments{
 \item{dat}{\emph{data.frame} a data.frame to export as por-file.}

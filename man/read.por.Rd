@@ -4,10 +4,18 @@
 \alias{read.por}
 \title{read.por}
 \usage{
-read.por(file, convert.factors = TRUE, generate.factors = TRUE,
-  encoding = TRUE, fromEncoding = NULL, use.missings = TRUE,
-  debug = FALSE, override = FALSE, convert.dates = TRUE,
-  add.rownames = FALSE)
+read.por(
+  file,
+  convert.factors = TRUE,
+  generate.factors = TRUE,
+  encoding = TRUE,
+  fromEncoding = NULL,
+  use.missings = TRUE,
+  debug = FALSE,
+  override = FALSE,
+  convert.dates = TRUE,
+  add.rownames = FALSE
+)
 }
 \arguments{
 \item{file}{\emph{string} a por-file to import. can be a file on a computer

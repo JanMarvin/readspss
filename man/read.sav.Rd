@@ -4,10 +4,19 @@
 \alias{read.sav}
 \title{read.sav}
 \usage{
-read.sav(file, convert.factors = TRUE, generate.factors = TRUE,
-  encoding = TRUE, fromEncoding = NULL, use.missings = TRUE,
-  debug = FALSE, override = FALSE, convert.dates = TRUE,
-  add.rownames = FALSE, pass)
+read.sav(
+  file,
+  convert.factors = TRUE,
+  generate.factors = TRUE,
+  encoding = TRUE,
+  fromEncoding = NULL,
+  use.missings = TRUE,
+  debug = FALSE,
+  override = FALSE,
+  convert.dates = TRUE,
+  add.rownames = FALSE,
+  pass
+)
 }
 \arguments{
 \item{file}{\emph{string} a sav-file to import. can be a file on a computer
