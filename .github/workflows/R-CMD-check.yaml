@@ -74,6 +74,7 @@ jobs:
           pkgs <- installed.packages()[, "Package"]
           sessioninfo::session_info(pkgs, include_base = TRUE)
         shell: Rscript {0}
+
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_: false
@@ -81,9 +82,16 @@ jobs:
         shell: Rscript {0}
 
       - name: Show testthat output
-        if: always()
+        if: runner.os != 'Ubuntu' && success()
         run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
         shell: bash
+
+      - name: Build binary package
+        if: success()
+        run: |
+          dir.create("build")
+          devtools::build(path = "build", binary = TRUE)
+        shell: Rscript {0}
 
       - name: Upload check results
         if: failure()
@@ -91,3 +99,5 @@ jobs:
         with:
           name: ${{ runner.os }}-r${{ matrix.config.r }}-results
           path: check
+
+        uses: actions/upload-artifact@main
