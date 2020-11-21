@@ -3,4 +3,5 @@
 ^\.travis\.yml$
 ^appveyor\.yml$
 ^src/Makevars$
+^build/$
 ^\.github$

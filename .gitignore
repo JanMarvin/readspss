@@ -1,6 +1,7 @@
 .Rproj.user
 .Rhistory
 .RData
+build/*
 readspss.Rcheck/*
 src/*.o
 src/*.so
