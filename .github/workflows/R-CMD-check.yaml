@@ -29,9 +29,9 @@ jobs:
           - {os: macOS-latest,   r: 'release'}
           - {os: windows-latest, r: 'release'}
           - {os: windows-latest, r: '3.5'}
-          - {os: ubuntu-20.04,  r: 'devel'}
-          - {os: ubuntu-20.04,  r: 'release'}
-          - {os: ubuntu-20.04,  r: 'oldrel'}
+          - {os: ubuntu-latest,  r: 'devel'}
+          - {os: ubuntu-latest,  r: 'release'}
+          - {os: ubuntu-latest,  r: 'oldrel'}
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
@@ -61,20 +61,11 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
           restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
 
-      - name: Install system dependencies
-        if: runner.os == 'Linux'
-        run: |
-          while read -r cmd
-          do
-            eval sudo $cmd
-          done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
-
       - name: Install dependencies
         run: |
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
           remotes::install_cran("sessioninfo")
-          remotes::install_cran("devtools")
         shell: Rscript {0}
 
       - name: Session info
@@ -103,14 +94,15 @@ jobs:
           path: check
 
       - name: Build binary package
-        if: success()
+        if: success() & runner.os != 'Ubuntu'
         run: |
           dir.create("build")
+          remotes::install_cran("devtools")
           devtools::build(path = "build", binary = TRUE)
         shell: Rscript {0}
 
       - name: Upload build results
-        if: success()
+        if: success() & runner.os != 'Ubuntu'
         uses: actions/upload-artifact@main
         with:
           name: ${{ runner.os }}-r-${{ matrix.config.r }}-pkg
