@@ -82,7 +82,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Show testthat output
-        if: runner.os != 'Ubuntu' && success()
+        if: runner.os != 'ubuntu' && success()
         run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
         shell: bash
 
@@ -97,10 +97,12 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@main
         with:
-          name: ${{ runner.os }}-r${{ matrix.config.r }}-results
+          name: ${{ runner.os }}-r${{ matrix.config.r }}-chk
           path: check
+
+      - name: Upload build results
         if: success()
         uses: actions/upload-artifact@main
         with:
-          name: ${{ runner.os }}-r${{ matrix.config.r }}-results
+          name: ${{ runner.os }}-r${{ matrix.config.r }}-pkg
           path: build
