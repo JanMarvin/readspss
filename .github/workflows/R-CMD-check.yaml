@@ -66,6 +66,7 @@ jobs:
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
           remotes::install_cran("sessioninfo")
+          remotes::install_cran("devtools")
         shell: Rscript {0}
 
       - name: Session info
@@ -86,19 +87,19 @@ jobs:
         run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
         shell: bash
 
-      - name: Build binary package
-        if: success()
-        run: |
-          dir.create("build")
-          devtools::build(path = "build", binary = TRUE)
-        shell: Rscript {0}
-
       - name: Upload check results
         if: failure()
         uses: actions/upload-artifact@main
         with:
           name: ${{ runner.os }}-r${{ matrix.config.r }}-chk
           path: check
+
+      - name: Build binary package
+        if: success()
+        run: |
+          dir.create("build")
+          devtools::build(path = "build", binary = TRUE)
+        shell: Rscript {0}
 
       - name: Upload build results
         if: success()
