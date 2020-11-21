@@ -5,6 +5,11 @@
 # @author Jan Marvin Garbuszus \email{jan.garbuszus@@ruhr-uni-bochum.de}
 # @author Sebastian Jeworutzki \email{sebastian.jeworutzki@@ruhr-uni-bochum.de}
 read.encoding <- function(x, fromEncoding, encoding) {
+
+  # avoid iconv errors
+  if (!is.na(fromEncoding) & is.na(encoding))
+    encoding <- fromEncoding
+
   iconv(x,
         from=fromEncoding,
         to=encoding ,
