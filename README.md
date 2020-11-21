@@ -1,4 +1,4 @@
-# Readspss [![Build Status](https://travis-ci.org/JanMarvin/readspss.svg?branch=master)](https://travis-ci.org/JanMarvin/readspss) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/JanMarvin/readspss?branch=master&svg=true)](https://ci.appveyor.com/project/JanMarvin/readspss)
+# Readspss ![R-CMD-check](https://github.com/JanMarvin/readspss/workflows/R-CMD-check/badge.svg)
 
 R package using Rcpp to parse an SPSS file into a data.frame(). Currently 
 `read.sav` and `read.por` are the main functions and feature of this package.
