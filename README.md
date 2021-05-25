@@ -31,7 +31,7 @@ bit more.
 
 In comparison to `haven` and `foreign` this package preforms pretty well. It
 reads more files than each of its predecessors, some are only readable using
-`readspss`and covers a few more cases of missing values.
+`readspss` and covers a few more cases of missing values.
 
 Focus was not so much on winning every benchmark, but reading all features of
 an SPSS file and to be as exactly as possible. So some benchmarks are
