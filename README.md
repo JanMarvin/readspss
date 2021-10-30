@@ -1,4 +1,5 @@
-# Readspss ![R-CMD-check](https://github.com/JanMarvin/readspss/workflows/R-CMD-check/badge.svg)
+# Readspss ![R-CMD-check](https://github.com/JanMarvin/readspss/workflows/R-CMD-check/badge.svg) [![Codecov test coverage](https://codecov.io/gh/JanMarvin/readspss/branch/main/graph/badge.svg)](https://app.codecov.io/gh/JanMarvin/readspss?branch=main)
+
 
 R package using Rcpp to parse an SPSS file into a data.frame(). Currently 
 `read.sav` and `read.por` are the main functions and feature of this package.
