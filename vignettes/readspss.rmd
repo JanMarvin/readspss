@@ -4,7 +4,7 @@ author: "Jan Marvin Garbuszus"
 date: "2021-10-30"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{readspss}
+  %\VignetteIndexEntry{readspss introduction}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
