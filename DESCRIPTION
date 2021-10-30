@@ -19,7 +19,13 @@ License: GPL-2 | file LICENSE
 LazyData: TRUE
 Imports:
     Rcpp (>= 0.11.2)
-Suggests: testthat, foreign, datasets, knitr, rmarkdown
+Suggests: 
+    testthat,
+    foreign,
+    datasets,
+    knitr,
+    rmarkdown,
+    covr
 LinkingTo: Rcpp, BH
 ByteCompile: yes
 SystemRequirements: C++11, OpenSSL >= 1.0.1
