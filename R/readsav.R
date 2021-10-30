@@ -112,19 +112,17 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   file <- file_ext(basename(filepath))
 
   if ((tolower(file) != "sav" & tolower(file) != "zsav") &
-      !isTRUE(override) ){
-    warning ("Filending is not sav.
+      !isTRUE(override)) {
+    warning("Filending is not sav.
              Use Override if this check should be ignored.")
-    return( NULL )
+    return(NULL)
   }
 
   encStr <- ""
   ownEnc <- localeToCharset(locale = Sys.getlocale("LC_CTYPE"))[1]
-  forceEncoding <- FALSE
 
   if (!is.null(fromEncoding)) {
     encStr <- fromEncoding
-    forceEncoding <- TRUE
   }
 
   if (encoding == FALSE)
@@ -155,7 +153,6 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   autoenc    <- attribs$autoenc
   label      <- attribs$label
   val.labels <- attribs$vallabels
-  vartypes   <- attribs$vartypes
   varmat     <- do.call("rbind", attribs$varmat)
   disppar    <- attribs$disppar
   if (!identical(disppar, integer(0))) {
@@ -172,7 +169,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     if (!identical(attribs$missings, list())) {
 
       mvtab <- attribs$missings
-      missinfo <- varmat[,3]
+      missinfo <- varmat[, 3]
       missinfo <- which(missinfo %in% missinfo[missinfo != 0])
 
 
@@ -182,7 +179,6 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
         if (mvtabi[1] == 1) {
           naval <- mvtabi[2]
-          # print(naval)
 
           data[missinf][data[missinf] == naval] <- NA
         }
@@ -190,7 +186,6 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
         if (mvtabi[1] == 2) {
           naval1 <- mvtabi[2]
           naval2 <- mvtabi[3]
-          # print(naval)
 
           data[missinf][data[missinf] == naval1 |
                           data[missinf] == naval2] <- NA
@@ -200,7 +195,6 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
           naval1 <- mvtabi[2]
           naval2 <- mvtabi[3]
           naval3 <- mvtabi[4]
-          # print(naval)
 
           data[missinf][data[missinf] == naval1 |
                           data[missinf] == naval2 | data[missinf] == naval3] <- NA
@@ -252,13 +246,11 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     for (i in seq_along(label)) {
 
       labname <- labnames[[i]]
-      # vartype <- types[i]
       labtable <- label[[i]]
 
       for (j in labname) {
-        vartype <- vartypes[j]
         varname <- varnames[j]
-        isNum   <- is.numeric(data[,varname])
+        isNum   <- is.numeric(data[, varname])
         anyNA   <- any(is.na(labtable))
 
         # get unique values / omit NA unless NA already in labtable
@@ -276,7 +268,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
         # assign label if label set is complete
         if (all(varunique %in% labtable)) {
-          data[[varname]] <- fast_factor(data[[varname]], y=labtable)
+          data[[varname]] <- fast_factor(data[[varname]], y = labtable)
 
           # else generate labels from codes
         } else {
@@ -311,13 +303,13 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   if (convert.dates) {
 
     nams   <- names(data)
-    isdate <- varmat[,6] %in% c(20,22,23,24,38,39)
-    istime <- varmat[,6] %in% c(21,25)
+    isdate <- varmat[, 6] %in% c(20 , 22, 23, 24, 38, 39)
+    istime <- varmat[, 6] %in% c(21, 25)
 
     if (any(isdate)) {
       for (nam in nams[isdate]) {
         data[[nam]] <- as.Date(as.POSIXct(
-          round(data[[nam]]),origin="1582-10-14"))
+          round(data[[nam]]), origin = "1582-10-14"))
       }
     }
     if (any(istime)) {
@@ -336,7 +328,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   haslongvarname <- !identical(longvarname, "") &
     !identical(longvarname, character(0))
 
-  if ( haslongvarname ) {
+  if (haslongvarname) {
 
     # contains long varname (e.g. when longer varnames are provided or if the
     # dataset contains long strings)
@@ -350,9 +342,9 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
       !identical(longstring, character(0))
 
     # only applicable, if dataset contains longstrings
-    if ( haslongstring ) {
+    if (haslongstring) {
 
-      longstring <- strsplit(longstring[!longstring==""], "=")
+      longstring <- strsplit(longstring[!longstring == ""], "=")
 
       # If the imported data contains strings longer than nchar(255) the data is
       # scrambled at this point. SPSS separates longer strings in different
@@ -368,7 +360,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
       replvec <- lapply(
         longstring,
-        function(x){
+        function(x) {
 
           nam <- x[[1]]
 
@@ -377,14 +369,14 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
           # next to the one stated in the string. this is somewhat risky,
           # but grepl adds some checks
           len <- as.numeric(x[[2]])
-          len <- ceiling(len/255) - 1
+          len <- ceiling(len / 255) - 1
 
           p <- which(nams %in% nam)
           if (!identical(p, integer(0)))
             nams[p : (p + len)]
         })
 
-      for (i in length(replvec):1) {
+      for (i in rev(seq_len(length(replvec)))) {
 
         pat <- replvec[[i]]
 
@@ -392,7 +384,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
           # any variables to combine?
           if (length(pat) > 1 & grepl("0", pat[2])) {
-            sel <- data[,names(data) %in% pat]
+            sel <- data[, names(data) %in% pat]
 
             if (all(sapply(sel, is.character))) {
               pp <- pat[-1]; p1 <- pat[1]
@@ -400,13 +392,13 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
               remove <- !names(data) %in% pp
 
               # remove columns pat[2:n]
-              data <- data[,remove]
+              data <- data[, remove]
 
               # resize varmat and disppar as well
-              varmat  <- varmat[remove,]
+              varmat  <- varmat[remove, ]
 
               if (!is.null(disppar))
-                disppar <- disppar[remove,]
+                disppar <- disppar[remove, ]
 
               data[p1] <- do.call(paste0, sel)
 
@@ -450,7 +442,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
     longmiss <- attribs$longmissing
 
-    if ( !identical(longmiss, list()) ) {
+    if (!identical(longmiss, list())) {
 
       mvars <- names(longmiss)
 
@@ -486,7 +478,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
       # assign label if label set is complete
       if (all(varunique %in% labtable)) {
-        data[[longlabname]] <- fast_factor(data[[longlabname]], y=labtable)
+        data[[longlabname]] <- fast_factor(data[[longlabname]], y = labtable)
 
         # else generate labels from codes
       } else {

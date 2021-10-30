@@ -62,14 +62,14 @@ write.por <- function(dat, filepath, label, add.rownames = FALSE,
   if (missing(label) & !is.null(attrlab))
     label <- attrlab
 
-  if ( !identical(label, "") & (length(label) != ncol(dat)) )
+  if (!identical(label, "") & (length(label) != ncol(dat)))
     stop("label and ncols differ. each col needs a label")
 
-  if (any(nchar(label))>255)
+  if (any(nchar(label)) > 255)
     stop("longlabels not yet implemented")
 
   if (add.rownames) {
-    dat <- data.frame(rownames= rownames(dat),
+    dat <- data.frame(rownames = rownames(dat),
                       dat, stringsAsFactors = FALSE)
   }
 
@@ -83,7 +83,7 @@ write.por <- function(dat, filepath, label, add.rownames = FALSE,
   if (convert.factors) {
     # If our data.frame contains factors, we create a label.table
     factors <- which(sapply(dat, is.factor))
-    f.names <- attr(factors,"names")
+    f.names <- attr(factors, "names")
 
     label.table <- vector("list", length(f.names))
     names(label.table) <- f.names
@@ -95,7 +95,7 @@ write.por <- function(dat, filepath, label, add.rownames = FALSE,
       f.labels <-  as.integer(labels(levels(dat[[v]])))
       attr(f.labels, "names") <- f.levels
       f.labels <- f.labels[names(f.labels) != ".."]
-      label.table[[ (f.names[i]) ]] <- f.labels
+      label.table[[(f.names[i])]] <- f.labels
     }
     attr(dat, "labtab") <- rev(label.table)
   } else {
@@ -103,7 +103,7 @@ write.por <- function(dat, filepath, label, add.rownames = FALSE,
   }
 
   vtyp <- as.integer(sapply(dat, is.character))
-  vtyp[vtyp != 0] <- as.integer(sapply(dat[vtyp!=0],
+  vtyp[vtyp != 0] <- as.integer(sapply(dat[vtyp != 0],
                                        function(x) max(nchar(x), na.rm = TRUE)))
 
   ff <- which(sapply(dat, is.factor))
@@ -111,11 +111,11 @@ write.por <- function(dat, filepath, label, add.rownames = FALSE,
   if (identical(unname(ff), integer(0)))
     ff <- unname(ff)
 
-  if (any(vtyp>255)) {
+  if (any(vtyp > 255)) {
     stop("Strings longer than 255 characters not yet implemented")
   }
 
-  vtyp <- ceiling(vtyp/8) * 8
+  vtyp <- ceiling(vtyp / 8) * 8
 
   fun <- function(vec) {
 
@@ -127,7 +127,7 @@ write.por <- function(dat, filepath, label, add.rownames = FALSE,
       if (val <= 8) {
         vartypes <- c(vartypes, val)
       } else {
-        vartypes <- c(vartypes, c(val, rep(-1, (val/8 - 1)) ) )
+        vartypes <- c(vartypes, c(val, rep(-1, (val / 8 - 1))))
       }
     }
 
@@ -143,15 +143,15 @@ write.por <- function(dat, filepath, label, add.rownames = FALSE,
   datestamp <- format(Sys.Date(), "%Y%m%d")
 
 
-  ii <- sapply(dat, is.integer)
-  nn <- sapply(dat, function(x){is.numeric(x) | is.factor(x)})
   itc <- rep(0, NCOL(dat))
 
   cc <- sapply(dat, is.character)
 
-  isint <- sapply(dat, function(x){is.numeric(x) & is.integer(x)})
+  isint <- sapply(dat, function(x) {
+    is.numeric(x) & is.integer(x)
+  })
 
-  vartypen <- sapply(dat, function(x)class(x)[[1]])
+  vartypen <- sapply(dat, function(x) class(x)[[1]])
   vartyp <- NA
   vartyp[vartypen == "numeric" | vartypen == "integer" |
            vartypen == "factor"] <- 0
@@ -165,14 +165,14 @@ write.por <- function(dat, filepath, label, add.rownames = FALSE,
     )
     for (v in dates)
       dat[[v]] <- as.vector(
-        julian(dat[[v]],as.Date("1582-10-14", tz = "GMT"))*24*60*60
+        julian(dat[[v]], as.Date("1582-10-14", tz = "GMT")) * 24 * 60 * 60
       )
     dates <- which(
-      sapply(dat, function(x) inherits(x,"POSIXt"))
+      sapply(dat, function(x) inherits(x, "POSIXt"))
     )
     for (v in dates)
       dat[[v]] <- as.vector(
-        round(julian(dat[[v]], ISOdate(1582, 10, 14, tz = tz)))*24*60*60
+        round(julian(dat[[v]], ISOdate(1582, 10, 14, tz = tz))) * 24 * 60 * 60
       )
   }
 

@@ -10,29 +10,29 @@ require(foreign)
 # electric
 
 df <- df_r <- df_h <- df_f <- NULL
-df <- system.file("extdata", "electric.sav", package="readspss")
+df <- system.file("extdata", "electric.sav", package = "readspss")
 
 df_r <- read.sav(df, convert.factors = FALSE, use.missings = FALSE)
 
 df_f <- foreign::read.spss(df, to.data.frame = TRUE, use.value.labels = FALSE,
-                           use.missings = FALSE, stringsAsFactors=FALSE)
+                           use.missings = FALSE, stringsAsFactors = FALSE)
 
-test_that( "electric", {
-  expect_true(all.equal(df_r, df_f, check.attributes = FALSE) )
+test_that("electric", {
+  expect_true(all.equal(df_r, df_f, check.attributes = FALSE))
 })
 
 
 # testdata
 
 df <- df_r <- df_h <- df_f <- NULL
-df <- system.file("extdata", "testdata.sav", package="readspss")
+df <- system.file("extdata", "testdata.sav", package = "readspss")
 
 df_r <- read.sav(df, convert.factors = FALSE, use.missings = FALSE,
                  convert.dates = FALSE)
 
-suppressWarnings( # caused by foreign
+suppressWarnings(# caused by foreign
   df_f <- foreign::read.spss(df, to.data.frame = TRUE, use.value.labels = FALSE,
-                             use.missings = FALSE, stringsAsFactors=FALSE,
+                             use.missings = FALSE, stringsAsFactors = FALSE,
                              trim_values = TRUE, trim.factor.names = TRUE)
 )
 
@@ -50,7 +50,7 @@ for (char in chars) {
 }
 
 
-test_that( "testdata", {
+test_that("testdata", {
   expect_true(all.equal(df_r, df_f, check.attributes = FALSE))
 })
 
@@ -60,7 +60,7 @@ test_that( "testdata", {
 # v13
 
 df <- df_r <- df_h <- df_f <- NULL
-df <- system.file("extdata", "v13.sav", package="readspss")
+df <- system.file("extdata", "v13.sav", package = "readspss")
 
 df_r <- read.sav(df, convert.factors = FALSE, use.missings = FALSE)
 
@@ -75,15 +75,15 @@ res <- data.frame(
   stringsAsFactors = FALSE
 )
 
-test_that( "third-test", {
-  expect_true(all.equal(df_r, res, check.attributes = FALSE) )
+test_that("third-test", {
+  expect_true(all.equal(df_r, res, check.attributes = FALSE))
 })
 
 
 # v14
 
 df <- df_r <- df_h <- df_f <- res <- NULL
-df <- system.file("extdata", "v14.sav", package="readspss")
+df <- system.file("extdata", "v14.sav", package = "readspss")
 
 df_r <- read.sav(df, convert.factors = FALSE, use.missings = FALSE)
 
@@ -96,8 +96,8 @@ res <- data.frame(
   stringsAsFactors = FALSE
 )
 
-test_that( "fourth-test", {
-  expect_true( all.equal(res, df_r, check.attributes = FALSE) )
+test_that("fourth-test", {
+  expect_true(all.equal(res, df_r, check.attributes = FALSE))
 })
 
 
@@ -106,21 +106,21 @@ test_that( "fourth-test", {
 # iris
 
 df <- df_r <- df_h <- df_f <- NULL
-df <- system.file("extdata", "iris.sav", package="readspss")
+df <- system.file("extdata", "iris.sav", package = "readspss")
 
 df_r <- read.sav(df, convert.factors = TRUE, use.missings = FALSE)
 
 data(iris)
 
 
-test_that( "sixth-test", {
-  expect_true (all.equal(df_r, iris, check.attributes = FALSE))
+test_that("sixth-test", {
+  expect_true(all.equal(df_r, iris, check.attributes = FALSE))
 })
 
 # factors ######################################################################
 
 # electric
-fl <- system.file("extdata", "electric.sav", package="readspss")
+fl <- system.file("extdata", "electric.sav", package = "readspss")
 
 df_r <- read.sav(fl)
 
@@ -131,7 +131,7 @@ test_that("factors", {
 })
 
 # hotel
-fl <- system.file("extdata", "hotel.sav", package="readspss")
+fl <- system.file("extdata", "hotel.sav", package = "readspss")
 
 df_r <- read.sav(fl)
 
@@ -143,7 +143,7 @@ test_that("factors", {
 
 
 # physiology
-fl <- system.file("extdata", "physiology.sav", package="readspss")
+fl <- system.file("extdata", "physiology.sav", package = "readspss")
 
 df_r <- read.sav(fl)
 
@@ -154,7 +154,7 @@ test_that("factors", {
 })
 
 # repairs
-fl <- system.file("extdata", "repairs.sav", package="readspss")
+fl <- system.file("extdata", "repairs.sav", package = "readspss")
 
 df_r <- read.sav(fl)
 
@@ -167,7 +167,7 @@ test_that("factors", {
 
 #### zsav test #####
 
-fl <- system.file("extdata", "cars.zsav", package="readspss")
+fl <- system.file("extdata", "cars.zsav", package = "readspss")
 
 df_r <- read.sav(fl)
 
@@ -177,8 +177,8 @@ test_that("zsav", {
 
 #### encryption test #####
 
-flu <- system.file("extdata", "hotel.sav", package="readspss")
-fle <- system.file("extdata", "hotel-encrypted.sav", package="readspss")
+flu <- system.file("extdata", "hotel.sav", package = "readspss")
+fle <- system.file("extdata", "hotel-encrypted.sav", package = "readspss")
 
 df_u <- read.sav(flu)
 df_e <- read.sav(fle, pass = "pspp")
@@ -190,8 +190,8 @@ test_that("encrypted", {
 #### por test ####
 
 
-f_sav <- system.file("extdata", "electric.sav", package="readspss")
-f_por <- system.file("extdata", "electric.por", package="readspss")
+f_sav <- system.file("extdata", "electric.sav", package = "readspss")
+f_por <- system.file("extdata", "electric.por", package = "readspss")
 
 df_sav <- read.sav(f_sav)
 df_por <- read.por(f_por)
@@ -203,8 +203,8 @@ test_that("por_vs_sav", {
 
 #### read.spps test ####
 
-f_sav <- system.file("extdata", "electric.sav", package="readspss")
-f_por <- system.file("extdata", "electric.por", package="readspss")
+f_sav <- system.file("extdata", "electric.sav", package = "readspss")
+f_por <- system.file("extdata", "electric.por", package = "readspss")
 
 df_sav <- readspss::read.spss(f_sav)
 df_por <- readspss::read.spss(f_por)

@@ -59,14 +59,14 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
   if (missing(label) & !is.null(attrlab))
     label <- attrlab
 
-  if ( !identical(label, "") & (length(label) != ncol(dat)) )
+  if (!identical(label, "") & (length(label) != ncol(dat)))
     stop("label and ncols differ. each col needs a label")
 
-  if (any(nchar(label))>255)
+  if (any(nchar(label)) > 255)
     stop("longlabels not yet implemented")
 
   if (add.rownames) {
-    dat <- data.frame(rownames= rownames(dat),
+    dat <- data.frame(rownames = rownames(dat),
                       dat, stringsAsFactors = FALSE)
   }
 
@@ -87,7 +87,7 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
 
   LONGVAR <- FALSE
 
-  if (all(nchar(nams)<=8) & (identical(toupper(nams), nams))) {
+  if (all(nchar(nams) <= 8) & (identical(toupper(nams), nams))) {
     nams <- toupper(nams)
     nvarnames <- substr(nams, 0, 8)
   } else {
@@ -96,16 +96,16 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
   }
 
   vtyp <- as.integer(sapply(dat, is.character))
-  vtyp[vtyp != 0] <- as.integer(sapply(dat[vtyp!=0],
+  vtyp[vtyp != 0] <- as.integer(sapply(dat[vtyp != 0],
                                        function(x) max(nchar(x), na.rm = TRUE)))
 
 
-  if (any(vtyp>255)) {
+  if (any(vtyp > 255)) {
     message("if you really need this, split the string into segments of 255")
     stop("Strings longer than 255 characters not yet implemented")
   }
 
-  vtyp <- ceiling(vtyp/8) * 8;
+  vtyp <- ceiling(vtyp / 8) * 8;
 
   vtyp[vtyp > 255] <- 255
 
@@ -119,7 +119,7 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
       if (val <= 8) {
         vartypes <- c(vartypes, val)
       } else {
-        vartypes <- c(vartypes, c(val, rep(-1, (ceiling(val/8) -1) ) ) )
+        vartypes <- c(vartypes, c(val, rep(-1, (ceiling(val / 8) - 1))))
       }
     }
 
@@ -137,11 +137,10 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
   nvarnames <- nams
 
   # update factor position with new varnames
-  nvm <- nvarnames[nvarnames!=""]
   pos <- which(nvarnames != "")
 
-  if (length(ff)>0)  {
-    ff <- sapply(ff, function(x){
+  if (length(ff) > 0)  {
+    ff <- sapply(ff, function(x) {
       # newnam <- nvm[x]
       x <- pos[x]
       # names(x) <- newnam
@@ -153,7 +152,7 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
   longvarnames <- ""
   if ((length(nvarnames) > length(names(dat))) | LONGVAR)
     longvarnames <- paste(
-      paste0(nvarnames[nvarnames!=""], "=", names(dat)),
+      paste0(nvarnames[nvarnames != ""], "=", names(dat)),
       collapse = "\t")
 
   systime <- Sys.time()
@@ -164,7 +163,9 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
 
 
   ii <- sapply(dat, is.integer)
-  nn <- sapply(dat, function(x){is.numeric(x) | is.factor(x)})
+  nn <- sapply(dat, function(x) {
+    is.numeric(x) | is.factor(x)
+  })
   itc <- rep(0, NCOL(dat))
 
   if (compress) {
@@ -178,7 +179,9 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
       dat[saveToConvert] <- sapply(dat[saveToConvert], as.integer)
     }
 
-    ii <- sapply(dat, function(x) { !(is.integer(x) & all(is.na(x))) })
+    ii <- sapply(dat, function(x) {
+      !(is.integer(x) & all(is.na(x)))
+    })
     gg <- sapply(dat[ii], function(x) {
         is.integer(x) & (min(x, na.rm = TRUE) >= -100 &
                            max(x, na.rm = TRUE) < 151)
@@ -210,14 +213,14 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
     )
     for (v in dates)
       dat[[v]] <- as.vector(
-        julian(dat[[v]],as.Date("1582-10-14", tz = "GMT"))*24*60*60
+        julian(dat[[v]], as.Date("1582-10-14", tz = "GMT")) * 24 * 60 * 60
       )
     dates <- which(
-      sapply(dat, function(x) inherits(x,"POSIXt"))
+      sapply(dat, function(x) inherits(x, "POSIXt"))
     )
     for (v in dates)
       dat[[v]] <- as.vector(
-        round(julian(dat[[v]], ISOdate(1582, 10, 14, tz = tz)))*24*60*60
+        round(julian(dat[[v]], ISOdate(1582, 10, 14, tz = tz))) * 24 * 60 * 60
       )
   }
 
@@ -246,6 +249,3 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
 
   writesav(filepath, dat, compress, debug, is_zsav)
 }
-
-
-# write.sav(cars)

@@ -62,7 +62,7 @@ if (dir.exists("data"))
 
 dir.create("data")
 
-fl <- system.file("extdata", "hotel.sav", package="readspss")
+fl <- system.file("extdata", "hotel.sav", package = "readspss")
 
 dd <- read.sav(fl)
 write.sav(dd, "data/hotel.sav")
@@ -103,14 +103,14 @@ if (dir.exists("data"))
 dir.create("data")
 
 dd <- mtcars
-dd$am <- factor(x = dd$am, levels = c(0,1), labels = c("auto", "man"))
+dd$am <- factor(x = dd$am, levels = c(0, 1), labels = c("auto", "man"))
 
 write.por(dd, "data/mtcars1.por", convert.factors = TRUE)
 df1 <- read.por("data/mtcars1.por", convert.factors = TRUE)
 
 write.por(dd, "data/mtcars2.por", convert.factors = FALSE)
 df2 <- read.por("data/mtcars2.por", convert.factors = TRUE)
-df2$AM <- df2$AM -1 # was not stored as factor, but was a factor previous
+df2$AM <- df2$AM - 1 # was not stored as factor, but was a factor previous
 
 test_that("por", {
   expect_true(all.equal(dd, df1, check.attributes = FALSE))
@@ -206,7 +206,7 @@ if (dir.exists("data"))
 
 dir.create("data")
 
-dd <- data.frame( dat = Sys.Date() )
+dd <- data.frame(dat = Sys.Date())
 
 write.sav(dd, "data/dd.sav", compress = TRUE)
 write.por(dd, "data/dd.por")

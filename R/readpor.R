@@ -66,19 +66,17 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   file <- file_ext(basename(filepath))
 
   if ((tolower(file) != "por") &
-      !isTRUE(override) ){
-    warning ("Filending is not por.
+      !isTRUE(override)) {
+    warning("Filending is not por.
              Use Override if this check should be ignored.")
-    return( NULL )
+    return(NULL)
   }
 
   encStr <- ""
   ownEnc <- localeToCharset(locale = Sys.getlocale("LC_CTYPE"))[1]
-  forceEncoding <- FALSE
 
   if (!is.null(fromEncoding)) {
     encStr <- fromEncoding
-    forceEncoding <- TRUE
   }
 
   if (encoding == FALSE)
@@ -91,8 +89,8 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   if (NROW(data) == 0) {
     message("file contains no data")
-    use.missings = FALSE
-    convert.factors = FALSE
+    use.missings <- FALSE
+    convert.factors <- FALSE
   }
 
 
@@ -184,8 +182,6 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   # if autoenc labels were not encoded during readsav() so encode now
   if (encoding) {
 
-    # print(encStr)
-
     # label
     for (i in seq_along(labtab))
       names(labtab[[i]]) <- read.encoding(names(labtab[[i]]),
@@ -197,10 +193,10 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
                            encoding = ownEnc)
 
 
-    for(v in (1:ncol(data))[vartypes > 0]) {
+    for (v in (seq_along(data))[vartypes > 0]) {
       data[, v] <- read.encoding(data[, v],
-                                 fromEncoding = encStr,
-                                 encoding = ownEnc)
+                                  fromEncoding = encStr,
+                                  encoding = ownEnc)
     }
   }
 
@@ -211,13 +207,11 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     for (i in seq_along(labtab)) {
 
       labname <- labnames[[i]]
-      # vartype <- types[i]
       labtable <- labtab[[i]]
 
       for (j in labname) {
-        vartype <- vartypes[which(varnames == j)]
         varname <- varnames[which(varnames == j)]
-        isNum   <- is.numeric(data[,varname])
+        isNum   <- is.numeric(data[, varname])
         anyNA   <- any(is.na(labtable))
 
         # get unique values / omit NA unless NA already in labtable
@@ -235,7 +229,7 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
         # assign label if label set is complete
         if (all(varunique %in% labtable)) {
-          data[[varname]] <- fast_factor(data[[varname]], y=labtable)
+          data[[varname]] <- fast_factor(data[[varname]], y = labtable)
 
           # else generate labels from codes
         } else {
@@ -270,10 +264,9 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   if (convert.dates) {
 
-
     nams   <- names(data)
-    isdate <- fmt[,1] %in% c(20,22,23,24,38,39)
-    istime <- fmt[,1] %in% c(21,25)
+    isdate <- fmt[, 1] %in% c(20, 22, 23, 24, 38, 39)
+    istime <- fmt[, 1] %in% c(21, 25)
 
     if (any(isdate)) {
       for (nam in nams[isdate]) {
@@ -281,7 +274,7 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
         # date conversion might be off by a day e.g. "13770950400". This is
         # avoided by rounding the value first
         data[[nam]] <- as.Date(as.POSIXct(
-          round(data[[nam]]), origin="1582-10-14"))
+          round(data[[nam]]), origin = "1582-10-14"))
       }
     }
     if (any(istime)) {
