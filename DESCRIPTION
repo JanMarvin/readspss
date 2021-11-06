@@ -1,7 +1,7 @@
 Package: readspss
 Type: Package
 Title: Importing and Exporting SPSS Files
-Version: 0.14
+Version: 0.15
 Authors@R: c(
     person("Jan Marvin", "Garbuszus",
     email = "jan.garbuszus@ruhr-uni-bochum.de", role = c("aut", "cre")),
