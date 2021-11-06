@@ -61,7 +61,7 @@ jobs:
         if: success() && runner.os != 'Linux'
         run: |
           dir.create("build")
-          remotes::install_cran("devtools")
+          install.packages("devtools")
           devtools::build(path = "build", binary = TRUE)
         shell: Rscript {0}
 
