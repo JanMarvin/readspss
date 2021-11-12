@@ -33,8 +33,8 @@
 #' por-format and provide additional options to import the data.
 #'
 #'@note Information to decrypt the por-format was provided by tda
-#' [http://www.stat.ruhr-uni-bochum.de/tda.html] and pspp
-#' [http://www.gnu.org/software/pspp/]
+#' [www.stat.rub.de/tda.html](http://www.stat.ruhr-uni-bochum.de/tda.html) and
+#' pspp [www.gnu.org/software/pspp/](http://www.gnu.org/software/pspp/)
 #'
 #'@seealso \code{\link[foreign]{read.spss}}, \code{memisc}.
 #'

@@ -108,8 +108,8 @@ are some integers stored as integers. Still they are returned as numerics.
 }
 \note{
 Information to decrypt the sav-format was provided by tda
-\link{http://www.stat.ruhr-uni-bochum.de/tda.html} and pspp
-\link{http://www.gnu.org/software/pspp/}
+\href{http://www.stat.ruhr-uni-bochum.de/tda.html}{www.stat.rub.de/tda.html} and
+pspp \href{http://www.gnu.org/software/pspp/}{www.gnu.org/software/pspp/}
 }
 \examples{
 fl <- system.file("extdata", "electric.sav", package = "readspss")

@@ -64,8 +64,8 @@ por-format and provide additional options to import the data.
 }
 \note{
 Information to decrypt the por-format was provided by tda
-\link{http://www.stat.ruhr-uni-bochum.de/tda.html} and pspp
-\link{http://www.gnu.org/software/pspp/}
+\href{http://www.stat.ruhr-uni-bochum.de/tda.html}{www.stat.rub.de/tda.html} and
+pspp \href{http://www.gnu.org/software/pspp/}{www.gnu.org/software/pspp/}
 }
 \seealso{
 \code{\link[foreign]{read.spss}}, \code{memisc}.

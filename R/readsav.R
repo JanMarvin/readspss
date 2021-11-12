@@ -77,8 +77,8 @@
 #' * _lmissings_ missings table if any in longstrings
 #'
 #'@note Information to decrypt the sav-format was provided by tda
-#' [http://www.stat.ruhr-uni-bochum.de/tda.html] and pspp
-#'  [http://www.gnu.org/software/pspp/]
+#' [www.stat.rub.de/tda.html](http://www.stat.ruhr-uni-bochum.de/tda.html) and
+#' pspp [www.gnu.org/software/pspp/](http://www.gnu.org/software/pspp/)
 #'
 #'@seealso \code{\link[foreign]{read.spss}}, \code{memisc} and
 #'\code{\link[haven]{read_sav}}.
