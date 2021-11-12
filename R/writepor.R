@@ -1,44 +1,28 @@
-#
-# Copyright (C) 2018 Jan Marvin Garbuszus
-#
-# This program is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the
-# Free Software Foundation; either version 2 of the License, or (at your
-# option) any later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
-# more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
-
-
 #' write.por
 #'
-#' !!! EXPERIMENTAL !!! Function to write an SPSS por file. Returns an por file
-#' that read.por can read as well as SPSS can. Other packages as foreign,
-#' memisc and haven might fail (fail reading or return wrong values).
-#' @param dat \emph{data.frame} a data.frame to export as por-file.
-#' @param filepath \emph{string} full path where and how this file should be
+#' Function to write an SPSS por file. Returns an por file that read.por can
+#' read as well as SPSS can. Other packages as foreign, memisc and haven might
+#' fail (fail reading or return wrong values).
+#' @param dat _data.frame_ a data.frame to export as por-file.
+#' @param filepath _string_ full path where and how this file should be
 #'  stored
-#' @param label \emph{character} vector of labels. must be of size `ncol(dat)`
-#' @param add.rownames \emph{logical.} If \code{TRUE}, a new variable rownames
+#' @param label _character_ vector of labels. must be of size `ncol(dat)`
+#' @param add.rownames _logical_ If `TRUE`, a new variable rownames
 #'  will be added to the por-file.
-#' @param convert.factors \emph{logical.} If \code{TRUE}, factors will be
-#'  converted to SPSS variables with labels.
+#' @param convert.factors _logical_ If `TRUE`, factors will be converted to
+#'  SPSS variables with labels.
 #'  SPSS expects strings to be encoded as Windows-1252, so all levels will be
-#'  recoded.  Character which can not be mapped in Windows-1252 will be saved as
+#'  recoded. Character which can not be mapped in Windows-1252 will be saved as
 #'  hexcode.
-#' @param toEncoding encoding used for the por file. SPSS itself claims to
-#'  have problems with unicode and por files, so "CP1252" is the default.
-#' @param convert.dates \emph{logical} should dates be converted to SPSS format
-#' @param tz \emph{character.} The name of the timezone convert.dates will use.
+#' @param toEncoding _character_ encoding used for the por file. SPSS itself
+#'  claims to have problems with unicode and por files, so "CP1252" is the
+#'  default.
+#' @param convert.dates _logical_ should dates be converted to SPSS format
+#' @param tz _character_ The name of the timezone convert.dates will use.
 #' @details Strings longer than 255 chars are not provided.
 #'  File will be stored using "CP1252" encoding.
 #'
-#' @return \code{readspss} returns nothing
+#' @return `write.por` returns nothing
 #'
 #' @export
 write.por <- function(dat, filepath, label, add.rownames = FALSE,

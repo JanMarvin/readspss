@@ -16,3 +16,6 @@ documentation for these functions.}
 Function to read a SPSS (z)sav or por file into a data.frame(). This is just
 a wrapper around read.sav and read.por for convenience.
 }
+\seealso{
+\link{read.sav} and \link{read.por}
+}

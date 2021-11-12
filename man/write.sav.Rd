@@ -23,9 +23,9 @@ write.sav(
 stored}
 
 \item{label}{\emph{character} if any provided this must be a vector of
-labels. It must be of size `ncol(dat)`}
+labels. It must be of size \code{ncol(dat)}}
 
-\item{add.rownames}{\emph{logical.} If \code{TRUE}, a new variable rownames
+\item{add.rownames}{\emph{logical} If \code{TRUE}, a new variable rownames
 will be added to the sav-file.}
 
 \item{compress}{\emph{logical} should compression be used. If TRUE some
@@ -34,7 +34,7 @@ chunks of 8 chars. Reduces memory size of sav-file.}
 
 \item{convert.dates}{\emph{logical} should dates be converted to SPSS format.}
 
-\item{tz}{\emph{character.} The name of the timezone convert.dates will use.}
+\item{tz}{\emph{character} The name of the timezone convert.dates will use.}
 
 \item{debug}{\emph{logical} print debug information.}
 
@@ -42,11 +42,11 @@ chunks of 8 chars. Reduces memory size of sav-file.}
 ending zsav is used, this is selected as default.}
 }
 \value{
-\code{readspss} returns nothing
+\code{write.sav} returns nothing
 }
 \description{
 Function to write an SPSS sav or zsav file from a data.frame().
 }
 \details{
-Strings longer than 255 chars are not provided.
+Writing of strings longer than 255 chars is not provided.
 }

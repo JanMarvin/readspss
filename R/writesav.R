@@ -1,41 +1,24 @@
-#
-# Copyright (C) 2018-2019 Jan Marvin Garbuszus
-#
-# This program is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the
-# Free Software Foundation; either version 2 of the License, or (at your
-# option) any later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
-# more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
-
-
 #' write.sav
 #'
 #' Function to write an SPSS sav or zsav file from a data.frame().
-#' @param dat \emph{data.frame} a data.frame to store as SPSS file.
-#' @param filepath \emph{string} full path where and how this file should be
+#' @param dat _data.frame_ a data.frame to store as SPSS file.
+#' @param filepath _string_ full path where and how this file should be
 #'  stored
-#' @param label \emph{character} if any provided this must be a vector of
+#' @param label _character_ if any provided this must be a vector of
 #'  labels. It must be of size `ncol(dat)`
-#' @param add.rownames \emph{logical.} If \code{TRUE}, a new variable rownames
+#' @param add.rownames _logical_ If `TRUE`, a new variable rownames
 #'  will be added to the sav-file.
-#' @param compress \emph{logical} should compression be used. If TRUE some
+#' @param compress _logical_ should compression be used. If TRUE some
 #'  integers will be stored more efficiently. Everything will be stored in
 #'  chunks of 8 chars. Reduces memory size of sav-file.
-#' @param convert.dates \emph{logical} should dates be converted to SPSS format.
-#' @param tz \emph{character.} The name of the timezone convert.dates will use.
-#' @param debug \emph{logical} print debug information.
-#' @param is_zsav \emph{logical} explicitly create a zsav file. If the file
+#' @param convert.dates _logical_ should dates be converted to SPSS format.
+#' @param tz _character_ The name of the timezone convert.dates will use.
+#' @param debug _logical_ print debug information.
+#' @param is_zsav _logical_ explicitly create a zsav file. If the file
 #'  ending zsav is used, this is selected as default.
-#' @details Strings longer than 255 chars are not provided.
+#' @details Writing of strings longer than 255 chars is not provided.
 #'
-#' @return \code{readspss} returns nothing
+#' @return `write.sav` returns nothing
 #'
 #' @export
 write.sav <- function(dat, filepath, label, add.rownames = FALSE,

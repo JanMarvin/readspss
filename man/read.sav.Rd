@@ -58,42 +58,41 @@ used as rownames. Variable will be dropped afterwards.}
 maximum of ten character encryption key.}
 }
 \value{
-\code{readspss} returns a data.frame with additional objects
-\describe{
-\item{row.names}{rownames}
-\item{names}{colnames}
-\item{datalabel}{datalabel}
-\item{datestamp}{datestamp}
-\item{timestamp}{timestamp}
-\item{filelabel}{filelabel}
-\item{class}{data.frame}
-\item{vtype}{SPSS type 0 is usually a numeric/integer}
-\item{val.label}{value labels}
-\item{disppar}{matrix of display parameters if available}
-\item{missings}{a list containing information about the missing variables. if
-\code{use.missings=TRUE} this Information will be used to generate missings.}
-\item{haslabel}{list of variables that contain labels}
-\item{longstring}{character vector of long strings if any in file}
-\item{longmissing}{character vector of missings in longstrings if any}
-\item{longlabel}{character vector of long labels}
-\item{cflag}{0 if uncompressed, 1 if compressed}
-\item{endian}{2 or 3 if little endian else 0}
-\item{compression}{compression similar to cflag, somehow stored twice in the
-sav file}
-\item{doc}{list containing documentation information if any}
-\item{charcode}{encoding string most likely 2 is CP1252}
-\item{encoding}{sometimes sav-file contain encoding as a extra string}
-\item{ownEnc}{encoding of the R-session}
-\item{doenc}{was the file supposed to be encoded?}
-\item{autoenc}{was encoding applied to the file?}
-\item{swapit}{were the bytes swapped?}
-\item{totals}{character string of totals if any}
-\item{dataview}{xml file how the data should be printed}
-\item{extraproduct}{additional string provided}
-\item{label}{list containing label value information}
-\item{varmatrix}{a matrix with information how the data is stored}
-\item{var.label}{variable labels}
-\item{lmissings}{missings table if any in longstrings}
+\code{readspss} returns a data.frame with additional attributes
+\itemize{
+\item \emph{row.names} rownames
+\item \emph{names} colnames
+\item \emph{datalabel} datalabel
+\item \emph{datestamp} datestamp
+\item \emph{timestamp} timestamp
+\item \emph{filelabel} filelabel
+\item \emph{class} data.frame
+\item \emph{vtype} SPSS type 0 is usually a numeric/integer
+\item \emph{disppar} matrix of display parameters if available
+\item \emph{missings} a list containing information about the missing variables. if
+\code{use.missings=TRUE} this Information will be used to generate missings.
+\item \emph{haslabel} list of variables that contain labels
+\item \emph{longstring} character vector of long strings if any in file
+\item \emph{longmissing} character vector of missings in longstrings if any
+\item \emph{longlabel} character vector of long labels
+\item \emph{cflag} 0 if uncompressed, 1 if compressed
+\item \emph{endian} 2 or 3 if little endian else 0
+\item \emph{compression} compression similar to cflag, somehow stored twice in the
+sav file
+\item \emph{doc} list containing documentation information if any
+\item \emph{charcode} encoding string most likely 2 is CP1252
+\item \emph{encoding} sometimes sav-file contain encoding as a extra string
+\item \emph{ownEnc} encoding of the R-session
+\item \emph{doenc} was the file supposed to be encoded?
+\item \emph{autoenc} was encoding applied to the file?
+\item \emph{swapit} were the bytes swapped?
+\item \emph{totals} character string of totals if any
+\item \emph{dataview} xml file how the data should be printed
+\item \emph{extraproduct} additional string provided
+\item \emph{label} list containing label value information
+\item \emph{varmatrix} a matrix with information how the data is stored
+\item \emph{var.label} variable labels
+\item \emph{lmissings} missings table if any in longstrings
 }
 }
 \description{
@@ -109,8 +108,8 @@ are some integers stored as integers. Still they are returned as numerics.
 }
 \note{
 Information to decrypt the sav-format was provided by tda
-\url{http://www.stat.ruhr-uni-bochum.de/tda.html} and pspp
- \url{http://www.gnu.org/software/pspp/}
+\link{http://www.stat.ruhr-uni-bochum.de/tda.html} and pspp
+\link{http://www.gnu.org/software/pspp/}
 }
 \examples{
 fl <- system.file("extdata", "electric.sav", package = "readspss")
@@ -120,7 +119,4 @@ dd <- read.sav(fl)
 \seealso{
 \code{\link[foreign]{read.spss}}, \code{memisc} and
 \code{\link[haven]{read_sav}}.
-}
-\author{
-Jan Marvin Garbuszus \email{jan.garbuszus@ruhr-uni-bochum.de}
 }

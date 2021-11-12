@@ -9,6 +9,7 @@
 #' @importFrom tools file_ext
 #' @importFrom stats na.omit
 #' @importFrom utils download.file localeToCharset
+#' @seealso [read.sav] and [read.por]
 #' @export
 read.spss <- function(x, ...) {
 

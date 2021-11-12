@@ -1,32 +1,32 @@
 #' read.sav
 #'
 #' Function to read a SPSS sav file into a data.frame().
-#'@param file \emph{string} a sav-file to import. can be a file on a computer
+#'@param file _string_ a sav-file to import. can be a file on a computer
 #' or an url. in this case the file will be downloaded and read before it is
 #' used.
-#'@param convert.factors \emph{logical} if true numeric or character variables
+#'@param convert.factors _logical_ if true numeric or character variables
 #' will be converted into a factor in R.
-#'@param generate.factors \emph{logical} function to convert variables with
+#'@param generate.factors _logical_ function to convert variables with
 #' partial labels into factors. e.g. 1 - low and 5 - high are provided, labels
 #' 2, 3 and 4 will be created. especially useful in combination with
-#' \code{use.missings=TRUE}.
-#'@param encoding \emph{logical} shall values be converted? If true, read.sav
+#' `use.missings=TRUE`.
+#'@param encoding _logical_ shall values be converted? If true, read.sav
 #' will try the charcode stored inside the sav-file. If this value is 2 or not
 #' available, fromEncoding can be used to change encoding.
-#'@param fromEncoding \emph{character.} encoding of the imported file. This
+#'@param fromEncoding _character._ encoding of the imported file. This
 #' information is stored inside the sav-file, but is currently unused. Still
 #' this option can be used to define the initial encoding by hand.
-#'@param use.missings \emph{logical} should missing values be converted.
+#'@param use.missings _logical_ should missing values be converted.
 #' Defaults to TRUE.
-#' @param debug \emph{logical} provides additional debug information. Most
+#' @param debug _logical_ provides additional debug information. Most
 #' likely not useful to any user.
-#'@param override \emph{logical}. The filename provided in \code{file} is
+#'@param override _logical_. The filename provided in `file` is
 #' checked for the ending sav. If the file ending is different, nothing is read.
 #' This option can be used to override this behavior.
-#'@param convert.dates \emph{logical}. Should dates be converted on the fly?
-#'@param add.rownames \emph{logical.} If \code{TRUE}, the first column will be
+#'@param convert.dates _logical_. Should dates be converted on the fly?
+#'@param add.rownames _logical._ If `TRUE`, the first column will be
 #'  used as rownames. Variable will be dropped afterwards.
-#'@param pass \emph{character}. If encrypted sav should be imported, this is a
+#'@param pass _character_. If encrypted sav should be imported, this is a
 #' maximum of ten character encryption key.
 #'
 #'@details SPSS files are widely available, though for R long time only foreign
@@ -40,48 +40,45 @@
 #' fl <- system.file("extdata", "electric.sav", package = "readspss")
 #' dd <- read.sav(fl)
 #'
-#'@return \code{readspss} returns a data.frame with additional objects
-#'\describe{
-#'\item{row.names}{rownames}
-#'\item{names}{colnames}
-#'\item{datalabel}{datalabel}
-#'\item{datestamp}{datestamp}
-#'\item{timestamp}{timestamp}
-#'\item{filelabel}{filelabel}
-#'\item{class}{data.frame}
-#'\item{vtype}{SPSS type 0 is usually a numeric/integer}
-#'\item{val.label}{value labels}
-#'\item{disppar}{matrix of display parameters if available}
-#'\item{missings}{a list containing information about the missing variables. if
-#' \code{use.missings=TRUE} this Information will be used to generate missings.}
-#'\item{haslabel}{list of variables that contain labels}
-#'\item{longstring}{character vector of long strings if any in file}
-#'\item{longmissing}{character vector of missings in longstrings if any}
-#'\item{longlabel}{character vector of long labels}
-#'\item{cflag}{0 if uncompressed, 1 if compressed}
-#'\item{endian}{2 or 3 if little endian else 0}
-#'\item{compression}{compression similar to cflag, somehow stored twice in the
-#' sav file}
-#'\item{doc}{list containing documentation information if any}
-#'\item{charcode}{encoding string most likely 2 is CP1252}
-#'\item{encoding}{sometimes sav-file contain encoding as a extra string}
-#'\item{ownEnc}{encoding of the R-session}
-#'\item{doenc}{was the file supposed to be encoded?}
-#'\item{autoenc}{was encoding applied to the file?}
-#'\item{swapit}{were the bytes swapped?}
-#'\item{totals}{character string of totals if any}
-#'\item{dataview}{xml file how the data should be printed}
-#'\item{extraproduct}{additional string provided}
-#'\item{label}{list containing label value information}
-#'\item{varmatrix}{a matrix with information how the data is stored}
-#'\item{var.label}{variable labels}
-#'\item{lmissings}{missings table if any in longstrings}
-#'}
+#'@return `readspss` returns a data.frame with additional attributes
+#'
+#' * _row.names_ rownames
+#' * _names_ colnames
+#' * _datalabel_ datalabel
+#' * _datestamp_ datestamp
+#' * _timestamp_ timestamp
+#' * _filelabel_ filelabel
+#' * _class_ data.frame
+#' * _vtype_ SPSS type 0 is usually a numeric/integer
+#' * _disppar_ matrix of display parameters if available
+#' * _missings_ a list containing information about the missing variables. if
+#' `use.missings=TRUE` this Information will be used to generate missings.
+#' * _haslabel_ list of variables that contain labels
+#' * _longstring_ character vector of long strings if any in file
+#' * _longmissing_ character vector of missings in longstrings if any
+#' * _longlabel_ character vector of long labels
+#' * _cflag_ 0 if uncompressed, 1 if compressed
+#' * _endian_ 2 or 3 if little endian else 0
+#' * _compression_ compression similar to cflag, somehow stored twice in the
+#' sav file
+#' * _doc_ list containing documentation information if any
+#' * _charcode_ encoding string most likely 2 is CP1252
+#' * _encoding_ sometimes sav-file contain encoding as a extra string
+#' * _ownEnc_ encoding of the R-session
+#' * _doenc_ was the file supposed to be encoded?
+#' * _autoenc_ was encoding applied to the file?
+#' * _swapit_ were the bytes swapped?
+#' * _totals_ character string of totals if any
+#' * _dataview_ xml file how the data should be printed
+#' * _extraproduct_ additional string provided
+#' * _label_ list containing label value information
+#' * _varmatrix_ a matrix with information how the data is stored
+#' * _var.label_ variable labels
+#' * _lmissings_ missings table if any in longstrings
 #'
 #'@note Information to decrypt the sav-format was provided by tda
-#' \url{http://www.stat.ruhr-uni-bochum.de/tda.html} and pspp
-#'  \url{http://www.gnu.org/software/pspp/}
-#'@author Jan Marvin Garbuszus \email{jan.garbuszus@@ruhr-uni-bochum.de}
+#' [http://www.stat.ruhr-uni-bochum.de/tda.html] and pspp
+#'  [http://www.gnu.org/software/pspp/]
 #'
 #'@seealso \code{\link[foreign]{read.spss}}, \code{memisc} and
 #'\code{\link[haven]{read_sav}}.

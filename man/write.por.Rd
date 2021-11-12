@@ -21,33 +21,34 @@ write.por(
 \item{filepath}{\emph{string} full path where and how this file should be
 stored}
 
-\item{label}{\emph{character} vector of labels. must be of size `ncol(dat)`}
+\item{label}{\emph{character} vector of labels. must be of size \code{ncol(dat)}}
 
-\item{add.rownames}{\emph{logical.} If \code{TRUE}, a new variable rownames
+\item{add.rownames}{\emph{logical} If \code{TRUE}, a new variable rownames
 will be added to the por-file.}
 
-\item{convert.factors}{\emph{logical.} If \code{TRUE}, factors will be
-converted to SPSS variables with labels.
+\item{convert.factors}{\emph{logical} If \code{TRUE}, factors will be converted to
+SPSS variables with labels.
 SPSS expects strings to be encoded as Windows-1252, so all levels will be
-recoded.  Character which can not be mapped in Windows-1252 will be saved as
+recoded. Character which can not be mapped in Windows-1252 will be saved as
 hexcode.}
 
-\item{toEncoding}{encoding used for the por file. SPSS itself claims to
-have problems with unicode and por files, so "CP1252" is the default.}
+\item{toEncoding}{\emph{character} encoding used for the por file. SPSS itself
+claims to have problems with unicode and por files, so "CP1252" is the
+default.}
 
 \item{convert.dates}{\emph{logical} should dates be converted to SPSS format}
 
-\item{tz}{\emph{character.} The name of the timezone convert.dates will use.}
+\item{tz}{\emph{character} The name of the timezone convert.dates will use.}
 }
 \value{
-\code{readspss} returns nothing
+\code{write.por} returns nothing
 }
 \description{
-!!! EXPERIMENTAL !!! Function to write an SPSS por file. Returns an por file
-that read.por can read as well as SPSS can. Other packages as foreign,
-memisc and haven might fail (fail reading or return wrong values).
+Function to write an SPSS por file. Returns an por file that read.por can
+read as well as SPSS can. Other packages as foreign, memisc and haven might
+fail (fail reading or return wrong values).
 }
 \details{
 Strings longer than 255 chars are not provided.
- File will be stored using "CP1252" encoding.
+File will be stored using "CP1252" encoding.
 }

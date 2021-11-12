@@ -1,7 +1,7 @@
 Package: readspss
 Type: Package
 Title: Importing and Exporting SPSS Files
-Version: 0.15
+Version: 0.15.1
 Authors@R: c(
     person("Jan Marvin", "Garbuszus",
     email = "jan.garbuszus@ruhr-uni-bochum.de", role = c("aut", "cre")),
@@ -15,6 +15,8 @@ Authors@R: c(
     )
 Maintainer: Jan Marvin Garbuszus <jan.garbuszus@ruhr-uni-bochum.de>
 Description: Package to read and write the SPSS file formats.
+URL: https://github.com/JanMarvin/readspss
+BugReports: https://github.com/JanMarvin/readspss/issues
 License: GPL-2 | file LICENSE
 LazyData: TRUE
 Imports:
@@ -30,4 +32,5 @@ LinkingTo: Rcpp, BH
 ByteCompile: yes
 SystemRequirements: C++11, OpenSSL >= 1.0.1
 VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2

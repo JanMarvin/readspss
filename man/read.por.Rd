@@ -30,11 +30,11 @@ partial labels into factors. e.g. 1 - low and 5 - high are provided, labels
 2, 3 and 4 will be created. especially useful in combination with
 \code{use.missings=TRUE}.}
 
-\item{encoding}{\emph{logical} shall values be converted? If true, read.por
+\item{encoding}{\emph{logical} shall values be converted? If true, \code{read.por()}
 will try the charcode stored inside the por-file. If this value is 2 or not
-available, fromEncoding can be used to change encoding.}
+available, \code{fromEncoding} can be used to change encoding.}
 
-\item{fromEncoding}{\emph{character.} encoding of the imported file. This
+\item{fromEncoding}{\emph{character} encoding of the imported file. This
 information is stored inside the por-file, but is currently unused. Still
 this option can be used to define the initial encoding by hand.}
 
@@ -44,13 +44,13 @@ Defaults to TRUE.}
 \item{debug}{\emph{logical} provides additional debug information. Most
 likely not useful to any user.}
 
-\item{override}{\emph{logical}. The filename provided in \code{file} is
+\item{override}{\emph{logical} The filename provided in \code{file} is
 checked for the ending por. If the file ending is different, nothing is read.
 This option can be used to override this behavior.}
 
-\item{convert.dates}{\emph{logical}. Should dates be converted on the fly?}
+\item{convert.dates}{\emph{logical} Should dates be converted on the fly?}
 
-\item{add.rownames}{\emph{logical.} If \code{TRUE}, the first column will be
+\item{add.rownames}{\emph{logical} If \code{TRUE}, the first column will be
 used as rownames. Variable will be dropped afterwards.}
 }
 \description{
@@ -64,12 +64,9 @@ por-format and provide additional options to import the data.
 }
 \note{
 Information to decrypt the por-format was provided by tda
-\url{http://www.stat.ruhr-uni-bochum.de/tda.html} and pspp
- \url{http://www.gnu.org/software/pspp/}
+\link{http://www.stat.ruhr-uni-bochum.de/tda.html} and pspp
+\link{http://www.gnu.org/software/pspp/}
 }
 \seealso{
 \code{\link[foreign]{read.spss}}, \code{memisc}.
-}
-\author{
-Jan Marvin Garbuszus \email{jan.garbuszus@ruhr-uni-bochum.de}
 }

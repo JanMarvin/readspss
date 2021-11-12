@@ -1,30 +1,30 @@
 #' read.por
 #'
 #' Function to read a SPSS por file into a data.frame().
-#'@param file \emph{string} a por-file to import. can be a file on a computer
+#'@param file _string_ a por-file to import. can be a file on a computer
 #' or an url. in this case the file will be downloaded and read before it is
 #' used.
-#'@param convert.factors \emph{logical} if true numeric or character variables
+#'@param convert.factors _logical_ if true numeric or character variables
 #' will be converted into a factor in R.
-#'@param generate.factors \emph{logical} function to convert variables with
+#'@param generate.factors _logical_ function to convert variables with
 #' partial labels into factors. e.g. 1 - low and 5 - high are provided, labels
 #' 2, 3 and 4 will be created. especially useful in combination with
-#' \code{use.missings=TRUE}.
-#'@param encoding \emph{logical} shall values be converted? If true, read.por
+#' `use.missings=TRUE`.
+#'@param encoding _logical_ shall values be converted? If true, `read.por()`
 #' will try the charcode stored inside the por-file. If this value is 2 or not
-#' available, fromEncoding can be used to change encoding.
-#'@param fromEncoding \emph{character.} encoding of the imported file. This
+#' available, `fromEncoding` can be used to change encoding.
+#'@param fromEncoding _character_ encoding of the imported file. This
 #' information is stored inside the por-file, but is currently unused. Still
 #' this option can be used to define the initial encoding by hand.
-#'@param use.missings \emph{logical} should missing values be converted.
+#'@param use.missings _logical_ should missing values be converted.
 #' Defaults to TRUE.
-#' @param debug \emph{logical} provides additional debug information. Most
+#' @param debug _logical_ provides additional debug information. Most
 #' likely not useful to any user.
-#'@param override \emph{logical}. The filename provided in \code{file} is
+#'@param override _logical_ The filename provided in `file` is
 #' checked for the ending por. If the file ending is different, nothing is read.
 #' This option can be used to override this behavior.
-#'@param convert.dates \emph{logical}. Should dates be converted on the fly?
-#'@param add.rownames \emph{logical.} If \code{TRUE}, the first column will be
+#'@param convert.dates _logical_ Should dates be converted on the fly?
+#'@param add.rownames _logical_ If `TRUE`, the first column will be
 #'  used as rownames. Variable will be dropped afterwards.
 #'
 #'@details SPSS files are widely available, though for R long time only foreign
@@ -33,9 +33,8 @@
 #' por-format and provide additional options to import the data.
 #'
 #'@note Information to decrypt the por-format was provided by tda
-#' \url{http://www.stat.ruhr-uni-bochum.de/tda.html} and pspp
-#'  \url{http://www.gnu.org/software/pspp/}
-#'@author Jan Marvin Garbuszus \email{jan.garbuszus@@ruhr-uni-bochum.de}
+#' [http://www.stat.ruhr-uni-bochum.de/tda.html] and pspp
+#' [http://www.gnu.org/software/pspp/]
 #'
 #'@seealso \code{\link[foreign]{read.spss}}, \code{memisc}.
 #'
