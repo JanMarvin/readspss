@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">readspss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.15</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.15.1</span>
       </span>
     </div>
 
@@ -92,7 +92,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/JanMarvin/readspss/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -107,7 +112,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>read.sav</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/JanMarvin/readspss/blob/master/R/readsav.R'><code>R/readsav.R</code></a></small>
     <div class="hidden name"><code>read.sav.Rd</code></div>
     </div>
 
@@ -196,43 +201,41 @@ maximum of ten character encryption key.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>readspss</code> returns a data.frame with additional objects</p><dl>
-<dt>row.names</dt><dd><p>rownames</p></dd>
-<dt>names</dt><dd><p>colnames</p></dd>
-<dt>datalabel</dt><dd><p>datalabel</p></dd>
-<dt>datestamp</dt><dd><p>datestamp</p></dd>
-<dt>timestamp</dt><dd><p>timestamp</p></dd>
-<dt>filelabel</dt><dd><p>filelabel</p></dd>
-<dt>class</dt><dd><p>data.frame</p></dd>
-<dt>vtype</dt><dd><p>SPSS type 0 is usually a numeric/integer</p></dd>
-<dt>val.label</dt><dd><p>value labels</p></dd>
-<dt>disppar</dt><dd><p>matrix of display parameters if available</p></dd>
-<dt>missings</dt><dd><p>a list containing information about the missing variables. if
-<code>use.missings=TRUE</code> this Information will be used to generate missings.</p></dd>
-<dt>haslabel</dt><dd><p>list of variables that contain labels</p></dd>
-<dt>longstring</dt><dd><p>character vector of long strings if any in file</p></dd>
-<dt>longmissing</dt><dd><p>character vector of missings in longstrings if any</p></dd>
-<dt>longlabel</dt><dd><p>character vector of long labels</p></dd>
-<dt>cflag</dt><dd><p>0 if uncompressed, 1 if compressed</p></dd>
-<dt>endian</dt><dd><p>2 or 3 if little endian else 0</p></dd>
-<dt>compression</dt><dd><p>compression similar to cflag, somehow stored twice in the
-sav file</p></dd>
-<dt>doc</dt><dd><p>list containing documentation information if any</p></dd>
-<dt>charcode</dt><dd><p>encoding string most likely 2 is CP1252</p></dd>
-<dt>encoding</dt><dd><p>sometimes sav-file contain encoding as a extra string</p></dd>
-<dt>ownEnc</dt><dd><p>encoding of the R-session</p></dd>
-<dt>doenc</dt><dd><p>was the file supposed to be encoded?</p></dd>
-<dt>autoenc</dt><dd><p>was encoding applied to the file?</p></dd>
-<dt>swapit</dt><dd><p>were the bytes swapped?</p></dd>
-<dt>totals</dt><dd><p>character string of totals if any</p></dd>
-<dt>dataview</dt><dd><p>xml file how the data should be printed</p></dd>
-<dt>extraproduct</dt><dd><p>additional string provided</p></dd>
-<dt>label</dt><dd><p>list containing label value information</p></dd>
-<dt>varmatrix</dt><dd><p>a matrix with information how the data is stored</p></dd>
-<dt>var.label</dt><dd><p>variable labels</p></dd>
-<dt>lmissings</dt><dd><p>missings table if any in longstrings</p></dd>
-
-</dl>
+    <p><code>readspss</code> returns a data.frame with additional attributes</p><ul>
+<li><p><em>row.names</em> rownames</p></li>
+<li><p><em>names</em> colnames</p></li>
+<li><p><em>datalabel</em> datalabel</p></li>
+<li><p><em>datestamp</em> datestamp</p></li>
+<li><p><em>timestamp</em> timestamp</p></li>
+<li><p><em>filelabel</em> filelabel</p></li>
+<li><p><em>class</em> data.frame</p></li>
+<li><p><em>vtype</em> SPSS type 0 is usually a numeric/integer</p></li>
+<li><p><em>disppar</em> matrix of display parameters if available</p></li>
+<li><p><em>missings</em> a list containing information about the missing variables. if
+<code>use.missings=TRUE</code> this Information will be used to generate missings.</p></li>
+<li><p><em>haslabel</em> list of variables that contain labels</p></li>
+<li><p><em>longstring</em> character vector of long strings if any in file</p></li>
+<li><p><em>longmissing</em> character vector of missings in longstrings if any</p></li>
+<li><p><em>longlabel</em> character vector of long labels</p></li>
+<li><p><em>cflag</em> 0 if uncompressed, 1 if compressed</p></li>
+<li><p><em>endian</em> 2 or 3 if little endian else 0</p></li>
+<li><p><em>compression</em> compression similar to cflag, somehow stored twice in the
+sav file</p></li>
+<li><p><em>doc</em> list containing documentation information if any</p></li>
+<li><p><em>charcode</em> encoding string most likely 2 is CP1252</p></li>
+<li><p><em>encoding</em> sometimes sav-file contain encoding as a extra string</p></li>
+<li><p><em>ownEnc</em> encoding of the R-session</p></li>
+<li><p><em>doenc</em> was the file supposed to be encoded?</p></li>
+<li><p><em>autoenc</em> was encoding applied to the file?</p></li>
+<li><p><em>swapit</em> were the bytes swapped?</p></li>
+<li><p><em>totals</em> character string of totals if any</p></li>
+<li><p><em>dataview</em> xml file how the data should be printed</p></li>
+<li><p><em>extraproduct</em> additional string provided</p></li>
+<li><p><em>label</em> list containing label value information</p></li>
+<li><p><em>varmatrix</em> a matrix with information how the data is stored</p></li>
+<li><p><em>var.label</em> variable labels</p></li>
+<li><p><em>lmissings</em> missings table if any in longstrings</p></li>
+</ul>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
@@ -245,15 +248,12 @@ are some integers stored as integers. Still they are returned as numerics.</p>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
     <p>Information to decrypt the sav-format was provided by tda
-<a href='http://www.stat.ruhr-uni-bochum.de/tda.html'>http://www.stat.ruhr-uni-bochum.de/tda.html</a> and pspp
- <a href='http://www.gnu.org/software/pspp/'>http://www.gnu.org/software/pspp/</a></p>
+http://www.stat.ruhr-uni-bochum.de/tda.html and pspp
+http://www.gnu.org/software/pspp/</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='https://rdrr.io/pkg/foreign/man/read.spss.html'>read.spss</a></code>, <code>memisc</code> and
 <code>read_sav</code>.</p></div>
-    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
-
-    <p>Jan Marvin Garbuszus <a href='mailto:jan.garbuszus@ruhr-uni-bochum.de'>jan.garbuszus@ruhr-uni-bochum.de</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='r-in'><span class='va'>fl</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"electric.sav"</span>, package <span class='op'>=</span> <span class='st'>"readspss"</span><span class='op'>)</span></span>

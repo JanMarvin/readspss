@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">readspss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.15</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.15.1</span>
       </span>
     </div>
 
@@ -92,7 +92,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/JanMarvin/readspss/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -107,7 +112,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>write.sav</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/JanMarvin/readspss/blob/master/R/writesav.R'><code>R/writesav.R</code></a></small>
     <div class="hidden name"><code>write.sav.Rd</code></div>
     </div>
 
@@ -142,11 +147,11 @@ stored</p></td>
     <tr>
       <th>label</th>
       <td><p><em>character</em> if any provided this must be a vector of
-labels. It must be of size `ncol(dat)`</p></td>
+labels. It must be of size <code>ncol(dat)</code></p></td>
     </tr>
     <tr>
       <th>add.rownames</th>
-      <td><p><em>logical.</em> If <code>TRUE</code>, a new variable rownames
+      <td><p><em>logical</em> If <code>TRUE</code>, a new variable rownames
 will be added to the sav-file.</p></td>
     </tr>
     <tr>
@@ -161,7 +166,7 @@ chunks of 8 chars. Reduces memory size of sav-file.</p></td>
     </tr>
     <tr>
       <th>tz</th>
-      <td><p><em>character.</em> The name of the timezone convert.dates will use.</p></td>
+      <td><p><em>character</em> The name of the timezone convert.dates will use.</p></td>
     </tr>
     <tr>
       <th>debug</th>
@@ -176,10 +181,10 @@ ending zsav is used, this is selected as default.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>readspss</code> returns nothing</p>
+    <p><code>write.sav</code> returns nothing</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Strings longer than 255 chars are not provided.</p>
+    <p>Writing of strings longer than 255 chars is not provided.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -40,9 +40,9 @@
 
 
 <meta property="og:title" content="write.por — write.por" />
-<meta property="og:description" content="!!! EXPERIMENTAL !!! Function to write an SPSS por file. Returns an por file
-that read.por can read as well as SPSS can. Other packages as foreign,
-memisc and haven might fail (fail reading or return wrong values)." />
+<meta property="og:description" content="Function to write an SPSS por file. Returns an por file that read.por can
+read as well as SPSS can. Other packages as foreign, memisc and haven might
+fail (fail reading or return wrong values)." />
 
 
 
@@ -74,7 +74,7 @@ memisc and haven might fail (fail reading or return wrong values)." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">readspss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.15</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.15.1</span>
       </span>
     </div>
 
@@ -94,7 +94,12 @@ memisc and haven might fail (fail reading or return wrong values)." />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/JanMarvin/readspss/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -109,14 +114,14 @@ memisc and haven might fail (fail reading or return wrong values)." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>write.por</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/JanMarvin/readspss/blob/master/R/writepor.R'><code>R/writepor.R</code></a></small>
     <div class="hidden name"><code>write.por.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>!!! EXPERIMENTAL !!! Function to write an SPSS por file. Returns an por file
-that read.por can read as well as SPSS can. Other packages as foreign,
-memisc and haven might fail (fail reading or return wrong values).</p>
+    <p>Function to write an SPSS por file. Returns an por file that read.por can
+read as well as SPSS can. Other packages as foreign, memisc and haven might
+fail (fail reading or return wrong values).</p>
     </div>
 
     <pre class="usage"><span class='fu'>write.por</span><span class='op'>(</span>
@@ -144,25 +149,26 @@ stored</p></td>
     </tr>
     <tr>
       <th>label</th>
-      <td><p><em>character</em> vector of labels. must be of size `ncol(dat)`</p></td>
+      <td><p><em>character</em> vector of labels. must be of size <code>ncol(dat)</code></p></td>
     </tr>
     <tr>
       <th>add.rownames</th>
-      <td><p><em>logical.</em> If <code>TRUE</code>, a new variable rownames
+      <td><p><em>logical</em> If <code>TRUE</code>, a new variable rownames
 will be added to the por-file.</p></td>
     </tr>
     <tr>
       <th>convert.factors</th>
-      <td><p><em>logical.</em> If <code>TRUE</code>, factors will be
-converted to SPSS variables with labels.
+      <td><p><em>logical</em> If <code>TRUE</code>, factors will be converted to
+SPSS variables with labels.
 SPSS expects strings to be encoded as Windows-1252, so all levels will be
-recoded.  Character which can not be mapped in Windows-1252 will be saved as
+recoded. Character which can not be mapped in Windows-1252 will be saved as
 hexcode.</p></td>
     </tr>
     <tr>
       <th>toEncoding</th>
-      <td><p>encoding used for the por file. SPSS itself claims to
-have problems with unicode and por files, so "CP1252" is the default.</p></td>
+      <td><p><em>character</em> encoding used for the por file. SPSS itself
+claims to have problems with unicode and por files, so "CP1252" is the
+default.</p></td>
     </tr>
     <tr>
       <th>convert.dates</th>
@@ -170,17 +176,17 @@ have problems with unicode and por files, so "CP1252" is the default.</p></td>
     </tr>
     <tr>
       <th>tz</th>
-      <td><p><em>character.</em> The name of the timezone convert.dates will use.</p></td>
+      <td><p><em>character</em> The name of the timezone convert.dates will use.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>readspss</code> returns nothing</p>
+    <p><code>write.por</code> returns nothing</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Strings longer than 255 chars are not provided.
- File will be stored using "CP1252" encoding.</p>
+File will be stored using "CP1252" encoding.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
