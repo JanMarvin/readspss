@@ -16,6 +16,7 @@
 #' @param debug _logical_ print debug information.
 #' @param is_zsav _logical_ explicitly create a zsav file. If the file
 #'  ending zsav is used, this is selected as default.
+#' @param disppar optional display parameter matrix. Needs documentation.
 #' @details Writing of strings longer than 255 chars is not provided.
 #'
 #' @return `write.sav` returns nothing
@@ -23,7 +24,7 @@
 #' @export
 write.sav <- function(dat, filepath, label, add.rownames = FALSE,
                       compress = FALSE, convert.dates = TRUE, tz="GMT",
-                      debug = FALSE, is_zsav = FALSE) {
+                      debug = FALSE, is_zsav = FALSE, disppar) {
 
   filepath <- path.expand(filepath)
 
@@ -229,6 +230,37 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
       )
   }
 
+  # optional disppar parameter. if none is passed to the function, create a
+  # default one with a few selected parameters.
+  # TODO: add a similar logic for varmatrix
+  if (missing(disppar)) {
+
+    measure <- rep(NA, ncol(dat))
+    # nominal if factor, logical or character; else metric
+    sel <- vartyp == -1 | vartyp == 1
+    measure[sel] <- 1
+    measure[!sel] <- 3
+
+    colwidth <- rep(NA, ncol(dat))
+    # colwidth 10 if date; else 8
+    sel <- vartyp == 20 || vartyp == 22
+    colwidth[sel] <- 10
+    colwidth[!sel] <- 8
+
+    alignment <- rep(NA, ncol(dat))
+    # characters left aligned; else right
+    sel <- vartyp == 1
+    alignment[sel] <- 3
+    alignment[!sel] <- 1
+
+    # create disppar matrix
+    disppar <- matrix(c(measure, colwidth, alignment),
+                      ncol = 3)
+  }
+
+  # make it flat
+  disppar <- c(t(disppar))
+
   attr(dat, "vtyp") <- vtyp
   attr(dat, "vartyp") <- vartyp
   attr(dat, "vartypes") <- vartypes
@@ -241,6 +273,7 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
   attr(dat, "labtab") <- labtab
   attr(dat, "itc") <- itc
   attr(dat, "cc") <- cc
+  attr(dat, "disppar") <- disppar
 
   if (file_ext(filepath) == "zsav")
     is_zsav <- TRUE

@@ -66,6 +66,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
 
     info.haslabel = dat.attr("haslabel");
     info.labtab = dat.attr("labtab");
+    info.disppar = dat.attr("disppar");
 
     std::string timestamp = Rcpp::as<std::string>(dat.attr("timestamp"));
     std::string datestamp = Rcpp::as<std::string>(dat.attr("datestamp"));
@@ -298,6 +299,27 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
 
 
     // rtype 7 -----------------------------------------------------------------
+
+    if (longvarname.compare(empty) != 0) {
+      // beign disppar
+      rtype = 7;
+      writebin(rtype, sav, swapit);
+
+      subtyp = 11;
+      writebin(subtyp, sav, swapit);
+
+      size = 1;
+      writebin(size, sav, swapit);
+
+      count = info.disppar.size();
+      writebin(count, sav, swapit);
+
+      for (auto i = 0; i < count; ++i) {
+        int32_t measure = info.disppar[i];
+        writebin(measure, sav, swapit);
+      }
+      // end disppar
+    }
 
     if (longvarname.compare(empty) != 0) {
       // beign longvarnames

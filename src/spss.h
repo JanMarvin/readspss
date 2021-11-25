@@ -17,6 +17,7 @@ struct info_t {
   Rcpp::CharacterVector label;
   Rcpp::IntegerVector haslabel;
   Rcpp::List labtab;
+  Rcpp::IntegerVector disppar;
 };
 
 template <typename T>

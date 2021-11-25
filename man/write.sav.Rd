@@ -13,7 +13,8 @@ write.sav(
   convert.dates = TRUE,
   tz = "GMT",
   debug = FALSE,
-  is_zsav = FALSE
+  is_zsav = FALSE,
+  disppar
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ chunks of 8 chars. Reduces memory size of sav-file.}
 
 \item{is_zsav}{\emph{logical} explicitly create a zsav file. If the file
 ending zsav is used, this is selected as default.}
+
+\item{disppar}{optional display parameter matrix. Needs documentation.}
 }
 \value{
 \code{write.sav} returns nothing

@@ -11,5 +11,5 @@ saveToExport(x)
 }
 \description{
 Compression can reduce numeric vectors as integers if the vector does only
-contain integer type data.
+contain integer type data. Same goes for logical values.
 }
