@@ -153,12 +153,33 @@ if (dir.exists("data"))
 
 dir.create("data")
 
-dd <- iris
-write.sav(dd, "data/iris.sav", compress = TRUE)
-df <- read.sav("data/iris.sav")
+# create a more complex test with integers, missings missing integers,
+# characters and more iris data
+dd <- cbind(iris,
+            as.integer(seq_len(nrow(iris))),
+            NA,
+            as.integer(NA),
+            "a",
+            iris)
+names(dd) <- letters[seq_len(ncol(dd))]
+write.sav(dd, "data/iris_unc.sav", compress = FALSE)
+write.sav(dd, "data/iris_com.sav", compress = TRUE)
+df_unc <- read.sav("data/iris_unc.sav")
+df_com <- read.sav("data/iris_com.sav")
 
-test_that("factor", {
-  expect_true(all.equal(dd, df, check.attributes = FALSE))
+# this is a known difference in the import and we can ignore it
+df_unc$g <- as.logical(df_unc$g)
+df_com$g <- as.logical(df_com$g)
+
+# check filesize of both
+fs_unc <- file.info("data/iris_unc.sav")[["size"]]
+fs_com <- file.info("data/iris_com.sav")[["size"]]
+
+
+test_that("compression", {
+  expect_true(all.equal(dd, df_unc, check.attributes = FALSE))
+  expect_true(all.equal(dd, df_com, check.attributes = FALSE))
+  expect_true(fs_com < fs_unc)
 })
 
 unlink("data", recursive = TRUE)
@@ -230,14 +251,24 @@ if (dir.exists("data"))
 
 dir.create("data")
 
-dd <- cars
+dd <- iris
 
-write.sav(dd, "data/dd.zsav", compress = TRUE, is_zsav = TRUE)
-ds <- read.sav("data/dd.zsav")
+write.sav(dd, "data/dd_unc.sav", compress = FALSE, is_zsav = FALSE)
+write.sav(dd, "data/dd_com.sav", compress = TRUE, is_zsav = FALSE)
+write.sav(dd, "data/dd_unc.zsav", compress = FALSE, is_zsav = TRUE)
+write.sav(dd, "data/dd_com.zsav", compress = TRUE, is_zsav = TRUE)
+
+ds_unc <- read.sav("data/dd_unc.sav")
+ds_com <- read.sav("data/dd_com.sav")
+dz_unc <- read.sav("data/dd_unc.zsav")
+dz_com <- read.sav("data/dd_com.zsav")
 
 
 test_that("zsav", {
-  expect_true(all.equal(dd, ds, check.attributes = FALSE))
+  expect_true(all.equal(dd, ds_unc, check.attributes = FALSE))
+  expect_true(all.equal(dd, ds_com, check.attributes = FALSE))
+  expect_true(all.equal(dd, dz_unc, check.attributes = FALSE))
+  expect_true(all.equal(dd, dz_com, check.attributes = FALSE))
 })
 
 unlink("data", recursive = TRUE)

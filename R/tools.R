@@ -42,9 +42,11 @@ get.filepath <- function(path = "") {
 #' Check if numeric vector can be expressed as integer vector
 #'
 #' Compression can reduce numeric vectors as integers if the vector does only
-#' contain integer type data.
+#' contain integer type data. Same goes for logical values.
 #'
 #' @param x vector of data frame
 saveToExport <- function(x) {
-  isTRUE(all.equal(x, as.integer(x))) | isTRUE(is.factor(x))
+  isTRUE(all.equal(x, as.integer(x))) |
+    isTRUE(is.factor(x)) |
+    isTRUE(is.logical(x))
 }
