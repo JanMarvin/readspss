@@ -206,7 +206,7 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
   cc <- sapply(dat, is.character)
 
   vartyp <- NA
-  vartyp[vartypen == "factor"] <- -1
+  vartyp[vartypen == "factor" | vartypen == "logical"] <- -1
   vartyp[vartypen == "numeric" | vartypen == "integer"] <- 0
   vartyp[vartypen == "character"] <- 1
   vartyp[vartypen == "Date"] <- 20
