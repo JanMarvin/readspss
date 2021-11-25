@@ -163,7 +163,7 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
     # convert numeric to integer without loss of information
     if (any(numToCompress)) {
       saveToConvert <- names(numToCompress[numToCompress])
-      # replace numeric as interger
+      # replace numeric as integer
       dat[saveToConvert] <- sapply(dat[saveToConvert], as.integer)
     }
 
