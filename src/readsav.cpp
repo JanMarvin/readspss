@@ -174,7 +174,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
     std::string name (8, '\0');
 
-    int32_t vtype=0, vlflag=0, nmiss=0, var4=0, var5 = 0, nolab = 0;
+    int32_t vtype=0, vlflag=0, nmiss=0, nolab = 0;
     int32_t subtyp = 0, size = 0, count = 0;
     int32_t major = 0, minor = 0, rev = 0, macode = 0;
     int32_t floatp = 0, compr = 0, endian = 0;
@@ -230,31 +230,17 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         nmiss  = readbin(nmiss, sav, swapit);
 
         // bits of int32_t define digits, width and type
-        // var4 = readbin(var4, sav, swapit);
-        int8_t unk41, unk42, unk43, unk44;
-        uint16_t unk416;
-
+        int8_t unk41 = 0, unk42 = 0, unk43 = 0, unk44 = 0;
         unk41 = readbin(unk41, sav, swapit);
         unk42 = readbin(unk42, sav, swapit);
         unk43 = readbin(unk43, sav, swapit);
         unk44 = readbin(unk44, sav, swapit);
-        // unk416 = readbin(unk416, sav, swapit);
 
-        // Rprintf("%d %d %d %d\n", unk41, unk42, unk43, unk44);
-
-        // 4 and 5 are most likely identical
-        // var5 = readbin(var5, sav, swapit
-        int8_t unk51, unk52, unk53, unk54;
-        // int16_t unk516;
-
+        int8_t unk51 = 0, unk52 = 0, unk53 = 0, unk54 = 0;
         unk51 = readbin(unk51, sav, swapit);
         unk52 = readbin(unk52, sav, swapit);
         unk53 = readbin(unk53, sav, swapit);
         unk54 = readbin(unk54, sav, swapit);
-        // unk516 = readbin(unk516, sav, swapit);
-
-        // Rprintf("%d %d %d %d\n", unk51, unk52, unk53, unk54);
-
 
         // Store vars in matrix export as attr varmat
         Rcpp::NumericMatrix varmat(1,11);
@@ -262,12 +248,13 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         varmat(0,0)  = vtype;
         varmat(0,1)  = vlflag;
         varmat(0,2)  = nmiss; // 1, 2, 3 or -1, -2, -3 (range)
-        varmat(0,3)  = unk41; // digits print format?
+        // print
+        varmat(0,3)  = unk41; // digits format
         varmat(0,4)  = unk42; // field width
         varmat(0,5)  = unk43; // format type
         varmat(0,6)  = unk44; // not used
         // write
-        varmat(0,7)  = unk51; // digits write format?
+        varmat(0,7)  = unk51; // digits format
         varmat(0,8)  = unk52; // field width
         varmat(0,9)  = unk53; // format type
         varmat(0,10) = unk54; // not used
