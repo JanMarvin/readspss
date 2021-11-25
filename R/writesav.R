@@ -237,6 +237,7 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
 
     measure <- rep(NA, ncol(dat))
     # nominal if factor, logical or character; else metric
+    # (nominal 1, ordinal 2, metric 3)
     sel <- vartyp == -1 | vartyp == 1
     measure[sel] <- 1
     measure[!sel] <- 3
@@ -249,6 +250,7 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
 
     alignment <- rep(NA, ncol(dat))
     # characters left aligned; else right
+    # (1 right, 2 center, 3 left)
     sel <- vartyp == 1
     alignment[sel] <- 3
     alignment[!sel] <- 1

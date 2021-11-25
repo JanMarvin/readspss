@@ -308,7 +308,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
       subtyp = 11;
       writebin(subtyp, sav, swapit);
 
-      size = 1;
+      size = 4;
       writebin(size, sav, swapit);
 
       count = info.disppar.size();
