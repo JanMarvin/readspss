@@ -166,14 +166,11 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
       # replace numeric as interger
       dat[saveToConvert] <- sapply(dat[saveToConvert], as.integer)
     }
-    assign("dat", dat, globalenv())
 
     # ii integer and not all missing
     ii <- sapply(dat, function(x) {
       (is.logical(x) | is.integer(x))
     })
-    assign("ii", ii, globalenv())
-
 
     gg <- FALSE
     dat_ii <- dat[names(ii)[ii]] # might have length 0
@@ -191,17 +188,14 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
         }
         z
       })
-    assign("gg", gg, globalenv())
 
     # adjust gg to the length of dat
     gg <- gg[names(dat)]
-
+    # logical matrix: is integer and good for compression?
     checkll <- rbind(ii, gg)
 
     # logical for integer compression
-    itc <- as.logical(checkll)
-    if (length(gg) > 0)
-      itc <- apply(checkll, 2, all)
+    itc <- apply(checkll, 2, all)
 
   }
 
