@@ -451,10 +451,4 @@ inline int32_t b30int (std::string &val_s) {
   return std::strtol(val_s.c_str(), NULL, 30);
 }
 
-union int_chars {
-  int32_t a;
-  char b[4];
-};
-
-
 #endif

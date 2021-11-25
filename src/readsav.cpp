@@ -230,10 +230,30 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         nmiss  = readbin(nmiss, sav, swapit);
 
         // bits of int32_t define digits, width and type
-        var4 = readbin(var4, sav, swapit);
+        // var4 = readbin(var4, sav, swapit);
+        int8_t unk41, unk42, unk43, unk44;
+        uint16_t unk416;
+
+        unk41 = readbin(unk41, sav, swapit);
+        unk42 = readbin(unk42, sav, swapit);
+        unk43 = readbin(unk43, sav, swapit);
+        unk44 = readbin(unk44, sav, swapit);
+        // unk416 = readbin(unk416, sav, swapit);
+
+        // Rprintf("%d %d %d %d\n", unk41, unk42, unk43, unk44);
 
         // 4 and 5 are most likely identical
-        var5 = readbin(var5, sav, swapit);
+        // var5 = readbin(var5, sav, swapit
+        int8_t unk51, unk52, unk53, unk54;
+        // int16_t unk516;
+
+        unk51 = readbin(unk51, sav, swapit);
+        unk52 = readbin(unk52, sav, swapit);
+        unk53 = readbin(unk53, sav, swapit);
+        unk54 = readbin(unk54, sav, swapit);
+        // unk516 = readbin(unk516, sav, swapit);
+
+        // Rprintf("%d %d %d %d\n", unk51, unk52, unk53, unk54);
 
 
         // Store vars in matrix export as attr varmat
@@ -242,17 +262,17 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         varmat(0,0)  = vtype;
         varmat(0,1)  = vlflag;
         varmat(0,2)  = nmiss; // 1, 2, 3 or -1, -2, -3 (range)
-        varmat(0,3)  = (int8_t)var4; // digits print format?
-        varmat(0,4)  = (var4 >> 8); // field width
-        varmat(0,5)  = (var4 >> 16); // format type
-        varmat(0,6)  = (var4 >> 24); // not used
+        varmat(0,3)  = unk41; // digits print format?
+        varmat(0,4)  = unk42; // field width
+        varmat(0,5)  = unk43; // format type
+        varmat(0,6)  = unk44; // not used
         // write
-        varmat(0,7)  = (int8_t)var5; // digits write format?
-        varmat(0,8)  = (var5 >> 8); // field width
-        varmat(0,9)  = (var5 >> 16); // format type
-        varmat(0,10) = (var5 >> 24); // not used
+        varmat(0,7)  = unk51; // digits write format?
+        varmat(0,8)  = unk52; // field width
+        varmat(0,9)  = unk53; // format type
+        varmat(0,10) = unk54; // not used
 
-        if (vtype > -1) // -1 is of no further useage
+        if (vtype > -1) // -1 is of no further usage
           varlist.push_back(varmat);
 
         vartype.push_back(vtype);
@@ -273,7 +293,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         {
           origlen = readbin(origlen, sav, swapit);
 
-          // Max laenge laut interwebz: 255.
+          // Max length: 255.
           origlen = ceil((double)origlen/4) * 4;
 
           std::string vallabel (origlen, '\0');

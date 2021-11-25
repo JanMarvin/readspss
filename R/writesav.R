@@ -204,8 +204,9 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
 
   vartypen <- sapply(dat, function(x)class(x)[[1]])
   vartyp <- NA
-  vartyp[vartypen == "numeric" | vartypen == "integer" |
-           vartypen == "factor"] <- 0
+
+  vartyp[vartypen == "factor"] <- -1
+  vartyp[vartypen == "numeric" | vartypen == "integer"] <- 0
   vartyp[vartypen == "character"] <- 1
   vartyp[vartypen == "Date"] <- 20
   vartyp[vartypen == "POSIXct"] <- 22
@@ -226,7 +227,6 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
         round(julian(dat[[v]], ISOdate(1582, 10, 14, tz = tz))) * 24 * 60 * 60
       )
   }
-
 
   attr(dat, "vtyp") <- vtyp
   attr(dat, "vartyp") <- vartyp

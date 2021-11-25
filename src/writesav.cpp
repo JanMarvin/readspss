@@ -136,61 +136,87 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
       int32_t nmiss = 0;
       writebin(nmiss, sav, swapit);
 
-      int_chars c;
-
-      int32_t var4;
-      char tmp1[4] = "";
+      uint8_t unk41 = 0, unk42 = 0, unk43 = 0, unk44 = 0;
+      // numeric
       if (subtyp == 0) {
-        tmp1[0] = 2;
-        tmp1[1] = 8;
-        tmp1[2] = isdate;
-        tmp1[3] = 0;
+        // factor
+        if (isdate == -1) {
+          unk41 = 0; // digits print format
+          unk42 = 8; // field width
+          unk43 = 5; // column format
+          unk44 = 0; // not used?
+        }
+        // digit value
+        if (isdate == 0) {
+          unk41 = 2; // digits print format
+          unk42 = 8; // field width
+          unk43 = 5; // column format
+          unk44 = 0; // not used?
+        }
+        // date
+        if (isdate == 20 || isdate == 22) {
+          unk41 = 0;
+          unk42 = 10;
+          unk43 = 39;
+          unk44 = 0;
+        }
       } else if (subtyp > 0) {
-        tmp1[0] = 0;
-        tmp1[1] = subtyp;
-        tmp1[2] = 1;
-        tmp1[3] = 0;
-      } else if (subtyp == -1) {
-        tmp1[0] = 1;
-        tmp1[1] = 29;
-        tmp1[2] = 1;
-        tmp1[3] = 0;
+        // character
+        unk41 = 0;
+        unk42 = subtyp;
+        unk43 = 1;
+        unk44 = 0;
+      } else if (subtyp == -1)  {
+        unk41 = 1;
+        unk42 = 29;
+        unk43 = 1;
+        unk44 = 0;
       }
+      writebin(unk41, sav, 0);
+      writebin(unk42, sav, 0);
+      writebin(unk43, sav, 0);
+      writebin(unk44, sav, 0);
 
-      c.b[0] = tmp1[0];
-      c.b[1] = tmp1[1];
-      c.b[2] = tmp1[2];
-      c.b[3] = tmp1[3];
-
-      var4 = c.a;
-      writebin(var4, sav, 0);
-
-      int32_t var5;
-      char tmp2[4] = "";
+      uint8_t unk51 = 0, unk52 = 0, unk53 = 0, unk54 = 0;
+      // numeric
       if (subtyp == 0) {
-        tmp2[0] = 2;
-        tmp2[1] = 8;
-        tmp2[2] = 5;
-        tmp2[3] = 0;
+        // factor value
+        if (isdate == -1) {
+          unk51 = 0; // digits format
+          unk52 = 8; // field width
+          unk53 = 5; // column format
+          unk54 = 0; // not used?
+        }
+        // digit value
+        if (isdate == 0) {
+          unk51 = 2; // digits format
+          unk52 = 8; // field width
+          unk53 = 5; // column format
+          unk54 = 0; // not used?
+        }
+        // date
+        if (isdate == 20 || isdate == 22) {
+          unk51 = 0;
+          unk52 = 10;
+          unk53 = 39;
+          unk54 = 0;
+        }
       } else if (subtyp > 0) {
-        tmp2[0] = 0;
-        tmp2[1] = subtyp;
-        tmp2[2] = 1;
-        tmp2[3] = 0;
-      } else if (subtyp == -1) {
-        tmp2[0] = 1;
-        tmp2[1] = 29;
-        tmp2[2] = 1;
-        tmp2[3] = 0;
+        // character
+        unk51 = 0;
+        unk52 = subtyp;
+        unk53 = 1;
+        unk54 = 0;
+      } else if (subtyp == -1)  {
+        unk41 = 1;
+        unk42 = 29;
+        unk43 = 1;
+        unk44 = 0;
       }
-
-      c.b[0] = tmp2[0];
-      c.b[1] = tmp2[1];
-      c.b[2] = tmp2[2];
-      c.b[3] = tmp2[3];
-
-      var5 = c.a;
-      writebin(var5, sav, 0);
+      writebin(unk51, sav, 0);
+      writebin(unk52, sav, 0);
+      writebin(unk53, sav, 0);
+      writebin(unk54, sav, 0);
 
       std::string nvarname = Rcpp::as<std::string>(info.nvarnames[i]);
       writestr(nvarname, 8, sav);
