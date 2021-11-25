@@ -151,6 +151,10 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
   })
   itc <- rep(0, NCOL(dat))
 
+  # get vartyp used for display parameters. has to be selected prior to
+  # compression. otherwise factor will be wrongfully identified as integer.
+  vartypen <- sapply(dat, function(x)class(x)[[1]])
+
   # if compression is selected, try to store numeric, logical and factor as
   # integer and try to compress integer as uint8 (with bias). Since R does
   # only know numeric and integer, this needs additional testing if a
@@ -201,10 +205,7 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
 
   cc <- sapply(dat, is.character)
 
-
-  vartypen <- sapply(dat, function(x)class(x)[[1]])
   vartyp <- NA
-
   vartyp[vartypen == "factor"] <- -1
   vartyp[vartypen == "numeric" | vartypen == "integer"] <- 0
   vartyp[vartypen == "character"] <- 1
