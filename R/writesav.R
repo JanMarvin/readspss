@@ -244,7 +244,7 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
 
     colwidth <- rep(NA, ncol(dat))
     # colwidth 10 if date; else 8
-    sel <- vartyp == 20 || vartyp == 22
+    sel <- vartyp == 20 | vartyp == 22
     colwidth[sel] <- 10
     colwidth[!sel] <- 8
 
