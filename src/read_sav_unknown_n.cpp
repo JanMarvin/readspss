@@ -22,7 +22,7 @@
 
 #include "spss.h"
 
-int64_t read_sav_unknown_n (std::istream& sav,
+int64_t read_sav_unknown_n (std::fstream& sav,
                              bool swapit, int32_t cflag, bool debug,
                              int32_t kv,
                              Rcpp::IntegerVector vtyp,

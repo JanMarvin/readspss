@@ -23,7 +23,7 @@
 
 #include "spss.h"
 
-std::string read_sav_uncompress (std::istream& sav,
+std::string read_sav_uncompress (std::fstream& sav,
                                  const bool swapit, const uint8_t cflag,
                                  bool debug) {
   uint64_t zhead_ofs = 0, ztail_ofs = 0, ztail_len = 0;

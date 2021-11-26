@@ -45,7 +45,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
              std::string const ownEnc)
 {
 
-  std::ifstream sav(filePath, std::ios::in | std::ios::binary);
+  std::fstream sav(filePath, std::ios::in | std::ios::binary);
   if (sav) {
 
     bool is_spss = false, is_sav = false, is_zsav = false,
@@ -842,6 +842,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
       // std::ifstream sav(sav_unc, std::ios::in | std::ios::binary);
 
       sav.open(sav_unc);
+      if (!sav) Rcpp::warning("could not open sav");
     }
 
     if (n < 0)
