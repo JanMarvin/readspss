@@ -26,7 +26,7 @@
 #include "spss.h"
 
 
-void write_sav_compress (std::fstream& sav, std::fstream& tmp,
+void write_sav_compress (std::fstream& sav, const std::string tempstr,
                          const bool swapit, bool debug) {
 
   // open zsav destination
@@ -36,11 +36,15 @@ void write_sav_compress (std::fstream& sav, std::fstream& tmp,
     // offset positions
     uint64_t zhead_ofs = 0, ztail_ofs = 0, ztail_len = 0;
 
+
+    std::fstream tmp (tempstr, std::ios::in | std::ios::binary);
+    if (!tmp.is_open()) Rcpp::stop("tmp not open");
+
     // temporary sav file to be removed afterwards
     tmp.seekg(0, std::ios_base::beg);
-    int64_t curpos = tmp.tellg();
+    size_t curpos = tmp.tellg();
     tmp.seekg(0, std::ios_base::end);
-    int64_t savlen = tmp.tellg();
+    size_t savlen = tmp.tellg();
     tmp.seekg(0, std::ios_base::beg);
 
     int64_t bias = -100, zero = 0;
@@ -146,6 +150,9 @@ void write_sav_compress (std::fstream& sav, std::fstream& tmp,
         "ztail_ofs " << ztail_ofs << "\n" <<
           "ztail_len " << ztail_len << "\n" << std::endl;
     }
+
+    tmp.close();
+
   } else {
     Rcpp::stop("sav file is unexpectedly closed");
   }
