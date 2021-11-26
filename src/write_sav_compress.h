@@ -18,7 +18,7 @@
 #ifndef WRITE_SAV_UNCOMPRESS_H
 #define WRITE_SAV_UNCOMPRESS_H
 
-void write_sav_compress (std::fstream& sav, std::fstream& tmp,
+void write_sav_compress (std::fstream& sav, const std::string tempstr,
                          const bool swapit, bool debug);
 
 #endif

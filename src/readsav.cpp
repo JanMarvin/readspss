@@ -45,8 +45,9 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
              std::string const ownEnc)
 {
 
-  std::ifstream sav(filePath, std::ios::in | std::ios::binary);
-  if (sav) {
+  std::fstream sav;
+  sav.open(filePath, std::ios::in | std::ios::binary);
+  if (sav.is_open()) {
 
     bool is_spss = false, is_sav = false, is_zsav = false,
       ml_sav = false, ml_zsav = false,
@@ -829,19 +830,17 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     if (debug)
       Rprintf("-- Start: Data Part \n");
 
-    // prepare if zsav
     std::string sav_unc;
 
+    // prepare if zsav
     if (is_zsav) {
-
       // uncompress to tempfile and close open uncompressed zsav file
       sav_unc = read_sav_uncompress(sav, swapit, cflag, debug);
       sav.close();
 
-      // reopen zsav uncompressed data part as sav file
-      // std::ifstream sav(sav_unc, std::ios::in | std::ios::binary);
-
-      sav.open(sav_unc);
+      sav.open(sav_unc, std::ios::in | std::ios::binary);
+      if (!sav.is_open()) Rcpp::warning("could not open sav");
+      sav.seekg(0, std::ios_base::beg);
     }
 
     if (n < 0)

@@ -29,6 +29,10 @@ void write_data(Rcpp::DataFrame dat, int32_t cflag,
                 int64_t n, int32_t kk, info_t *infos,
                 std::fstream& sav, bool swapit) {
 
+  if (!sav.is_open())
+    Rcpp::stop("Could not write data");
+
+
   if (cflag) {
 
     // data is read in 8 byte chunks. k*n/8 (data remains)

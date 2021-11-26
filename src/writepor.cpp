@@ -40,7 +40,7 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
   int64_t n = dat.nrows();
 
 
-  std::ofstream por(filePath, std::ofstream::out | std::ofstream::binary);
+  std::fstream por(filePath, std::ios::out | std::ios::binary);
   if (por.is_open())
   {
 

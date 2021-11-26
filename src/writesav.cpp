@@ -300,26 +300,24 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
 
     // rtype 7 -----------------------------------------------------------------
 
-    if (longvarname.compare(empty) != 0) {
-      // beign disppar
-      rtype = 7;
-      writebin(rtype, sav, swapit);
+    // beign disppar
+    rtype = 7;
+    writebin(rtype, sav, swapit);
 
-      subtyp = 11;
-      writebin(subtyp, sav, swapit);
+    subtyp = 11;
+    writebin(subtyp, sav, swapit);
 
-      size = 4;
-      writebin(size, sav, swapit);
+    size = 4;
+    writebin(size, sav, swapit);
 
-      count = info.disppar.size();
-      writebin(count, sav, swapit);
+    count = info.disppar.size();
+    writebin(count, sav, swapit);
 
-      for (auto i = 0; i < count; ++i) {
-        int32_t measure = info.disppar[i];
-        writebin(measure, sav, swapit);
-      }
-      // end disppar
+    for (auto i = 0; i < count; ++i) {
+      int32_t measure = info.disppar[i];
+      writebin(measure, sav, swapit);
     }
+    // end disppar
 
     if (longvarname.compare(empty) != 0) {
       // beign longvarnames
@@ -352,18 +350,15 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
       // in this logic outfile = sav and sav = zsav
       const std::string tempstr = ".readspss_zsa_tmp_file";
       std::fstream tmp (tempstr, std::ios::out | std::ios::binary);
-
-      // write data part to tmp file
+      if (!tmp.is_open()) Rcpp::stop("tmp not open");
       write_data(dat, cflag, n, kk, &info, tmp, swapit);
       tmp.close();
 
-      tmp.open(tempstr);
       // write zsav body
-      write_sav_compress(sav, tmp, swapit, debug);
-      tmp.close();
-
+      write_sav_compress(sav, tempstr, swapit, debug);
 
       // remove tempfile
+      if (debug) Rcpp::Rcout << tempstr.c_str() << std::endl;
       std::remove(tempstr.c_str());
 
     } else {

@@ -45,7 +45,7 @@ int encryptfile (const char * filePath, std::string &outpath, std::string pass)
   // bool swapit = false;
 
 
-  std::ifstream sav(filePath, std::ios::in | std::ios::binary);
+  std::fstream sav(filePath, std::ios::in | std::ios::binary);
   if (sav) {
 
     std::string fileheader(36, '\0');

@@ -22,7 +22,7 @@
 
 #include "spss.h"
 
-Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
+Rcpp::List read_sav_known_n (Rcpp::List& df, std::fstream& sav,
                const bool swapit, const uint8_t cflag,
                const bool debug,
                int64_t n, int32_t kv,
@@ -35,7 +35,7 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::istream& sav,
 
   // final position
   auto curpos = sav.tellg();
-  sav.seekg(0, sav.end);
+  sav.seekg(0, std::ios_base::end);
   auto endoffile = sav.tellg();
   sav.seekg(curpos);
 

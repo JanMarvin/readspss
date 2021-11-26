@@ -18,7 +18,7 @@
 #ifndef READ_SAV_UNCOMPRESS_H
 #define READ_SAV_UNCOMPRESS_H
 
-std::string read_sav_uncompress (std::istream& sav,
+std::string read_sav_uncompress (std::fstream& sav,
                                        const bool swapit, const uint8_t cflag,
                                        bool debug);
 
