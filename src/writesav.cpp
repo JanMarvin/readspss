@@ -349,7 +349,6 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
       // write to temporary file
       // in this logic outfile = sav and sav = zsav
       const std::string tempstr = ".readspss_zsa_tmp_file";
-      Rcpp::Rcout << tempstr.c_str() << std::endl;
       std::fstream tmp (tempstr, std::ios::out | std::ios::binary);
       if (!tmp.is_open()) Rcpp::stop("tmp not open");
       write_data(dat, cflag, n, kk, &info, tmp, swapit);
@@ -358,8 +357,9 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
       // write zsav body
       write_sav_compress(sav, tempstr, swapit, debug);
 
-      // // remove tempfile
-      // std::remove(tempstr.c_str());
+      // remove tempfile
+      if (debug) Rcpp::Rcout << tempstr.c_str() << std::endl;
+      std::remove(tempstr.c_str());
 
     } else {
       // write data part

@@ -830,17 +830,13 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     if (debug)
       Rprintf("-- Start: Data Part \n");
 
-    // prepare if zsav
     std::string sav_unc;
 
+    // prepare if zsav
     if (is_zsav) {
-
       // uncompress to tempfile and close open uncompressed zsav file
       sav_unc = read_sav_uncompress(sav, swapit, cflag, debug);
       sav.close();
-
-      // reopen zsav uncompressed data part as sav file
-      // std::ifstream sav(sav_unc, std::ios::in | std::ios::binary);
 
       sav.open(sav_unc, std::ios::in | std::ios::binary);
       if (!sav.is_open()) Rcpp::warning("could not open sav");

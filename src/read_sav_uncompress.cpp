@@ -108,9 +108,9 @@ std::string read_sav_uncompress (std::fstream& sav,
 
       if (status != 0) Rcpp::stop("uncompress failed.");
 
-
       outfile.write((char *)(&uncompr_block[0]), uncompr_block_len);
     }
+    if (debug) Rcpp::Rcout << tempstr.c_str() << std::endl;
     outfile.close();
   } else {
     Rcpp::stop("outfile could not be opend");

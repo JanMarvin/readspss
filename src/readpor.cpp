@@ -43,8 +43,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
   std::string file;
   std::stringstream por;
 
-  std::ifstream por_file(filePath, std::ios::in | std::ios::binary);
-  if (por_file) {
+  std::fstream por_file(filePath, std::ios::in | std::ios::binary);
+  if (por_file.is_open()) {
 
     while (getline(por_file, input)) {
       // some EDCDIC file I found is shorter than 80 characters
