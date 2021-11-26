@@ -85,7 +85,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
       spss = "$FL3@(#)";
     writestr(spss, spss.size(), sav);
 
-    std::string datalabel = "readspss 0.13";
+    std::string datalabel = "readspss 0.15.2";
     writestr(datalabel, 56, sav);
 
     int32_t arch = 2;
