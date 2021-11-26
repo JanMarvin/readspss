@@ -35,7 +35,7 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::fstream& sav,
 
   // final position
   auto curpos = sav.tellg();
-  sav.seekg(0, sav.end);
+  sav.seekg(0, std::ios_base::end);
   auto endoffile = sav.tellg();
   sav.seekg(curpos);
 

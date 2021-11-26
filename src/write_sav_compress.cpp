@@ -37,12 +37,11 @@ void write_sav_compress (std::fstream& sav, std::fstream& tmp,
     uint64_t zhead_ofs = 0, ztail_ofs = 0, ztail_len = 0;
 
     // temporary sav file to be removed afterwards
-
-    tmp.seekg(0, tmp.beg);
+    tmp.seekg(0, std::ios_base::beg);
     int64_t curpos = tmp.tellg();
-    tmp.seekg(0, tmp.end);
+    tmp.seekg(0, std::ios_base::end);
     int64_t savlen = tmp.tellg();
-    tmp.seekg(0, tmp.beg);
+    tmp.seekg(0, std::ios_base::beg);
 
     int64_t bias = -100, zero = 0;
     int32_t block_size = 4190208; // bytes
@@ -147,6 +146,8 @@ void write_sav_compress (std::fstream& sav, std::fstream& tmp,
         "ztail_ofs " << ztail_ofs << "\n" <<
           "ztail_len " << ztail_len << "\n" << std::endl;
     }
+  } else {
+    Rcpp::stop("sav file is unexpectedly closed");
   }
 
 }

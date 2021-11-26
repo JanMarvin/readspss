@@ -86,32 +86,35 @@ std::string read_sav_uncompress (std::fstream& sav,
   // write to temporary file
   const std::string tempstr = ".readspss_unc_tmp_file";
   std::fstream outfile (tempstr, std::ios::out | std::ios::binary);
+  if (outfile) {
+    for (int i = 0; i < n_blocks; ++i) {
+      // seek to compr ofset
+      sav.seekg(c_ofs[i], std::ios_base::beg);
 
-  for (int i = 0; i < n_blocks; ++i) {
-    // seek to compr ofset
-    sav.seekg(c_ofs[i], std::ios_base::beg);
+      // Bytef is unsigned char *
+      std::vector<unsigned char>   compr_block(c_size[i], 0);
+      std::vector<unsigned char> uncompr_block(u_size[i], 0);
 
-    // Bytef is unsigned char *
-    std::vector<unsigned char>   compr_block(c_size[i], 0);
-    std::vector<unsigned char> uncompr_block(u_size[i], 0);
+      // read the complete compr data part
+      sav.read((char*)&compr_block[0], c_size[i]);
 
-    // read the complete compr data part
-    sav.read((char*)&compr_block[0], c_size[i]);
+      int32_t status = 0;
+      uLong uncompr_block_len = u_size[i];
+      uLong compr_block_len = c_size[i];
 
-    int32_t status = 0;
-    uLong uncompr_block_len = u_size[i];
-    uLong compr_block_len = c_size[i];
+      // uncompress should be 0
+      status = uncompress(&uncompr_block[0], &uncompr_block_len,
+                          &compr_block[0], compr_block_len);
 
-    // uncompress should be 0
-    status = uncompress(&uncompr_block[0], &uncompr_block_len,
-                        &compr_block[0], compr_block_len);
-
-    if (status != 0) Rcpp::stop("uncompress failed.");
+      if (status != 0) Rcpp::stop("uncompress failed.");
 
 
-    outfile.write((char *)(&uncompr_block[0]), uncompr_block_len);
+      outfile.write((char *)(&uncompr_block[0]), uncompr_block_len);
+    }
+    outfile.close();
+  } else {
+    Rcpp::stop("outfile could not be opend");
   }
-  outfile.close();
 
   return tempstr;
 }
