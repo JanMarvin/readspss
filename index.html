@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">readspss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.15.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.2</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="articles/readspss.html">Get started</a>
 </li>
@@ -52,7 +48,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/JanMarvin/readspss/">
+  <a href="https://github.com/JanMarvin/readspss/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -69,9 +65,9 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="readspss-r-cmd-check-codecov-test-coverage" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#readspss-r-cmd-check-codecov-test-coverage" class="anchor"></a>Readspss <img src="https://github.com/JanMarvin/readspss/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"><a href="https://app.codecov.io/gh/JanMarvin/readspss?branch=main"><img src="https://codecov.io/gh/JanMarvin/readspss/branch/main/graph/badge.svg" alt="Codecov test coverage"></a>
+<div class="section level1">
+<div class="page-header"><h1 id="readspss-r-cmd-check-codecov-test-coverage">Readspss <img src="https://github.com/JanMarvin/readspss/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"><a href="https://app.codecov.io/gh/JanMarvin/readspss?branch=main" class="external-link"><img src="https://codecov.io/gh/JanMarvin/readspss/branch/main/graph/badge.svg" alt="Codecov test coverage"></a>
+<a class="anchor" aria-label="anchor" href="#readspss-r-cmd-check-codecov-test-coverage"></a>
 </h1></div>
 <p>R package using Rcpp to parse an SPSS file into a data.frame(). Currently <code>read.sav</code> and <code>read.por</code> are the main functions and feature of this package. Writing of SPSS files is provided by <code>write.por</code> and <code>write.sav</code>. Writing is limited to uncompressed por and sav files and to compressed sav file.</p>
 <p>It works. Testing is welcome though the package is still at an early stage. Its read function is extensively tested on approximately 600+ sav-files and ~100 por-files. The code is maturing and is frequently tested. The read functions imports everything into a data frame. Including long strings and labels. Various features such as importing of value label or missings are tested and are working as intended.</p>
@@ -93,70 +89,81 @@
 <p>Focus was not so much on winning every benchmark, but reading all features of an SPSS file and to be as exactly as possible. So some benchmarks are won and others are lost. It is entirely up to the task. Besides the data itself <code>readspss</code> ships additional information provided by the SPSS files like the data label, documentation, date and timestamp.</p>
 <p>Reading of sav and por files is considered feature complete.</p>
 <p>Writing of (un)compressed sav and por files is implemented and considered working. Unsupported features are reading and writing of dates and writing of long strings.</p>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <p>With <code>drat</code>:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">drat</span><span class="fu">::</span><span class="fu">addRepo</span><span class="op">(</span><span class="st">"JanMarvin"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"readspss"</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"readspss"</span><span class="op">)</span></code></pre></div>
 <p>With <code>devtools</code>:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_git</span><span class="op">(</span><span class="st">"https://github.com/JanMarvin/readspss.git"</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="usage" class="section level2">
-<h2 class="hasAnchor">
-<a href="#usage" class="anchor"></a>Usage</h2>
+<div class="section level2">
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+</h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">fls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"electric.sav"</span>, package<span class="op">=</span><span class="st">"readspss"</span><span class="op">)</span>
-<span class="va">flp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"electric.por"</span>, package<span class="op">=</span><span class="st">"readspss"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">fls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"electric.sav"</span>, package<span class="op">=</span><span class="st">"readspss"</span><span class="op">)</span>
+<span class="va">flp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"electric.por"</span>, package<span class="op">=</span><span class="st">"readspss"</span><span class="op">)</span>
 
 <span class="va">df_s</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read.sav.html">read.sav</a></span><span class="op">(</span><span class="va">fls</span><span class="op">)</span>
 <span class="va">df_p</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read.por.html">read.por</a></span><span class="op">(</span><span class="va">flp</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="va">df_s</span>, <span class="va">df_p</span>, check.attributes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">df_s</span>, <span class="va">df_p</span>, check.attributes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Browse source code at <br><a href="https://github.com/JanMarvin/readspss/">https://​github.com/​JanMarvin/​readspss/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/JanMarvin/readspss/issues">https://​github.com/​JanMarvin/​readspss/​issues</a>
-</li>
+<li><a href="https://github.com/JanMarvin/readspss/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/JanMarvin/readspss/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>
-<a href="https://www.r-project.org/Licenses/GPL-2">GPL-2</a> | file <a href="LICENSE-text.html">LICENSE</a>
+<a href="https://www.r-project.org/Licenses/GPL-2" class="external-link">GPL-2</a> | file <a href="LICENSE-text.html">LICENSE</a>
 </li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing readspss</a></li>
+</ul>
+</div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Jan Marvin Garbuszus <br><small class="roles"> Author, maintainer </small>  </li>
-<li>Ben Pfaff <br><small class="roles"> Author, copyright holder </small>  <br><small>(author of encryption part)</small>
-</li>
-<li><a href="authors.html">All authors...</a></li>
+<li>Ben Pfaff <br><small class="roles"> Author, copyright holder </small>  </li>
+<li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
+
+
 
   </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Jan Marvin Garbuszus, Ben Pfaff.</p>
+  <p></p>
+<p>Developed by Jan Marvin Garbuszus, Ben Pfaff.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -164,6 +171,8 @@
 
   
 
+
+  
 
   </body>
 </html>
