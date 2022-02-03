@@ -85,10 +85,10 @@
 <li>por files.</li>
 </ul>
 <p>Because of the R code wrapped Rcpp functions the package is pretty fast. The R code for factor conversion slows things down a bit, changing the encoding a bit more.</p>
-<p>In comparison to <code>haven</code> and <code>foreign</code> this package preforms pretty well. It reads more files than each of its predecessors, some are only readable using <code>readspss</code> and covers a few more cases of missing values.</p>
+<p>In comparison to <code>haven</code> and <code>foreign</code> this package preforms pretty well. It reads more files than each of its predecessors, some are only readable using <code>readspss</code> and it covers a few more cases of missing values.</p>
 <p>Focus was not so much on winning every benchmark, but reading all features of an SPSS file and to be as exactly as possible. So some benchmarks are won and others are lost. It is entirely up to the task. Besides the data itself <code>readspss</code> ships additional information provided by the SPSS files like the data label, documentation, date and timestamp.</p>
 <p>Reading of sav and por files is considered feature complete.</p>
-<p>Writing of (un)compressed sav and por files is implemented and considered working. Unsupported features are reading and writing of dates and writing of long strings.</p>
+<p>Writing of (un)compressed sav and por files is implemented and considered working. Unsupported features are reading and writing of dates (might no longer be true) and writing of long strings.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -96,9 +96,9 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">drat</span><span class="fu">::</span><span class="fu">addRepo</span><span class="op">(</span><span class="st">"JanMarvin"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"readspss"</span><span class="op">)</span></code></pre></div>
-<p>With <code>devtools</code>:</p>
+<p>With <code>remotes</code>:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_git</span><span class="op">(</span><span class="st">"https://github.com/JanMarvin/readspss.git"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JanMarvin/readspss"</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
@@ -163,7 +163,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
