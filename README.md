@@ -32,7 +32,7 @@ bit more.
 
 In comparison to `haven` and `foreign` this package preforms pretty well. It
 reads more files than each of its predecessors, some are only readable using
-`readspss` and covers a few more cases of missing values.
+`readspss` and it covers a few more cases of missing values.
 
 Focus was not so much on winning every benchmark, but reading all features of
 an SPSS file and to be as exactly as possible. So some benchmarks are
@@ -43,8 +43,8 @@ the data label, documentation, date and timestamp.
 Reading of sav and por files is considered feature complete.
 
 Writing of (un)compressed sav and por files is implemented and considered 
-working. Unsupported features are reading and writing of dates and writing of
-long strings.
+working. Unsupported features are reading and writing of dates (might no
+longer be true) and writing of long strings.
 
 ## Installation
 
@@ -54,9 +54,9 @@ drat::addRepo("JanMarvin")
 install.packages("readspss")
 ```
 
-With `devtools`:
+With `remotes`:
 ```R
-devtools::install_git("https://github.com/JanMarvin/readspss.git")
+remotes::install_github("JanMarvin/readspss")
 ```
 
 ## Usage
