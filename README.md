@@ -6,12 +6,11 @@ R package using Rcpp to parse an SPSS file into a data.frame(). Currently
 Writing of SPSS files is provided by `write.por` and `write.sav`. Writing is
 limited to uncompressed por and sav files and to compressed sav file.
 
-It works. Testing is welcome though the package is still at an early stage. Its
-read function is extensively tested on approximately 600+ sav-files and ~100
-por-files. The code is maturing and is frequently tested. The read functions
-imports everything into a data frame. Including long strings and labels. Various
-features such as importing of value label or missings are tested and are working
-as intended.
+It works. Its read function is extensively tested on approximately 600+ 
+sav-files and ~100 por-files. The code is maturing and is frequently tested. The
+read functions imports everything into a data frame. Including long strings and
+labels. Various features such as importing of value label or missings are tested
+and are working as intended.
 
 The package features reading of
 
