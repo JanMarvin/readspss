@@ -27,7 +27,7 @@
 #' @export
 write.por <- function(dat, filepath, label, add.rownames = FALSE,
                       convert.factors = TRUE, toEncoding = "CP1252",
-                      convert.dates = TRUE, tz="GMT") {
+                      convert.dates = TRUE, tz = "GMT") {
 
   filepath <- path.expand(filepath)
 
@@ -40,13 +40,13 @@ write.por <- function(dat, filepath, label, add.rownames = FALSE,
     attrlab <- NULL
 
 
-  if (missing(label) & is.null(attrlab))
+  if (missing(label) && is.null(attrlab))
     label <- ""
 
-  if (missing(label) & !is.null(attrlab))
+  if (missing(label) && !is.null(attrlab))
     label <- attrlab
 
-  if (!identical(label, "") & (length(label) != ncol(dat)))
+  if (!identical(label, "") && (length(label) != ncol(dat)))
     stop("label and ncols differ. each col needs a label")
 
   if (any(nchar(label)) > 255)

@@ -108,7 +108,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   file <- file_ext(basename(filepath))
 
-  if ((tolower(file) != "sav" & tolower(file) != "zsav") &
+  if ((tolower(file) != "sav" && tolower(file) != "zsav") &&
       !isTRUE(override)) {
     warning("Filending is not sav.
              Use Override if this check should be ignored.")
@@ -154,7 +154,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   disppar    <- attribs$disppar
   if (!identical(disppar, integer(0))) {
     disppar    <- t(matrix(disppar, ncol = NCOL(data)))
-  } else{
+  } else {
     disppar <- NULL
   }
   if (NROW(data) == 0)
@@ -229,7 +229,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   varnames <- attribs$varnames
 
   # if autoenc labels were not encoded during readsav() so encode now
-  if (encoding & autoenc) {
+  if (encoding && autoenc) {
 
     # label
     for (i in seq_along(label))
@@ -257,7 +257,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
           varunique <- na.omit(unique(data[[varname]]))
         }
 
-        if (isNum & all(is.na(labtable))) {
+        if (isNum && all(is.na(labtable))) {
           nam <- names(labtable)
           labtable <- as.numeric(labtable)
           names(labtable) <- nam
@@ -300,8 +300,9 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   if (convert.dates) {
 
     nams   <- names(data)
-    isdate <- varmat[, 6] %in% c(20 , 22, 23, 24, 38, 39)
-    istime <- varmat[, 6] %in% c(21, 25)
+    isdate <- varmat[, 6] %in% c(20, 23, 24, 28, 29, 30, 38, 39)
+    isdatetime <- varmat[, 6] %in% c(22, 41)
+    istime <- varmat[, 6] %in% c(21, 25, 40)
 
     if (any(isdate)) {
       for (nam in nams[isdate]) {
@@ -309,12 +310,20 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
           round(data[[nam]]), origin = "1582-10-14"))
       }
     }
+    if (any(isdatetime)) {
+      for (nam in nams[isdatetime]) {
+        data[[nam]] <- as.POSIXct(
+          data[[nam]],
+          origin = "1582-10-14",
+          tz = "GMT")
+      }
+    }
     if (any(istime)) {
-      message("time format found for", nams[istime],
-              "This is a 24 time and no date and thus not converted.")
-    #   for (nam in nams[istime]) {
-    #     data[[nam]] <- as.POSIXlt(data[[nam]], origin="1582-10-14")
-    #   }
+      message(
+        "time format found for:\n",
+        paste(nams[istime], collapse = "\n"),
+        "\ntime variables are not dates and thus not converted."
+      )
     }
 
   }
@@ -380,11 +389,12 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
         if (!is.null(pat)) {
 
           # any variables to combine?
-          if (length(pat) > 1 & grepl("0", pat[2])) {
+          if (length(pat) > 1 && grepl("0", pat[2])) {
             sel <- data[, names(data) %in% pat]
 
             if (all(sapply(sel, is.character))) {
-              pp <- pat[-1]; p1 <- pat[1]
+              pp <- pat[-1]
+              p1 <- pat[1]
 
               remove <- !names(data) %in% pp
 
@@ -413,7 +423,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
     names(nams) <- nams
 
     # new_nams <- do.call(rbind, longname)
-    new_nams <- sapply(longname, function(x){
+    new_nams <- sapply(longname, function(x) {
       z <- x[[2]]
       names(z) <- x[[1]]
       z
@@ -455,7 +465,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   longlabel <- attribs$longlabel
 
-  if (convert.factors & !identical(longlabel, list())) {
+  if (convert.factors && !identical(longlabel, list())) {
 
     longlabnames  <- names(longlabel)
 
