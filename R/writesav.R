@@ -23,7 +23,7 @@
 #'
 #' @export
 write.sav <- function(dat, filepath, label, add.rownames = FALSE,
-                      compress = FALSE, convert.dates = TRUE, tz="GMT",
+                      compress = FALSE, convert.dates = TRUE, tz = "GMT",
                       debug = FALSE, is_zsav = FALSE, disppar) {
 
   filepath <- path.expand(filepath)
@@ -37,13 +37,13 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
     attrlab <- NULL
 
 
-  if (missing(label) & is.null(attrlab))
+  if (missing(label) && is.null(attrlab))
     label <- ""
 
-  if (missing(label) & !is.null(attrlab))
+  if (missing(label) && !is.null(attrlab))
     label <- attrlab
 
-  if (!identical(label, "") & (length(label) != ncol(dat)))
+  if (!identical(label, "") && (length(label) != ncol(dat)))
     stop("label and ncols differ. each col needs a label")
 
   if (any(nchar(label)) > 255)
@@ -71,7 +71,7 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
 
   LONGVAR <- FALSE
 
-  if (all(nchar(nams) <= 8) & (identical(toupper(nams), nams))) {
+  if (all(nchar(nams) <= 8) && (identical(toupper(nams), nams))) {
     nams <- toupper(nams)
     nvarnames <- substr(nams, 0, 8)
   } else {
@@ -89,7 +89,7 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
     stop("Strings longer than 255 characters not yet implemented")
   }
 
-  vtyp <- ceiling(vtyp / 8) * 8;
+  vtyp <- ceiling(vtyp / 8) * 8
 
   vtyp[vtyp > 255] <- 255
 
@@ -134,14 +134,15 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
   }
 
   longvarnames <- ""
-  if ((length(nvarnames) > length(names(dat))) | LONGVAR)
+  if ((length(nvarnames) > length(names(dat))) || LONGVAR)
     longvarnames <- paste(
       paste0(nvarnames[nvarnames != ""], "=", names(dat)),
       collapse = "\t")
 
   systime <- Sys.time()
   timestamp <- substr(systime, 12, 19)
-  lct <- Sys.getlocale("LC_TIME"); Sys.setlocale("LC_TIME", "C")
+  lct <- Sys.getlocale("LC_TIME")
+  Sys.setlocale("LC_TIME", "C")
   datestamp <- format(Sys.Date(), "%d %b %y")
   Sys.setlocale("LC_TIME", lct)
 
@@ -154,7 +155,7 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
 
   # get vartyp used for display parameters. has to be selected prior to
   # compression. otherwise factor will be wrongfully identified as integer.
-  vartypen <- sapply(dat, function(x)class(x)[[1]])
+  vartypen <- sapply(dat, function(x) class(x)[[1]])
 
   # if compression is selected, try to store numeric, logical and factor as
   # integer and try to compress integer as uint8 (with bias). Since R does

@@ -7,7 +7,7 @@
 read.encoding <- function(x, fromEncoding, encoding) {
 
   # avoid iconv errors
-  if (!is.na(fromEncoding) & is.na(encoding))
+  if (!is.na(fromEncoding) && is.na(encoding))
     encoding <- fromEncoding
 
   iconv(x,

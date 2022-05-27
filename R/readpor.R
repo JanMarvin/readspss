@@ -64,7 +64,7 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
 
   file <- file_ext(basename(filepath))
 
-  if ((tolower(file) != "por") &
+  if ((tolower(file) != "por") &&
       !isTRUE(override)) {
     warning("Filending is not por.
              Use Override if this check should be ignored.")
@@ -220,7 +220,7 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
           varunique <- na.omit(unique(data[[varname]]))
         }
 
-        if (isNum | all(is.na(labtable))) {
+        if (isNum || all(is.na(labtable))) {
           nam <- names(labtable)
           labtable <- as.numeric(labtable)
           names(labtable) <- nam

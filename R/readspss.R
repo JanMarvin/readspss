@@ -18,7 +18,7 @@ read.spss <- function(x, ...) {
 
   file <- file_ext(basename(x))
 
-  if (tolower(file) == "sav" | tolower(file) == "zsav") {
+  if (tolower(file) == "sav" || tolower(file) == "zsav") {
     res <- read.sav(x, ...)
   } else if (tolower(file) == "por") {
     res <- read.por(x, ...)
