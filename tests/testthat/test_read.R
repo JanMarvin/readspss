@@ -295,6 +295,11 @@ exp <- structure(
   lmissing = list()
 )
 
+# fix for non UTF-8 R (oldrel linux on github atm)
+attr(df_sav, "autoenc") <- FALSE
+attr(df_sav, "doenc") <- FALSE
+attr(df_sav, "ownEnc") <- "UTF-8"
+
 test_that("time dates", {
   expect_equal(exp, df_sav)
 })
