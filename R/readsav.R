@@ -300,8 +300,9 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   if (convert.dates) {
 
     nams   <- names(data)
-    isdate <- varmat[, 6] %in% c(20 , 22, 23, 24, 38, 39)
-    istime <- varmat[, 6] %in% c(21, 25)
+    isdate <- varmat[, 6] %in% c(20, 23, 24, 28, 29, 30, 38, 39)
+    isdatetime <- varmat[, 6] %in% c(22, 41)
+    istime <- varmat[, 6] %in% c(21, 25, 40)
 
     if (any(isdate)) {
       for (nam in nams[isdate]) {
@@ -309,12 +310,20 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
           round(data[[nam]]), origin = "1582-10-14"))
       }
     }
+    if (any(isdatetime)) {
+      for (nam in nams[isdatetime]) {
+        data[[nam]] <- as.POSIXct(
+          data[[nam]],
+          origin = "1582-10-14",
+          tz = "GMT")
+      }
+    }
     if (any(istime)) {
-      message("time format found for", nams[istime],
-              "This is a 24 time and no date and thus not converted.")
-    #   for (nam in nams[istime]) {
-    #     data[[nam]] <- as.POSIXlt(data[[nam]], origin="1582-10-14")
-    #   }
+      message(
+        "time format found for:\n",
+        paste(nams[istime], collapse = "\n"),
+        "\ntime variables are not dates and thus not converted."
+      )
     }
 
   }
