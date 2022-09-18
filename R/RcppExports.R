@@ -5,7 +5,8 @@
 #'
 #' @param val_s CharacterVector
 #' @import Rcpp
-#' @export
+#' @keywords internal
+#' @noRd
 boost_split <- function(val_s) {
     .Call(`_readspss_boost_split`, val_s)
 }
@@ -16,7 +17,8 @@ boost_split <- function(val_s) {
 #' @param x vector
 #' @param y charactervector with labels
 #' @import Rcpp
-#' @export
+#' @keywords internal
+#' @noRd
 fast_factor <- function(x, y) {
     .Call(`_readspss_fast_factor`, x, y)
 }
@@ -29,7 +31,8 @@ fast_factor <- function(x, y) {
 #' @param ownEnc encoding provided by localeToCharset
 #' @param pass passkey required for encoding
 #' @import Rcpp
-#' @export
+#' @keywords internal
+#' @noRd
 readencrypted <- function(filePath, debug, encStr, ownEnc, pass) {
     .Call(`_readspss_readencrypted`, filePath, debug, encStr, ownEnc, pass)
 }
@@ -41,7 +44,8 @@ readencrypted <- function(filePath, debug, encStr, ownEnc, pass) {
 #' @param encStr encoding string
 #' @param override override bool
 #' @import Rcpp
-#' @export
+#' @keywords internal
+#' @noRd
 readpor <- function(filePath, debug, encStr, override) {
     .Call(`_readspss_readpor`, filePath, debug, encStr, override)
 }
@@ -53,7 +57,8 @@ readpor <- function(filePath, debug, encStr, override) {
 #' @param encStr encoding string
 #' @param ownEnc encoding provided by localeToCharset
 #' @import Rcpp
-#' @export
+#' @keywords internal
+#' @noRd
 readsav <- function(filePath, debug, encStr, ownEnc) {
     .Call(`_readspss_readsav`, filePath, debug, encStr, ownEnc)
 }
@@ -63,7 +68,8 @@ readsav <- function(filePath, debug, encStr, ownEnc) {
 #' @param filePath The full systempath to the dta file you want to import.
 #' @param dat the data frame
 #' @import Rcpp
-#' @export
+#' @keywords internal
+#' @noRd
 writepor <- function(filePath, dat) {
     invisible(.Call(`_readspss_writepor`, filePath, dat))
 }
@@ -76,7 +82,8 @@ writepor <- function(filePath, dat) {
 #' @param debug print debug information
 #' @param is_zsav write zsav
 #' @import Rcpp
-#' @export
+#' @keywords internal
+#' @noRd
 writesav <- function(filePath, dat, compress, debug, is_zsav) {
     invisible(.Call(`_readspss_writesav`, filePath, dat, compress, debug, is_zsav))
 }

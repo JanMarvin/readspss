@@ -18,7 +18,8 @@ IntegerVector fast_factor_template( const Vector<RTYPE>& x,
 //' @param x vector
 //' @param y charactervector with labels
 //' @import Rcpp
-//' @export
+//' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 SEXP fast_factor( SEXP x , SEXP y) {
   switch( TYPEOF(x) ) {

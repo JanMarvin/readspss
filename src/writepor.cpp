@@ -31,7 +31,8 @@ using namespace Rcpp;
 //' @param filePath The full systempath to the dta file you want to import.
 //' @param dat the data frame
 //' @import Rcpp
-//' @export
+//' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 void writepor(const char * filePath, Rcpp::DataFrame dat)
 {

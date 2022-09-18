@@ -33,7 +33,8 @@ using namespace Rcpp;
 //' @param encStr encoding string
 //' @param override override bool
 //' @import Rcpp
-//' @export
+//' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 List readpor(const char * filePath, const bool debug, std::string encStr,
              bool override)

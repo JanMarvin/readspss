@@ -35,7 +35,8 @@ using namespace Rcpp;
 //' @param debug print debug information
 //' @param is_zsav write zsav
 //' @import Rcpp
-//' @export
+//' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
               bool debug, bool is_zsav)

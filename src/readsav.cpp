@@ -39,7 +39,8 @@ using namespace Rcpp;
 //' @param encStr encoding string
 //' @param ownEnc encoding provided by localeToCharset
 //' @import Rcpp
-//' @export
+//' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 List readsav(const char * filePath, const bool debug, std::string encStr,
              std::string const ownEnc)
