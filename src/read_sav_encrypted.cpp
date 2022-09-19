@@ -106,7 +106,8 @@ int encryptfile (const char * filePath, std::string &outpath, std::string pass)
 //' @param ownEnc encoding provided by localeToCharset
 //' @param pass passkey required for encoding
 //' @import Rcpp
-//' @export
+//' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 Rcpp::List readencrypted(const char * filePath, const bool debug,
                          std::string encStr,

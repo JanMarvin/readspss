@@ -25,7 +25,8 @@
 //'
 //' @param val_s CharacterVector
 //' @import Rcpp
-//' @export
+//' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 Rcpp::CharacterVector boost_split(std::string val_s) {
 
