@@ -45,6 +45,8 @@ get.filepath <- function(path = "") {
 #' contain integer type data. Same goes for logical values.
 #'
 #' @param x vector of data frame
+#' @keywords internal
+#' @noRd
 saveToExport <- function(x) {
   isTRUE(all.equal(x, as.integer(x))) |
     isTRUE(is.factor(x)) |
