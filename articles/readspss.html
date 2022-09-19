@@ -89,55 +89,55 @@
 <p>Installation is provided using <code>drat</code> or <code>devtools</code>. The <code>drat</code> repo provides binary files for Windows in case one has no rtools installed. Travis indicates that building on a Mac is possible. [^Still since I do not own such system and have not yet figured out how to export binary files from Travis, it is unlikely that the repo will contain Mac binary files anytime soon.]</p>
 <p>With <code>drat</code>:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">drat</span><span class="fu">::</span><span class="fu">addRepo</span><span class="op">(</span><span class="st">"JanMarvin"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"readspss"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">drat</span><span class="fu">::</span><span class="fu">addRepo</span><span class="op">(</span><span class="st">"JanMarvin"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"readspss"</span><span class="op">)</span></span></code></pre></div>
 <p>With <code>devtools</code>:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_git</span><span class="op">(</span><span class="st">"https://github.com/JanMarvin/readspss.git"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_git</span><span class="op">(</span><span class="st">"https://github.com/JanMarvin/readspss.git"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="import">Import<a class="anchor" aria-label="anchor" href="#import"></a>
 </h3>
 <p>For the import of (z)sav and por files <code><a href="../reference/read.sav.html">read.sav()</a></code> and <code><a href="../reference/read.por.html">read.por()</a></code> are available.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JanMarvin/readspss" class="external-link">readspss</a></span><span class="op">)</span>
-
-<span class="co"># example using sav</span>
-<span class="va">fl_sav</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"electric.sav"</span>, package <span class="op">=</span> <span class="st">"readspss"</span><span class="op">)</span>
-<span class="va">ds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.sav.html">read.sav</a></span><span class="op">(</span><span class="va">fl_sav</span><span class="op">)</span>
-
-<span class="co"># example using zsav</span>
-<span class="va">fl_zsav</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"cars.zsav"</span>, package <span class="op">=</span> <span class="st">"readspss"</span><span class="op">)</span>
-<span class="va">dz</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.sav.html">read.sav</a></span><span class="op">(</span><span class="va">fl_zsav</span><span class="op">)</span>
-
-<span class="co"># example using por</span>
-<span class="va">fl_por</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"electric.por"</span>, package <span class="op">=</span> <span class="st">"readspss"</span><span class="op">)</span>
-<span class="va">dp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.por.html">read.por</a></span><span class="op">(</span><span class="va">fl_por</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JanMarvin/readspss" class="external-link">readspss</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># example using sav</span></span>
+<span><span class="va">fl_sav</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"electric.sav"</span>, package <span class="op">=</span> <span class="st">"readspss"</span><span class="op">)</span></span>
+<span><span class="va">ds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.sav.html">read.sav</a></span><span class="op">(</span><span class="va">fl_sav</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># example using zsav</span></span>
+<span><span class="va">fl_zsav</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"cars.zsav"</span>, package <span class="op">=</span> <span class="st">"readspss"</span><span class="op">)</span></span>
+<span><span class="va">dz</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.sav.html">read.sav</a></span><span class="op">(</span><span class="va">fl_zsav</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># example using por</span></span>
+<span><span class="va">fl_por</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"electric.por"</span>, package <span class="op">=</span> <span class="st">"readspss"</span><span class="op">)</span></span>
+<span><span class="va">dp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.por.html">read.por</a></span><span class="op">(</span><span class="va">fl_por</span><span class="op">)</span></span></code></pre></div>
 <p>Both functions return data.frame objects, containing numerics, dates, factors or characters.</p>
 <div class="section level4">
 <h4 id="import-options">Import options<a class="anchor" aria-label="anchor" href="#import-options"></a>
 </h4>
 <p>For user specific demand the package supports many option available in <code>foreign</code> such as <code>convert.factors</code> and <code>use.missings</code>. If one is familiar with said package, one should have no problem adapting to <code>readspss</code>. If for example one does not want to have factors since they work differently in R than in SPSS this can be achieved using the following code.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># example using sav</span>
-<span class="va">fl_sav</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"electric.sav"</span>, package <span class="op">=</span> <span class="st">"readspss"</span><span class="op">)</span>
-<span class="va">ds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.sav.html">read.sav</a></span><span class="op">(</span><span class="va">fl_sav</span>, convert.factors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="co"># example using zsav</span>
-<span class="va">fl_zsav</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"cars.zsav"</span>, package <span class="op">=</span> <span class="st">"readspss"</span><span class="op">)</span>
-<span class="va">dz</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.sav.html">read.sav</a></span><span class="op">(</span><span class="va">fl_zsav</span>, convert.factors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="co"># example using por</span>
-<span class="va">fl_por</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"electric.por"</span>, package <span class="op">=</span> <span class="st">"readspss"</span><span class="op">)</span>
-<span class="va">dp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.por.html">read.por</a></span><span class="op">(</span><span class="va">fl_por</span>, convert.factors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># example using sav</span></span>
+<span><span class="va">fl_sav</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"electric.sav"</span>, package <span class="op">=</span> <span class="st">"readspss"</span><span class="op">)</span></span>
+<span><span class="va">ds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.sav.html">read.sav</a></span><span class="op">(</span><span class="va">fl_sav</span>, convert.factors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># example using zsav</span></span>
+<span><span class="va">fl_zsav</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"cars.zsav"</span>, package <span class="op">=</span> <span class="st">"readspss"</span><span class="op">)</span></span>
+<span><span class="va">dz</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.sav.html">read.sav</a></span><span class="op">(</span><span class="va">fl_zsav</span>, convert.factors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># example using por</span></span>
+<span><span class="va">fl_por</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"electric.por"</span>, package <span class="op">=</span> <span class="st">"readspss"</span><span class="op">)</span></span>
+<span><span class="va">dp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.por.html">read.por</a></span><span class="op">(</span><span class="va">fl_por</span>, convert.factors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>Since many features are self explanatory not all will be explained. Of course <code>readspss</code> can handle sav files in different encodings; it handles file sets without data; all types of missings SPSS developers over the years came up with; short, long and longer strings; little and big endian files; sav, por and zsav compressed files; files without valid header information; old and new SPSS files. As stated above, every SPSS file I came across and during the development I came across many.</p>
 <p>Using code by Ben Pfaff <code>readspss</code> can handle encrypted SPSS files.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">flu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"hotel.sav"</span>, package<span class="op">=</span><span class="st">"readspss"</span><span class="op">)</span>
-<span class="va">fle</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"hotel-encrypted.sav"</span>, package<span class="op">=</span><span class="st">"readspss"</span><span class="op">)</span>
-
-<span class="va">df_u</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.sav.html">read.sav</a></span><span class="op">(</span><span class="va">flu</span><span class="op">)</span>
-<span class="va">df_e</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.sav.html">read.sav</a></span><span class="op">(</span><span class="va">fle</span>, pass <span class="op">=</span> <span class="st">"pspp"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">flu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"hotel.sav"</span>, package<span class="op">=</span><span class="st">"readspss"</span><span class="op">)</span></span>
+<span><span class="va">fle</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"hotel-encrypted.sav"</span>, package<span class="op">=</span><span class="st">"readspss"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">df_u</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.sav.html">read.sav</a></span><span class="op">(</span><span class="va">flu</span><span class="op">)</span></span>
+<span><span class="va">df_e</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read.sav.html">read.sav</a></span><span class="op">(</span><span class="va">fle</span>, pass <span class="op">=</span> <span class="st">"pspp"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="import-details">Import details<a class="anchor" aria-label="anchor" href="#import-details"></a>
@@ -150,14 +150,14 @@
 </h3>
 <p>R data.frame objects can be exported using <code><a href="../reference/write.sav.html">write.sav()</a></code> and <code><a href="../reference/write.por.html">write.por()</a></code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JanMarvin/readspss" class="external-link">readspss</a></span><span class="op">)</span>
-
-<span class="fu"><a href="../reference/write.sav.html">write.sav</a></span><span class="op">(</span><span class="va">cars</span>, filepath <span class="op">=</span> <span class="st">"cars.sav"</span><span class="op">)</span> <span class="co"># optional compress = TRUE</span>
-
-<span class="fu"><a href="../reference/write.sav.html">write.sav</a></span><span class="op">(</span><span class="va">cars</span>, filepath <span class="op">=</span> <span class="st">"cars.zsav"</span><span class="op">)</span> <span class="co"># optional compress = TRUE</span>
-<span class="co">#&gt; Zsav compression is still experimental. Testing is welcome!</span>
-
-<span class="fu"><a href="../reference/write.por.html">write.por</a></span><span class="op">(</span><span class="va">cars</span>, filepath <span class="op">=</span> <span class="st">"cars.por"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JanMarvin/readspss" class="external-link">readspss</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/write.sav.html">write.sav</a></span><span class="op">(</span><span class="va">cars</span>, filepath <span class="op">=</span> <span class="st">"cars.sav"</span><span class="op">)</span> <span class="co"># optional compress = TRUE</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/write.sav.html">write.sav</a></span><span class="op">(</span><span class="va">cars</span>, filepath <span class="op">=</span> <span class="st">"cars.zsav"</span><span class="op">)</span> <span class="co"># optional compress = TRUE</span></span>
+<span><span class="co">#&gt; Zsav compression is still experimental. Testing is welcome!</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/write.por.html">write.por</a></span><span class="op">(</span><span class="va">cars</span>, filepath <span class="op">=</span> <span class="st">"cars.por"</span><span class="op">)</span></span></code></pre></div>
 <p>Export provides a few options to add a label, for compression of sav and zsav files and conversion of dates. Currently it is not possible to export strings longer than 255 chars. Obviously all exported files can be imported using SPSS and <code>readspss</code> (PSPP is expected to work).</p>
 </div>
 <div class="section level3">
@@ -196,7 +196,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

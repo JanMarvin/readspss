@@ -53,52 +53,73 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">write.sav</span><span class="op">(</span>
-  <span class="va">dat</span>,
-  <span class="va">filepath</span>,
-  <span class="va">label</span>,
-  add.rownames <span class="op">=</span> <span class="cn">FALSE</span>,
-  compress <span class="op">=</span> <span class="cn">FALSE</span>,
-  convert.dates <span class="op">=</span> <span class="cn">TRUE</span>,
-  tz <span class="op">=</span> <span class="st">"GMT"</span>,
-  debug <span class="op">=</span> <span class="cn">FALSE</span>,
-  is_zsav <span class="op">=</span> <span class="cn">FALSE</span>,
-  <span class="va">disppar</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">write.sav</span><span class="op">(</span></span>
+<span>  <span class="va">dat</span>,</span>
+<span>  <span class="va">filepath</span>,</span>
+<span>  <span class="va">label</span>,</span>
+<span>  add.rownames <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  compress <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  convert.dates <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  tz <span class="op">=</span> <span class="st">"GMT"</span>,</span>
+<span>  debug <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  is_zsav <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">disppar</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>dat</dt>
 <dd><p><em>data.frame</em> a data.frame to store as SPSS file.</p></dd>
+
+
 <dt>filepath</dt>
 <dd><p><em>string</em> full path where and how this file should be
 stored</p></dd>
+
+
 <dt>label</dt>
 <dd><p><em>character</em> if any provided this must be a vector of
 labels. It must be of size <code>ncol(dat)</code></p></dd>
+
+
 <dt>add.rownames</dt>
 <dd><p><em>logical</em> If <code>TRUE</code>, a new variable rownames
 will be added to the sav-file.</p></dd>
+
+
 <dt>compress</dt>
 <dd><p><em>logical</em> should compression be used. If TRUE some
 integers will be stored more efficiently. Everything will be stored in
 chunks of 8 chars. Reduces memory size of sav-file.</p></dd>
+
+
 <dt>convert.dates</dt>
 <dd><p><em>logical</em> should dates be converted to SPSS format.</p></dd>
+
+
 <dt>tz</dt>
 <dd><p><em>character</em> The name of the timezone convert.dates will use.</p></dd>
+
+
 <dt>debug</dt>
 <dd><p><em>logical</em> print debug information.</p></dd>
+
+
 <dt>is_zsav</dt>
 <dd><p><em>logical</em> explicitly create a zsav file. If the file
 ending zsav is used, this is selected as default.</p></dd>
+
+
 <dt>disppar</dt>
 <dd><p>optional display parameter matrix. Needs documentation.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>write.sav</code> returns nothing</p>
+    
+
+<p><code>write.sav</code> returns nothing</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -117,7 +138,7 @@ ending zsav is used, this is selected as default.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

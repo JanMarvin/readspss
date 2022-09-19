@@ -19,12 +19,6 @@
     <loc>/index.html</loc>
   </url>
   <url>
-    <loc>/reference/boost_split.html</loc>
-  </url>
-  <url>
-    <loc>/reference/fast_factor.html</loc>
-  </url>
-  <url>
     <loc>/reference/index.html</loc>
   </url>
   <url>
@@ -37,15 +31,6 @@
     <loc>/reference/read.spss.html</loc>
   </url>
   <url>
-    <loc>/reference/readencrypted.html</loc>
-  </url>
-  <url>
-    <loc>/reference/readpor.html</loc>
-  </url>
-  <url>
-    <loc>/reference/readsav.html</loc>
-  </url>
-  <url>
     <loc>/reference/saveToExport.html</loc>
   </url>
   <url>
@@ -53,11 +38,5 @@
   </url>
   <url>
     <loc>/reference/write.sav.html</loc>
-  </url>
-  <url>
-    <loc>/reference/writepor.html</loc>
-  </url>
-  <url>
-    <loc>/reference/writesav.html</loc>
   </url>
 </urlset>
