@@ -66,7 +66,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
     // if encStr == NA, set doenc = false and encStr to "" to avoid messing
     // with iconv
-    if (encStr.compare(na)==0) {
+    if (encStr.compare(na) == 0) {
       encStr = "";
       doenc = false, noenc = true;
     }
@@ -119,7 +119,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     // file format? should be 2 or 3
     arch = readbin(arch, sav, swapit);
 
-    if ((arch <2) | (arch > 3))
+    if (arch < 2 || arch > 3)
       swapit = true;
 
     if (debug)
@@ -136,7 +136,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     // Number of string variables
     // Number of unkown types
 
-    int32_t cflag=0, cwvariables = 0;
+    int32_t cflag = 0, cwvariables = 0;
 
     cflag = readbin(cflag, sav, swapit); // cflag compression
     cwvariables = readbin(cwvariables, sav, swapit); // case weight variables
@@ -149,7 +149,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     int bias = 0; double biasd = 0; // 100: compression bias
     bias = readbin(biasd, sav, swapit);
 
-    if ((cflag == 1) & (bias!=100))
+    if (cflag == 1 && bias != 100)
       Rcpp::warning("Cflag = 1. Found bias = %d. Using this. Expected 100.",
                     bias);
 
@@ -204,7 +204,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     if (debug)
       Rprintf("rtype: %d\n", rtype);
 
-    while( rtype < 999 )
+    while(rtype < 999)
     {
       Rcpp::checkUserInterrupt();
 
@@ -278,12 +278,12 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         varnames.push_back(nvarname);
 
         int32_t origlen = 0;
-        if (vlflag==1)
+        if (vlflag == 1)
         {
           origlen = readbin(origlen, sav, swapit);
 
           // Max length: 255.
-          origlen = ceil((double)origlen/4) * 4;
+          origlen = ceil((double)origlen / 4) * 4;
 
           std::string vallabel (origlen, '\0');
           vallabel = readstring(vallabel, sav);
@@ -335,18 +335,17 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
               std::string mV (8, '\0');
               mV = readstring(mV, sav);
 
-
               mV = std::regex_replace(mV, std::regex("^ +| +$"), "$1");
 
               missingV(0) = nmiss;
-              missingV(i+1) = mV;
+              missingV(i + 1) = mV;
 
             } else {
 
               miss0 = readbin(miss0, sav, swapit);
 
               missing(0) = nmiss;
-              missing(i+1) = miss0;
+              missing(i + 1) = miss0;
             }
 
           }
@@ -373,7 +372,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         // for some reason codes can be either doubles or strings. since we do
         // not know which we want, we read everything as a string. compare it
         // to figure out, what kind of type we have.
-        for (int i=0; i < nolab; ++i)
+        for (int32_t i = 0; i < nolab; ++i)
         {
           double coden = 0;
 
@@ -388,7 +387,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
             !std::regex_search(cV, std::regex("@$"));
 
             // if its a double, do a memcpy, else trim whitespaces
-            if ( noNum ) {
+            if (noNum) {
               if (doenc) cV = Riconv(cV, encStr);
               cV = std::regex_replace(cV, std::regex("^ +| +$"), "$1");
 
@@ -407,7 +406,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
             lablen = readbin(lablen, sav, swapit);
 
             // +1 is whitespace caracter
-            lablen = ( ceil((double)(lablen+1)/8) * 8 ) - 1;
+            lablen = (ceil((double)(lablen + 1) / 8) * 8) - 1;
 
             std::string lab (lablen, '\0');
             lab = readstring(lab, sav);
@@ -435,7 +434,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
       // first int: 4
       // second int: number of combined labels
       // (second int) ints: unk
-      if (rtype==4) {
+      if (rtype == 4) {
         Rcpp::checkUserInterrupt();
 
         nolabels = readbin(nolabels, sav, swapit); // number of labels
@@ -443,17 +442,16 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         Rcpp::NumericVector haslab(nolabels);
 
 
-        for (int i=0; i<nolabels; ++i) {
+        for (int32_t i = 0; i < nolabels; ++i) {
           lab_id = readbin(lab_id, sav, swapit); // unk
 
           haslab(i) = lab_id;
-
         }
 
         haslabel.push_back(haslab);
       }
 
-      if (rtype==6) {
+      if (rtype == 6) {
         Rcpp::checkUserInterrupt();
 
         int32_t nlines = 0; // number of lines
@@ -465,8 +463,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         std::string document (80, '\0');
 
         // Rcout << " --- Documentation --- " << std::endl;
-        for (int i = 0; i < nlines; ++i)
-        {
+        for (int32_t i = 0; i < nlines; ++i) {
           std::string docline = readstring(document, sav);
 
           // if (doenc) docline = Riconv(docline, encStr);
@@ -476,7 +473,6 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
                                        std::regex(" +$"), "$1");
 
           Document(i) = docline;
-
         }
 
         doc.push_back( Document );
@@ -484,7 +480,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
       }
 
       // additional information
-      if (rtype==7) {
+      if (rtype == 7) {
         Rcpp::checkUserInterrupt();
 
         // subtype integer: 3 / floating: 4 / varsyst: 11
@@ -514,12 +510,12 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
           charcode = readbin(charcode, sav, swapit); // charcode
 
           // not forcefully userdefined or NA == ""
-          if ((encStr.compare(empty) == 0) & (!noenc)) {
+          if (encStr.compare(empty) == 0 && !noenc) {
             encStr = codepage(charcode);
 
             // if a codepage was found, recode else not
             // do not encode if in matching encoding
-            if ((encStr.compare(empty) != 0) & (encStr.compare(ownEnc) != 0)) {
+            if (encStr.compare(empty) != 0 && encStr.compare(ownEnc) != 0) {
               doenc = true;
               autoenc = true;
             }
@@ -541,7 +537,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
           }
 
           // TODO: is this correct?
-          if ( std::isnan(sysmiss) ) {
+          if (std::isnan(sysmiss)) {
             lowest = highest;
             highest = R_PosInf;
           }
@@ -627,8 +623,8 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         {
           encoding = readstringsize(data, sav, count);
 
-          if ((!noenc) & (charcode == 2) &
-              (encoding.compare("windows-1252") == 0)) {
+          if (!noenc && charcode == 2 &&
+            encoding.compare("windows-1252") == 0) {
             encStr = "CP1252";
             autoenc = true;
             doenc = true;
@@ -664,7 +660,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
           CharacterVector longv(nvars);
           CharacterVector longl(nvars);
 
-          for (int32_t i = 0; i<nvars; ++i){
+          for (int32_t i = 0; i < nvars; ++i) {
 
             int32_t len1 = 0, len2 = 0;
 
@@ -777,7 +773,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
     // encStr should not be empty otherwise
     // the iconv call would be useless
-    if (doenc & (encStr.compare(empty)!=0)) {
+    if (doenc && encStr.compare(empty) != 0) {
 
       if (debug)
         Rcout << "encoding" << std::endl;
@@ -820,7 +816,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
     // wrangling around to get the length of the strings
     NumericVector vtyp2 = wrap(vtyp);
-    NumericVector res = ceil( vtyp2 / 8);
+    NumericVector res = ceil(vtyp2 / 8);
 
     if (debug) {
       Rcout << vnam << std::endl;
@@ -850,7 +846,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
     // 1. Create Rcpp::List
     Rcpp::List df(kv);
-    for (int32_t i=0; i<kv; ++i)
+    for (int32_t i = 0; i < kv; ++i)
     {
       int const type = vtyp[i];
       switch(type)
@@ -879,8 +875,8 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     }
 
     // encode full Character vector
-    if (doenc & (n > 0)) {
-      for (int32_t i=0; i<kv; ++i)
+    if (doenc && n > 0) {
+      for (int32_t i = 0; i < kv; ++i)
       {
         int const type = vtyp[i];
 
