@@ -22,12 +22,13 @@ LazyData: TRUE
 Imports:
     Rcpp (>= 0.11.2)
 Suggests: 
-    testthat,
-    foreign,
+    covr,
     datasets,
+    foreign,
     knitr,
     rmarkdown,
-    covr
+    roxygen2,
+    testthat
 LinkingTo: Rcpp, BH
 ByteCompile: yes
 SystemRequirements: OpenSSL >= 1.0.1
