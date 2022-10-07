@@ -1,9 +1,7 @@
-linters: with_defaults(
+linters: linters_with_defaults(
   line_length_linter = NULL,
   cyclocomp_linter = NULL,
   commented_code_linter = NULL,
   object_name_linter = NULL,
-  trailing_whitespace_linter = NULL,
-  commas_linter = NULL,
   trailing_whitespace_linter = NULL
   )
