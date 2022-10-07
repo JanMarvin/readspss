@@ -18,20 +18,21 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
-#include <regex>
+
+#include <boost/regex.hpp>
 
 #include "spss.h"
 
 Rcpp::List read_sav_known_n (Rcpp::List& df, std::fstream& sav,
-               const bool swapit, const uint8_t cflag,
-               const bool debug,
-               int64_t n, int32_t kv,
-               Rcpp::IntegerVector vtyp,
-               Rcpp::NumericVector res,
-               std::vector<int> vartype,
-               const double lowest,
-               const double highest,
-               const int bias) {
+                             const bool swapit, const uint8_t cflag,
+                             const bool debug,
+                             int64_t n, int32_t kv,
+                             Rcpp::IntegerVector vtyp,
+                             Rcpp::NumericVector res,
+                             std::vector<int> vartype,
+                             const double lowest,
+                             const double highest,
+                             const int bias) {
 
   // final position
   auto curpos = sav.tellg();
@@ -163,8 +164,8 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::fstream& sav,
           if (res_i == res_kk-1) {
 
             // trim additional whitespaces to the right
-            start = std::regex_replace(start,
-                                       std::regex(" +$"), "$1");
+            start = boost::regex_replace(start,
+                                         boost::regex(" +$"), "$1");
 
             Rcpp::as<Rcpp::CharacterVector>(df[kk])[nn] = start;
 
@@ -248,8 +249,8 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::fstream& sav,
           if (res_i == res_kk-1) {
 
             // trim additional whitespaces to the right
-            start = std::regex_replace(start,
-                                       std::regex(" +$"), "$1");
+            start = boost::regex_replace(start,
+                                         boost::regex(" +$"), "$1");
 
             Rcpp::as<Rcpp::CharacterVector>(df[kk])[nn] = start;
 
@@ -277,12 +278,12 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::fstream& sav,
           switch(type)
         {
 
-          case 0:
-          {
-            // --kk_i;
-            res_i = 0;
-            break;
-          }
+        case 0:
+        {
+          // --kk_i;
+          res_i = 0;
+          break;
+        }
 
         default:
         {
@@ -292,8 +293,8 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::fstream& sav,
           if (res_i == res_kk-1) {
 
           // trim additional whitespaces to the right
-          start = std::regex_replace(start,
-                                     std::regex(" +$"), "$1");
+          start = boost::regex_replace(start,
+                                       boost::regex(" +$"), "$1");
 
           Rcpp::as<Rcpp::CharacterVector>(df[kk])[nn] = start;
 
@@ -416,8 +417,8 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::fstream& sav,
         val_s.erase(type, std::string::npos);
 
         // trim additional whitespaces
-        val_s = std::regex_replace(val_s,
-                                   std::regex("^ +| +$"), "$1");
+        val_s = boost::regex_replace(val_s,
+                                     boost::regex("^ +| +$"), "$1");
 
         // Rcpp::Rcout << val_s << std::endl;
         Rcpp::as<Rcpp::CharacterVector>(df[kk])[nn] = val_s;
