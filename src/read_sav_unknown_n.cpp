@@ -18,7 +18,6 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
-#include <regex>
 
 #include "spss.h"
 

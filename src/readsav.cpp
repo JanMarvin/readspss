@@ -20,10 +20,10 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
-#include <regex>
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <boost/regex.hpp>
 
 using namespace Rcpp;
 
@@ -77,10 +77,10 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     std::string spss (8, '\0');
     spss = readstring(spss, sav);
 
-    is_sav = std::regex_match(spss, std::regex("^\\$FL2@\\(#\\)$"));
-    is_zsav = std::regex_match(spss, std::regex("^\\$FL3@\\(#\\)$"));
-    ml_sav = std::regex_match(spss.substr(0,4), std::regex("^\\$FL2$"));
-    ml_zsav = std::regex_match(spss.substr(0,4), std::regex("^\\$FL3$"));
+    is_sav = boost::regex_match(spss, boost::regex("^\\$FL2@\\(#\\)$"));
+    is_zsav = boost::regex_match(spss, boost::regex("^\\$FL3@\\(#\\)$"));
+    ml_sav = boost::regex_match(spss.substr(0,4), boost::regex("^\\$FL2$"));
+    ml_zsav = boost::regex_match(spss.substr(0,4), boost::regex("^\\$FL3$"));
     // most likely: "$FL2" can be followed by "SPSS"
     is_spss = (is_sav == true) || (is_zsav == true) ||
       (ml_sav == true) || (ml_zsav == true);
@@ -93,9 +93,9 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
       fileheader = spss + fileheader;
 
-      if (std::regex_search(fileheader, std::regex("ENCRYPTEDSAV")))
+      if (boost::regex_search(fileheader, boost::regex("ENCRYPTEDSAV")))
         stop("The file header indicates that this file is encrypted. "
-              "A password is required to decode this file");
+               "A password is required to decode this file");
 
       throw std::range_error("Can not read this file. Is it no SPSS sav file?");
     }
@@ -108,8 +108,8 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     datalabel = readstring(datalabel, sav);
 
     // trim additional whitespaces
-    datalabel = std::regex_replace(datalabel,
-                                   std::regex("^ +| +$"), "$1");
+    datalabel = boost::regex_replace(datalabel,
+                                     boost::regex("^ +| +$"), "$1");
 
     if (doenc) datalabel = Riconv(datalabel, encStr);
 
@@ -165,8 +165,8 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     filelabel = readstring(filelabel, sav);
 
 
-    filelabel = std::regex_replace(filelabel,
-                                   std::regex("^ +| +$"), "$1");
+    filelabel = boost::regex_replace(filelabel,
+                                     boost::regex("^ +| +$"), "$1");
 
     if (doenc) filelabel = Riconv(filelabel, encStr);
 
@@ -272,8 +272,8 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         nvarname = readstring(nvarname, sav);
 
         // trim additional whitespaces
-        nvarname = std::regex_replace(nvarname,
-                                      std::regex("^ +| +$"), "$1");
+        nvarname = boost::regex_replace(nvarname,
+                                        boost::regex("^ +| +$"), "$1");
 
         varnames.push_back(nvarname);
 
@@ -290,8 +290,8 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
 
           // trim additional whitespaces on the right
-          vallabel = std::regex_replace(vallabel,
-                                        std::regex("^ +| +$"), "$1");
+          vallabel = boost::regex_replace(vallabel,
+                                          boost::regex("^ +| +$"), "$1");
 
           if (vtype > -1) // -1 is of no further useage
             vallabels.push_back(vallabel);
@@ -335,7 +335,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
               std::string mV (8, '\0');
               mV = readstring(mV, sav);
 
-              mV = std::regex_replace(mV, std::regex("^ +| +$"), "$1");
+              mV = boost::regex_replace(mV, boost::regex("^ +| +$"), "$1");
 
               missingV(0) = nmiss;
               missingV(i + 1) = mV;
@@ -363,8 +363,8 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
         nolab = readbin(nolab, sav, swapit);
 
-        // if (debug)
-        //   Rprintf("nolab %d", nolab);
+        if (debug)
+          Rprintf("nolab %d", nolab);
 
         Rcpp::CharacterVector label(nolab), codeV(nolab);
         Rcpp::NumericVector code(nolab);
@@ -383,13 +383,14 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
           // check for characters in the string lets hope SPSS does not allow
           // characters starting with a numeric or special character
-          noNum = std::regex_search(cV, std::regex("^[A-Za-z0-9]")) &&
-            !std::regex_search(cV, std::regex("@$"));
+          noNum = boost::regex_search(cV, boost::regex("^[A-Za-z0-9]")) &&
+            !boost::regex_search(cV, boost::regex("@$"));
+
 
             // if its a double, do a memcpy, else trim whitespaces
             if (noNum) {
               if (doenc) cV = Riconv(cV, encStr);
-              cV = std::regex_replace(cV, std::regex("^ +| +$"), "$1");
+              cV = boost::regex_replace(cV, boost::regex("^ +| +$"), "$1");
 
               // return something so that we can later create a factor
               if (cV.compare(empty) != 0)
@@ -410,7 +411,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
             std::string lab (lablen, '\0');
             lab = readstring(lab, sav);
-            lab = std::regex_replace(lab, std::regex("^ +| +$"), "$1");
+            lab = boost::regex_replace(lab, boost::regex("^ +| +$"), "$1");
 
             if (doenc) lab = Riconv(lab, encStr);
 
@@ -469,8 +470,8 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
           // if (doenc) docline = Riconv(docline, encStr);
 
           // trim additional whitespaces to the right
-          docline = std::regex_replace(docline,
-                                       std::regex(" +$"), "$1");
+          docline = boost::regex_replace(docline,
+                                         boost::regex(" +$"), "$1");
 
           Document(i) = docline;
         }
@@ -624,7 +625,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
           encoding = readstringsize(data, sav, count);
 
           if (!noenc && charcode == 2 &&
-            encoding.compare("windows-1252") == 0) {
+              encoding.compare("windows-1252") == 0) {
             encStr = "CP1252";
             autoenc = true;
             doenc = true;
@@ -641,52 +642,52 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
           while(sav.tellg() < end21pos)
           {
 
-          len = readbin(len, sav, swapit);
-          std::string vn (len, '\0');
+            len = readbin(len, sav, swapit);
+            std::string vn (len, '\0');
 
-          vn = readstringsize(vn, sav, len);
+            vn = readstringsize(vn, sav, len);
 
-          // Rprintf("vn %d \n", len);
-          // Rcout << vn << std::endl;
+            // Rprintf("vn %d \n", len);
+            // Rcout << vn << std::endl;
 
-          // 8 is the minimal value
-          int32_t varw = 0, nvars = 0;
-          varw = readbin(varw, sav, swapit);
-          nvars = readbin(nvars, sav, swapit);
+            // 8 is the minimal value
+            int32_t varw = 0, nvars = 0;
+            varw = readbin(varw, sav, swapit);
+            nvars = readbin(nvars, sav, swapit);
 
-          // Rprintf("varw %d\n", varw);
+            // Rprintf("varw %d\n", varw);
 
-          // set size
-          CharacterVector longv(nvars);
-          CharacterVector longl(nvars);
+            // set size
+            CharacterVector longv(nvars);
+            CharacterVector longl(nvars);
 
-          for (int32_t i = 0; i < nvars; ++i) {
+            for (int32_t i = 0; i < nvars; ++i) {
 
-            int32_t len1 = 0, len2 = 0;
+              int32_t len1 = 0, len2 = 0;
 
-            len1 = readbin(len1, sav, swapit);
-            std::string val (len1, '\0');
-            val = readstringsize(val, sav, len1);
+              len1 = readbin(len1, sav, swapit);
+              std::string val (len1, '\0');
+              val = readstringsize(val, sav, len1);
 
-            val = std::regex_replace(val, std::regex(" +$"), "$1");
+              val = boost::regex_replace(val, boost::regex(" +$"), "$1");
 
 
-            len2 = readbin(len2, sav, swapit);
-            std::string lab (len2, '\0');
-            lab = readstringsize(lab, sav, len2);
+              len2 = readbin(len2, sav, swapit);
+              std::string lab (len2, '\0');
+              lab = readstringsize(lab, sav, len2);
 
-            // Rcout << val << " : "<< lab << std::endl;
+              // Rcout << val << " : "<< lab << std::endl;
 
-            longv(i) = val;
-            longl(i) = lab;
-          }
+              longv(i) = val;
+              longl(i) = lab;
+            }
 
-          longv.attr("names") = longl;
+            longv.attr("names") = longl;
 
-          longlabvn.push_back(vn);
-          longllist.push_back(longv);
+            longlabvn.push_back(vn);
+            longllist.push_back(longv);
 
-          longllist.attr("names") = longlabvn;
+            longllist.attr("names") = longlabvn;
           }
 
           break;
@@ -721,7 +722,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
               std::string val (len, '\0');
               val = readstring(val, sav);
 
-              val = std::regex_replace(val, std::regex(" +$"), "$1");
+              val = boost::regex_replace(val, boost::regex(" +$"), "$1");
 
               longmissing(mm) = val;
             }

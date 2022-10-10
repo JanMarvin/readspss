@@ -20,7 +20,8 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
-#include <regex>
+
+#include <boost/regex.hpp>
 
 using namespace Rcpp;
 
@@ -110,10 +111,10 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
     spss = readstring(spss, por);
 
     if (!override){
-      if (!std::regex_search(spss, std::regex("ASCII SPSS PORT FILE")) &&
-          !std::regex_search(spss, std::regex("EBCDIC SPSS PORT FILE"))) {
+      if (!boost::regex_search(spss, boost::regex("ASCII SPSS PORT FILE")) &&
+          !boost::regex_search(spss, boost::regex("EBCDIC SPSS PORT FILE"))) {
           stop("The file header indicates that it is not an SPSS por file. "
-               "Use 'override = TRUE' to ignore this check.");
+                 "Use 'override = TRUE' to ignore this check.");
       }
     }
 

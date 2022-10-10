@@ -21,7 +21,8 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
-#include <regex>
+
+#include <boost/regex.hpp>
 
 #include <openssl/aes.h>
 #include <openssl/cmac.h>
@@ -51,7 +52,7 @@ int encryptfile (const char * filePath, std::string &outpath, std::string pass)
     std::string fileheader(36, '\0');
     fileheader = readstring(fileheader, sav);
 
-    if (!std::regex_search(fileheader, std::regex("ENCRYPTEDSAV"))) {
+    if (!boost::regex_search(fileheader, boost::regex("ENCRYPTEDSAV"))) {
       stop("The file header indicates that it is not an SPSS sav file.");
     }
 
