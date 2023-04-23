@@ -158,7 +158,7 @@ inline std::string readtostring(T& sav)
     std::string next(1, '\0');
     next = readstring(next, sav);
 
-    if ( (res.compare("*") == 0) &
+    if ( (res.compare("*") == 0) &&
          (((next.compare(".") == 0)) || (next.compare("1") == 0) ) ) {
       // missing (combine so we can check for "*.")
       res = res + next;
@@ -296,7 +296,7 @@ inline std::string pnum1(int32_t n)
   while (n >= 30) {
     m = (int32_t) (n / 30);
     r = n - 30 * m;
-    sprintf(p++,"%c",DIG30[r]);
+    snprintf(p++, 100, "%c",DIG30[r]);
     n = m;
   }
   val_s += DIG30[n];
