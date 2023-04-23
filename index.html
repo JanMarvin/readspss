@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">readspss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17</span>
       </span>
     </div>
 
@@ -66,8 +66,8 @@
       </header><div class="row">
   <div class="contents col-md-9">
 <div class="section level1">
-<div class="page-header"><h1 id="readspss-r-cmd-check-codecov-test-coverage">Readspss <img src="https://github.com/JanMarvin/readspss/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"><a href="https://app.codecov.io/gh/JanMarvin/readspss?branch=main" class="external-link"><img src="https://codecov.io/gh/JanMarvin/readspss/branch/main/graph/badge.svg" alt="Codecov test coverage"></a>
-<a class="anchor" aria-label="anchor" href="#readspss-r-cmd-check-codecov-test-coverage"></a>
+<div class="page-header"><h1 id="readspss-r-cmd-check-codecov-test-coverage-r-universe">Readspss <img src="https://github.com/JanMarvin/readspss/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"><a href="https://app.codecov.io/gh/JanMarvin/readspss?branch=main" class="external-link"><img src="https://codecov.io/gh/JanMarvin/readspss/branch/main/graph/badge.svg" alt="Codecov test coverage"></a> <a href="https://janmarvin.r-universe.dev/readspss" class="external-link"><img src="https://janmarvin.r-universe.dev/badges/readspss" alt="r-universe"></a>
+<a class="anchor" aria-label="anchor" href="#readspss-r-cmd-check-codecov-test-coverage-r-universe"></a>
 </h1></div>
 <p>R package using Rcpp to parse an SPSS file into a data.frame(). Currently <code>read.sav</code> and <code>read.por</code> are the main functions and feature of this package. Writing of SPSS files is provided by <code>write.por</code> and <code>write.sav</code>. Writing is limited to uncompressed por and sav files and to compressed sav file.</p>
 <p>It works. Its read function is extensively tested on approximately 600+ sav-files and ~100 por-files. The code is maturing and is frequently tested. The read functions imports everything into a data frame. Including long strings and labels. Various features such as importing of value label or missings are tested and are working as intended.</p>
@@ -92,13 +92,15 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>With <code>drat</code>:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">drat</span><span class="fu">::</span><span class="fu">addRepo</span><span class="op">(</span><span class="st">"JanMarvin"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"readspss"</span><span class="op">)</span></span></code></pre></div>
 <p>With <code>remotes</code>:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JanMarvin/readspss"</span><span class="op">)</span></span></code></pre></div>
+<p>Or from <a href="https://r-universe.dev/" class="external-link">r-universe</a> with:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  janmarvin <span class="op">=</span> <span class="st">'https://janmarvin.r-universe.dev'</span>,</span>
+<span>  CRAN <span class="op">=</span> <span class="st">'https://cloud.r-project.org'</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'readspss'</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
@@ -163,7 +165,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
