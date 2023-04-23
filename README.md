@@ -1,4 +1,4 @@
-# Readspss ![R-CMD-check](https://github.com/JanMarvin/readspss/workflows/R-CMD-check/badge.svg) [![Codecov test coverage](https://codecov.io/gh/JanMarvin/readspss/branch/main/graph/badge.svg)](https://app.codecov.io/gh/JanMarvin/readspss?branch=main)
+# Readspss ![R-CMD-check](https://github.com/JanMarvin/readspss/workflows/R-CMD-check/badge.svg) [![Codecov test coverage](https://codecov.io/gh/JanMarvin/readspss/branch/main/graph/badge.svg)](https://app.codecov.io/gh/JanMarvin/readspss?branch=main) [![r-universe](https://janmarvin.r-universe.dev/badges/readspss)](https://janmarvin.r-universe.dev/readspss)
 
 
 R package using Rcpp to parse an SPSS file into a data.frame(). Currently 
@@ -47,15 +47,18 @@ longer be true) and writing of long strings.
 
 ## Installation
 
-With `drat`:
-```R
-drat::addRepo("JanMarvin")
-install.packages("readspss")
-```
-
 With `remotes`:
 ```R
 remotes::install_github("JanMarvin/readspss")
+```
+
+Or from [r-universe](https://r-universe.dev/) with:
+
+``` r
+options(repos = c(
+  janmarvin = 'https://janmarvin.r-universe.dev',
+  CRAN = 'https://cloud.r-project.org'))
+install.packages('readspss')
 ```
 
 ## Usage
