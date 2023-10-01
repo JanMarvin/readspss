@@ -64,8 +64,8 @@ install.packages('readspss')
 ## Usage
 
 ```R
-fls <- system.file("extdata", "electric.sav", package="readspss")
-flp <- system.file("extdata", "electric.por", package="readspss")
+fls <- system.file("extdata", "electric.sav", package = "readspss")
+flp <- system.file("extdata", "electric.por", package = "readspss")
 
 df_s <- read.sav(fls)
 df_p <- read.por(flp)
