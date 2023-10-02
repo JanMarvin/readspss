@@ -1,0 +1,88 @@
+---
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  out.width = "100%"
+)
+library(readspss)
+```
+
+# readspss
+![R-CMD-check](https://github.com/JanMarvin/readspss/workflows/R-CMD-check/badge.svg) [![Codecov test coverage](https://codecov.io/gh/JanMarvin/readspss/branch/main/graph/badge.svg)](https://app.codecov.io/gh/JanMarvin/readspss?branch=main) [![r-universe](https://janmarvin.r-universe.dev/badges/readspss)](https://janmarvin.r-universe.dev/readspss)
+
+
+R package using Rcpp to parse an SPSS file into a data.frame(). Currently 
+`read.sav` and `read.por` are the main functions and feature of this package.
+Writing of SPSS files is provided by `write.por` and `write.sav`. Writing is
+limited to uncompressed por and sav files and to compressed sav file.
+
+It works. Its read function is extensively tested on approximately 600+ 
+sav-files and ~100 por-files. The code is maturing and is frequently tested. The
+read functions imports everything into a data frame. Including long strings and
+labels. Various features such as importing of value label or missings are tested
+and are working as intended.
+
+The package features reading of
+
+* sav files,
+* zsav files,
+* encrypted sav files and
+* por files
+
+and (experimental) writing support of (un)compressed
+
+* sav files and
+* zsav files and
+* por files.
+
+Because of the R code wrapped Rcpp functions the package is pretty fast. The 
+R code for factor conversion slows things down a bit, changing the encoding a
+bit more.
+
+In comparison to `haven` and `foreign` this package preforms pretty well. It
+reads more files than each of its predecessors, some are only readable using
+`readspss` and it covers a few more cases of missing values.
+
+Focus was not so much on winning every benchmark, but reading all features of
+an SPSS file and to be as exactly as possible. So some benchmarks are
+won and others are lost. It is entirely up to the task. Besides the data
+itself `readspss` ships additional information provided by the SPSS files like
+the data label, documentation, date and timestamp.
+
+Reading of sav and por files is considered feature complete.
+
+Writing of (un)compressed sav and por files is implemented and considered 
+working. Unsupported features are reading and writing of dates (might no
+longer be true) and writing of long strings.
+
+## Installation
+
+With `remotes`:
+```R
+remotes::install_github("JanMarvin/readspss")
+```
+
+Or from [r-universe](https://r-universe.dev/) with:
+
+``` r
+options(repos = c(
+  janmarvin = 'https://janmarvin.r-universe.dev',
+  CRAN = 'https://cloud.r-project.org'))
+install.packages('readspss')
+```
+
+## Usage
+
+```{r}
+fls <- system.file("extdata", "electric.sav", package = "readspss")
+flp <- system.file("extdata", "electric.por", package = "readspss")
+
+df_s <- read.sav(fls)
+df_p <- read.por(flp)
+
+all.equal(df_s, df_p, check.attributes = FALSE)
+```
