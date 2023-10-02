@@ -66,9 +66,9 @@
       </header><div class="row">
   <div class="contents col-md-9">
 <div class="section level1">
-<div class="page-header"><h1 id="readspss-r-cmd-check-codecov-test-coverage-r-universe">Readspss <img src="https://github.com/JanMarvin/readspss/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"><a href="https://app.codecov.io/gh/JanMarvin/readspss?branch=main" class="external-link"><img src="https://codecov.io/gh/JanMarvin/readspss/branch/main/graph/badge.svg" alt="Codecov test coverage"></a> <a href="https://janmarvin.r-universe.dev/readspss" class="external-link"><img src="https://janmarvin.r-universe.dev/badges/readspss" alt="r-universe"></a>
-<a class="anchor" aria-label="anchor" href="#readspss-r-cmd-check-codecov-test-coverage-r-universe"></a>
+<div class="page-header"><h1 id="readspss">readspss<a class="anchor" aria-label="anchor" href="#readspss"></a>
 </h1></div>
+<p><img src="https://github.com/JanMarvin/readspss/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"><a href="https://app.codecov.io/gh/JanMarvin/readspss?branch=main" class="external-link"><img src="https://codecov.io/gh/JanMarvin/readspss/branch/main/graph/badge.svg" alt="Codecov test coverage"></a> <a href="https://janmarvin.r-universe.dev/readspss" class="external-link"><img src="https://janmarvin.r-universe.dev/badges/readspss" alt="r-universe"></a></p>
 <p>R package using Rcpp to parse an SPSS file into a data.frame(). Currently <code>read.sav</code> and <code>read.por</code> are the main functions and feature of this package. Writing of SPSS files is provided by <code>write.por</code> and <code>write.sav</code>. Writing is limited to uncompressed por and sav files and to compressed sav file.</p>
 <p>It works. Its read function is extensively tested on approximately 600+ sav-files and ~100 por-files. The code is maturing and is frequently tested. The read functions imports everything into a data frame. Including long strings and labels. Various features such as importing of value label or missings are tested and are working as intended.</p>
 <p>The package features reading of</p>
@@ -112,7 +112,8 @@
 <span><span class="va">df_s</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read.sav.html">read.sav</a></span><span class="op">(</span><span class="va">fls</span><span class="op">)</span></span>
 <span><span class="va">df_p</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read.por.html">read.por</a></span><span class="op">(</span><span class="va">flp</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">df_s</span>, <span class="va">df_p</span>, check.attributes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">df_s</span>, <span class="va">df_p</span>, check.attributes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </div>
 </div>
   </div>
