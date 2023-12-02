@@ -52,7 +52,7 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::fstream& sav,
   if (debug) {
     Rcpp::Rcout << "cflag: " << cflag
                 << "\ncurpos: " << curpos
-                << "\nendpos: " << endpos
+                << "\nendpos: " << endoffile
                 << std::endl;
   }
 
