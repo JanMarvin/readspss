@@ -144,7 +144,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     n = readbin((int32_t)n, sav, swapit);
 
     if (debug)
-      Rprintf("N: %d \n", n);
+      Rcpp::Rcout << "N: " << n << std::endl;
 
     int bias = 0; double biasd = 0; // 100: compression bias
     bias = readbin(biasd, sav, swapit);
@@ -532,9 +532,10 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
           lowest = readbin(lowest, sav, swapit);    // lowest
 
           if (debug) {
-            Rprintf("\nsysmiss %fl\n", sysmiss);
-            Rprintf("highest %d\n", highest);
-            Rprintf("lowest %d\n\n", lowest);
+            Rcpp::Rcout << "\nsysmiss" << sysmiss
+                        << "\nhighest " << highest
+                        << "\nlowest " << lowest
+                        << "\n" << std::endl;
           }
 
           // TODO: is this correct?

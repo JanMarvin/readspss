@@ -50,9 +50,10 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::fstream& sav,
 
 
   if (debug) {
-    Rprintf("cflag: %d\n", cflag);
-    Rprintf("curpos: %d\n", curpos);
-    Rprintf("endpos: %d\n", endoffile);
+    Rcpp::Rcout << "cflag: " << cflag
+                << "\ncurpos: " << curpos
+                << "\nendpos: " << endpos
+                << std::endl;
   }
 
 

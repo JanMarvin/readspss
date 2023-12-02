@@ -336,7 +336,7 @@ int64_t read_sav_unknown_n (std::fstream& sav,
   sav.seekg(curpos);
 
   if (debug) {
-    Rprintf("n is %d\n", nn);
+    Rcpp::Rcout << "n is " << nn << std::endl;
   }
 
   return(nn);
