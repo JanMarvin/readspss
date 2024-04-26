@@ -32,7 +32,7 @@ Suggests:
     testthat
 LinkingTo: Rcpp, BH
 ByteCompile: yes
-SystemRequirements: OpenSSL >= 1.0.1
+SystemRequirements: OpenSSL >= 1.0.2
 VignetteBuilder: knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

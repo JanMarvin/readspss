@@ -1,7 +1,9 @@
 PKG_CPPFLAGS = @cflags@
-PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` -lz  @libs@
+PKG_LIBS = -lz @libs@
 
 all: clean
+
+$(SHLIB): $(OBJECTS)
 
 clean:
 	rm -f $(OBJECTS) $(SHLIB)
