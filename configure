@@ -50,6 +50,11 @@ elif [ `uname` = "Darwin" ]; then
   fi
 fi
 
+# Fix broken homebrew openssl@3.3.0
+if echo "$PKG_LIBS" | grep -q '/opt/homebrew/Cellar/openssl@3/3.3.0 -lssl -lcrypto'; then
+    PKG_LIBS=$(echo "$PKG_LIBS" | sed 's|/opt/homebrew/Cellar/openssl@3/3.3.0|/opt/homebrew/Cellar/openssl@3/3.3.0/lib|g')
+fi
+
 # Find compiler
 CC=`${R_HOME}/bin/R CMD config CC`
 CFLAGS=`${R_HOME}/bin/R CMD config CFLAGS`
