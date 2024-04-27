@@ -1,4 +1,4 @@
-# Anticonf (tm) script by Jeroen Ooms (2020)
+# Anticonf (tm) script by Jeroen Ooms (2023)
 # This script will query 'pkg-config' for the required cflags and ldflags.
 # If pkg-config is unavailable or does not find the library, try setting
 # INCLUDE_DIR and LIB_DIR manually via e.g:
@@ -17,8 +17,13 @@ PKG_CFLAGS=""
 # Build against a specific openssl version
 # export PKG_CONFIG_PATH="/usr/local/opt/openssl@1.1/lib/pkgconfig"
 
+# On MacOS we avoid legacy versions of openssl
+if [ `uname` = "Darwin" ]; then
+MINVERSION="--atleast-version=3"
+fi
+
 # Use pkg-config if available
-pkg-config ${PKG_CONFIG_NAME} --atleast-version=1.0  2>/dev/null
+pkg-config ${PKG_CONFIG_NAME} ${MINVERSION} 2>/dev/null
 if [ $? -eq 0 ]; then
   PKGCONFIG_CFLAGS=`pkg-config --cflags ${PKG_CONFIG_NAME}`
   PKGCONFIG_LIBS=`pkg-config --libs ${PKG_CONFIG_NAME}`
@@ -37,12 +42,17 @@ elif [ `uname` = "Darwin" ]; then
   test ! "$CI" && brew --version 2>/dev/null
   if [ $? -eq 0 ]; then
     BREWDIR=`brew --prefix`
-    PKG_CFLAGS="-I$BREWDIR/opt/openssl/include -I$BREWDIR/opt/openssl@1.1/include"
-    PKG_LIBS="-L$BREWDIR/opt/openssl/lib -L$BREWDIR/opt/openssl@1.1/lib $PKG_LIBS"
+    PKG_CFLAGS="-I$BREWDIR/opt/openssl/include"
+    PKG_LIBS="-L$BREWDIR/opt/openssl/lib $PKG_LIBS"
   else
     curl -sfL "https://autobrew.github.io/scripts/$PKG_BREW_NAME" > autobrew
     . ./autobrew
   fi
+fi
+
+# Fix broken homebrew openssl@3.3.0
+if echo "$PKG_LIBS" | grep -q '/opt/homebrew/Cellar/openssl@3/3.3.0 -lssl -lcrypto'; then
+    PKG_LIBS=$(echo "$PKG_LIBS" | sed 's|/opt/homebrew/Cellar/openssl@3/3.3.0|/opt/homebrew/Cellar/openssl@3/3.3.0/lib|g')
 fi
 
 # Find compiler
@@ -76,7 +86,7 @@ fi
 
 # Try to link against the correct OpenSSL version
 if [ -z "$AUTOBREW" ]; then
-SONAME=`${CC} -E ${PKG_CFLAGS} src/tests/soname.h | sh | xargs`
+SONAME=`${CC} -E ${PKG_CFLAGS} src/tests/soname.h | grep 'echo' | sh | xargs`
 if [ "$SONAME" ]; then
 if [ `uname` = "Darwin" ]; then
   PKG_LIBS_VERSIONED=`echo "${PKG_LIBS}" | sed "s/-lssl/-lssl.${SONAME}/" | sed "s/-lcrypto/-lcrypto.${SONAME}/"`

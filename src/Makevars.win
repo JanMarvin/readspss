@@ -1,11 +1,23 @@
-VERSION=1.1.1k
-PKG_CPPFLAGS= -I../windows/openssl-$(VERSION)/include
-PKG_LIBS = -L../windows/openssl-$(VERSION)/lib${R_ARCH}${CRT} -lz -lcrypto -lws2_32 -lcrypt32
+RWINLIB = ../windows/libssl
+TARGET = lib$(subst gcc,,$(COMPILED_BY))$(R_ARCH)
+PKG_CPPFLAGS = -I$(RWINLIB)/include -DOPENSSL_SUPPRESS_DEPRECATED
 
-all: clean winlibs
+PKG_LIBS = \
+	-L$(RWINLIB)/$(TARGET) \
+	-L$(RWINLIB)/lib \
+	-lssl -lcrypto -lz -lws2_32 -lcrypt32
+
+#all: clean
+all: $(SHLIB)
+
+$(OBJECTS): winlibs
+
+$(SHLIB): $(OBJECTS)
+
+winlibs:
+	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" "../tools/winlibs.R"
 
 clean:
 	rm -f $(SHLIB) $(OBJECTS)
 
-winlibs:
-	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" "../tools/winlibs.R" $(VERSION)
+.PHONY: all clean winlibs
