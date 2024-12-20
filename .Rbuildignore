@@ -12,3 +12,9 @@
 .lintr
 ^configure.log$
 ^README.Rmd$
+^windows$
+^src/Makevars$
+.*\.so
+.*\.dll
+.*\.o
+.*\.a
