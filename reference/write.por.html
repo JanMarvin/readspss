@@ -5,7 +5,7 @@ fail (fail reading or return wrong values)."><!-- mathjax --><script src="https:
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -33,20 +33,20 @@ fail (fail reading or return wrong values)."><!-- mathjax --><script src="https:
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/JanMarvin/readspss/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>write.por</h1>
-    <small class="dont-index">Source: <a href="https://github.com/JanMarvin/readspss/blob/HEAD/R/writepor.R" class="external-link"><code>R/writepor.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/JanMarvin/readspss/blob/main/R/writepor.R" class="external-link"><code>R/writepor.R</code></a></small>
     <div class="hidden name"><code>write.por.Rd</code></div>
     </div>
 
@@ -71,25 +71,27 @@ fail (fail reading or return wrong values).</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>dat</dt>
+
+
+<dl><dt id="arg-dat">dat<a class="anchor" aria-label="anchor" href="#arg-dat"></a></dt>
 <dd><p><em>data.frame</em> a data.frame to export as por-file.</p></dd>
 
 
-<dt>filepath</dt>
+<dt id="arg-filepath">filepath<a class="anchor" aria-label="anchor" href="#arg-filepath"></a></dt>
 <dd><p><em>string</em> full path where and how this file should be
 stored</p></dd>
 
 
-<dt>label</dt>
+<dt id="arg-label">label<a class="anchor" aria-label="anchor" href="#arg-label"></a></dt>
 <dd><p><em>character</em> vector of labels. must be of size <code>ncol(dat)</code></p></dd>
 
 
-<dt>add.rownames</dt>
+<dt id="arg-add-rownames">add.rownames<a class="anchor" aria-label="anchor" href="#arg-add-rownames"></a></dt>
 <dd><p><em>logical</em> If <code>TRUE</code>, a new variable rownames
 will be added to the por-file.</p></dd>
 
 
-<dt>convert.factors</dt>
+<dt id="arg-convert-factors">convert.factors<a class="anchor" aria-label="anchor" href="#arg-convert-factors"></a></dt>
 <dd><p><em>logical</em> If <code>TRUE</code>, factors will be converted to
 SPSS variables with labels.
 SPSS expects strings to be encoded as Windows-1252, so all levels will be
@@ -97,25 +99,23 @@ recoded. Character which can not be mapped in Windows-1252 will be saved as
 hexcode.</p></dd>
 
 
-<dt>toEncoding</dt>
+<dt id="arg-toencoding">toEncoding<a class="anchor" aria-label="anchor" href="#arg-toencoding"></a></dt>
 <dd><p><em>character</em> encoding used for the por file. SPSS itself
 claims to have problems with unicode and por files, so "CP1252" is the
 default.</p></dd>
 
 
-<dt>convert.dates</dt>
+<dt id="arg-convert-dates">convert.dates<a class="anchor" aria-label="anchor" href="#arg-convert-dates"></a></dt>
 <dd><p><em>logical</em> should dates be converted to SPSS format</p></dd>
 
 
-<dt>tz</dt>
+<dt id="arg-tz">tz<a class="anchor" aria-label="anchor" href="#arg-tz"></a></dt>
 <dd><p><em>character</em> The name of the timezone convert.dates will use.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p><code>write.por</code> returns nothing</p>
+    <p><code>write.por</code> returns nothing</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -135,15 +135,15 @@ File will be stored using "CP1252" encoding.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 
