@@ -89,6 +89,22 @@ else
   PKG_LIBS_VERSIONED=`echo "${PKG_LIBS}" | sed "s/-lssl/-l:libssl.so.${SONAME}/" | sed "s/-lcrypto/-l:libcrypto.so.${SONAME}/"`
 fi
 
+# r-universe oldrel mac builds fail because of this. not sure if this is mac specific
+if [ `uname` = "Darwin" ]; then
+cat > conftest.cpp <<EOF
+#include <boost/container_hash/hash.hpp>
+int main() { return 0; }
+EOF
+
+BOOST_INCLUDE_PATH=$(${R_HOME}/bin/Rscript -e "cat(system.file('include', package = 'BH'))")
+
+if ! ${CXX} ${CPPFLAGS} ${PKG_CFLAGS} ${CXXFLAGS} -I$BOOST_INCLUDE_PATH -E -c conftest.cpp >/dev/null 2>&1; then
+  PKG_CFLAGS="$PKG_CFLAGS -DBOOST_NO_CXX98_FUNCTION_BASE"
+fi
+
+rm -f conftest.cpp
+fi
+
 # Test if versioned linking works
 ${CC} ${PKG_CFLAGS} src/tests/main.c ${PKG_LIBS_VERSIONED} -o src/main.exe 2>/dev/null
 if [ $? -eq 0 ]; then PKG_LIBS="${PKG_LIBS_VERSIONED}"; fi
