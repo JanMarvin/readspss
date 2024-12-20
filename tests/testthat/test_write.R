@@ -203,8 +203,8 @@ dd <- data.frame(
   stringsAsFactors = FALSE
 )
 
-write.sav(dd, "data/dd_u.sav", compress = FALSE)
-write.sav(dd, "data/dd_c.sav", compress = TRUE)
+write.sav(dd, "data/dd_u.sav", label = c("A numeric", "A not so long string", "A long string"), compress = FALSE)
+write.sav(dd, "data/dd_c.sav", label = c("A numeric", "A not so long string", "A long string"), compress = TRUE)
 
 write.por(dd, "data/dd_p.por")
 
