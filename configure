@@ -89,6 +89,7 @@ else
   PKG_LIBS_VERSIONED=`echo "${PKG_LIBS}" | sed "s/-lssl/-l:libssl.so.${SONAME}/" | sed "s/-lcrypto/-l:libcrypto.so.${SONAME}/"`
 fi
 
+# r-universe oldrel mac builds fail because of this. not sure if this is mac specific
 if [ `uname` = "Darwin" ]; then
 cat > conftest.cpp <<EOF
 #include <boost/container_hash/hash.hpp>
