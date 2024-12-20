@@ -1,3 +1,29 @@
+resize_vartyp <- function(vec, var = NULL) {
+
+  out <- NULL
+  for (i in seq_along(vec)) {
+
+    val <- vec[i]
+
+    if (is.null(var)) {
+      if (val <= 8) {
+        out <- c(out, val)
+      } else {
+        out <- c(out, c(val, rep(-1, (ceiling(val / 8) - 1))))
+      }
+    } else {
+      if (val <= 8) {
+        out <- c(out, var[i])
+      } else {
+        out <- c(out, c(var[i], rep(var[i], (ceiling(val / 8) - 1))))
+      }
+    }
+
+  }
+
+  out
+}
+
 #' write.sav
 #'
 #' Function to write an SPSS sav or zsav file from a data.frame().
@@ -93,25 +119,7 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
 
   vtyp[vtyp > 255] <- 255
 
-  fun <- function(vec) {
-
-    vartypes <- NULL
-    for (i in seq_along(vec)) {
-
-      val <- vtyp[i]
-
-      if (val <= 8) {
-        vartypes <- c(vartypes, val)
-      } else {
-        vartypes <- c(vartypes, c(val, rep(-1, (ceiling(val / 8) - 1))))
-      }
-    }
-
-    vartypes
-
-  }
-
-  vartypes <- fun(vtyp)
+  vartypes <- resize_vartyp(vtyp)
 
   vartypes[vartypes > 255] <- 255
 
@@ -263,6 +271,15 @@ write.sav <- function(dat, filepath, label, add.rownames = FALSE,
 
   # make it flat
   disppar <- c(t(disppar))
+
+  # resize vartyp for long strings
+  if (length(vartyp) != length(vartypes)) {
+    vartyp <- resize_vartyp(vtyp, vartyp)
+  }
+
+  if (length(label) != length(vartypes)) {
+    label <- resize_vartyp(vtyp, label)
+  }
 
   attr(dat, "vtyp") <- vtyp
   attr(dat, "vartyp") <- vartyp
