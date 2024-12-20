@@ -92,13 +92,16 @@ fi
 # r-universe oldrel mac builds fail because of this. not sure if this is mac specific
 if [ `uname` = "Darwin" ]; then
 cat > conftest.cpp <<EOF
-#include <boost/container_hash/hash.hpp>
+#include <functional>
+#ifndef BOOST_NO_CXX98_FUNCTION_BASE
+// Test if C++98 function base classes are available
+struct Test : std::unary_function<int, void> {};
+#endif
 int main() { return 0; }
 EOF
 
-BOOST_INCLUDE_PATH=$(${R_HOME}/bin/Rscript -e "cat(system.file('include', package = 'BH'))")
-
-if ! ${CXX} ${CPPFLAGS} ${PKG_CFLAGS} ${CXXFLAGS} -I$BOOST_INCLUDE_PATH -E -c conftest.cpp >/dev/null 2>&1; then
+if ! ${CXX} ${CPPFLAGS} ${PKG_CFLAGS} ${CXXFLAGS} -E -c conftest.cpp >/dev/null 2>&1; then
+  echo "adding -DBOOST_NO_CXX98_FUNCTION_BASE"
   PKG_CFLAGS="$PKG_CFLAGS -DBOOST_NO_CXX98_FUNCTION_BASE"
 fi
 
