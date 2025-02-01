@@ -81,7 +81,7 @@
 #' pspp [www.gnu.org/software/pspp/](http://www.gnu.org/software/pspp/)
 #'
 #'@seealso \code{\link[foreign]{read.spss}}, \code{memisc} and
-#'\code{\link[haven]{read_sav}}.
+#'\code{haven}.
 
 #' @useDynLib readspss, .registration=TRUE
 #' @importFrom tools file_ext

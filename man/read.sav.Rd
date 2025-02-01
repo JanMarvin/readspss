@@ -118,5 +118,5 @@ dd <- read.sav(fl)
 }
 \seealso{
 \code{\link[foreign]{read.spss}}, \code{memisc} and
-\code{\link[haven]{read_sav}}.
+\code{haven}.
 }
