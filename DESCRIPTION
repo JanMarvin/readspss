@@ -1,7 +1,7 @@
 Package: readspss
 Type: Package
 Title: Importing and Exporting SPSS Files
-Version: 0.18.1
+Version: 0.19
 Authors@R: c(
     person("Jan Marvin", "Garbuszus",
     email = "jan.garbuszus@ruhr-uni-bochum.de", role = c("aut", "cre")),
@@ -22,18 +22,17 @@ LazyData: TRUE
 Language: en-US
 Imports:
     Rcpp (>= 0.11.2)
-Suggests: 
-    covr,
+Suggests:
     datasets,
     foreign,
     knitr,
     rmarkdown,
     roxygen2,
     testthat
-LinkingTo: Rcpp, BH
+LinkingTo: Rcpp
 ByteCompile: yes
 SystemRequirements: OpenSSL >= 1.0.2
 VignetteBuilder: knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3

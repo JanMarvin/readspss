@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Jan Marvin Garbuszus
+ * Copyright (C) 2018-2025 Jan Marvin Garbuszus
  * Copyright (c) 2013 Ben Pfaff
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -21,8 +21,6 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
-
-#include <boost/regex.hpp>
 
 #include <openssl/aes.h>
 #include <openssl/cmac.h>
@@ -52,11 +50,9 @@ int encryptfile (const char * filePath, std::string &outpath, std::string pass)
     std::string fileheader(36, '\0');
     fileheader = readstring(fileheader, sav);
 
-    if (!boost::regex_search(fileheader, boost::regex("ENCRYPTEDSAV"))) {
-      stop("The file header indicates that it is not an SPSS sav file.");
+    if (fileheader.find("ENCRYPTEDSAV") == std::string::npos) {
+        stop("The file header indicates that it is not an SPSS sav file.");
     }
-
-
 
     /* Read first ciphertext block and use it to verify the password.  Try the
      password as plaintext first, then try decoding it. */

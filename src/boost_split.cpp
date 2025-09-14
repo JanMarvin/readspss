@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Jan Marvin Garbuszus
+ * Copyright (C) 2018-2025 Jan Marvin Garbuszus
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,11 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Rcpp.h>
-#include <string>
-
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/algorithm/string/split.hpp>
+#include "spss.h"
 
 //' split character vector at "="
 //'
@@ -32,8 +28,7 @@ Rcpp::CharacterVector boost_split(std::string val_s) {
 
   std::vector<std::string> vec_r;
 
-  boost::split(vec_r, val_s,
-               boost::is_any_of("="), boost::token_compress_on);
+  vec_r = split(val_s, "=", true);
 
   return(Rcpp::wrap(vec_r));
 }

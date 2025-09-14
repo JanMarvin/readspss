@@ -5,7 +5,51 @@
 #include <Rcpp.h>
 #include <fstream>
 #include <string>
+#include <unordered_set>
 #include "swap_endian.h"
+
+inline void rtrim(std::string& s) {
+  s.erase(std::find_if(s.rbegin(), s.rend(),
+                       [](unsigned char ch) { return !std::isspace(ch); }).base(),
+                       s.end());
+}
+
+inline void trim(std::string& s) {
+    // Trim leading spaces
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(),
+                                    [](unsigned char ch) { return !std::isspace(ch); }));
+    // Trim trailing spaces
+    rtrim(s);
+}
+
+inline std::vector<std::string> split(
+    const std::string& input,
+    const std::string& delimiters,
+    bool compress = true
+) {
+  std::vector<std::string> result;
+  std::string token;
+  std::unordered_set<char> delims(delimiters.begin(), delimiters.end());
+
+  for (char c : input) {
+    if (delims.count(c)) {
+      if (!token.empty() || !compress) {
+        result.push_back(token);
+        token.clear();
+      }
+      // if compress == true, skip consecutive delimiters
+    } else {
+      token += c;
+    }
+  }
+  if (!token.empty() || !compress)
+    result.push_back(token);
+
+  if (result.empty())
+    result.push_back("");
+
+  return result;
+}
 
 struct info_t {
   Rcpp::IntegerVector vtyp;
@@ -23,6 +67,10 @@ struct info_t {
 template <typename T>
 T readbin( T t , std::istream& sav, bool swapit)
 {
+  if (sav.peek() == EOF) {
+    Rcpp::stop("Reached EOF");
+  }
+
   if (!sav.read ((char*)&t, sizeof(t)))
     Rcpp::stop("readbin: a binary read error occurred");
   if (swapit==0)

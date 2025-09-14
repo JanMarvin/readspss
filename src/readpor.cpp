@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Jan Marvin Garbuszus
+ * Copyright (C) 2018-2025 Jan Marvin Garbuszus
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -20,8 +20,6 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
-
-#include <boost/regex.hpp>
 
 using namespace Rcpp;
 
@@ -110,12 +108,12 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
     std::string spss (200, '\0');
     spss = readstring(spss, por);
 
-    if (!override){
-      if (!boost::regex_search(spss, boost::regex("ASCII SPSS PORT FILE")) &&
-          !boost::regex_search(spss, boost::regex("EBCDIC SPSS PORT FILE"))) {
-          stop("The file header indicates that it is not an SPSS por file. "
-                 "Use 'override = TRUE' to ignore this check.");
-      }
+    if (!override) {
+        if (spss.find("ASCII SPSS PORT FILE") == std::string::npos &&
+            spss.find("EBCDIC SPSS PORT FILE") == std::string::npos) {
+            stop("The file header indicates that it is not an SPSS por file. "
+                "Use 'override = TRUE' to ignore this check.");
+        }
     }
 
     // Controll characters
