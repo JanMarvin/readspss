@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Jan Marvin Garbuszus
+ * Copyright (C) 2018-2025 Jan Marvin Garbuszus
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -21,10 +21,6 @@
 #include <fstream>
 #include <streambuf>
 
-#include <boost/regex.hpp>
-
-using namespace Rcpp;
-
 #include "spss.h"
 
 //' Reads the binary SPSS file
@@ -37,7 +33,7 @@ using namespace Rcpp;
 //' @keywords internal
 //' @noRd
 // [[Rcpp::export]]
-List readpor(const char * filePath, const bool debug, std::string encStr,
+Rcpp::List readpor(const char * filePath, const bool debug, std::string encStr,
              bool override)
 {
 
@@ -64,7 +60,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
     }
 
   } else {
-    stop ("No file was read.");
+    Rcpp::stop ("No file was read.");
   }
   por_file.close();
 
@@ -110,12 +106,12 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
     std::string spss (200, '\0');
     spss = readstring(spss, por);
 
-    if (!override){
-      if (!boost::regex_search(spss, boost::regex("ASCII SPSS PORT FILE")) &&
-          !boost::regex_search(spss, boost::regex("EBCDIC SPSS PORT FILE"))) {
-          stop("The file header indicates that it is not an SPSS por file. "
-                 "Use 'override = TRUE' to ignore this check.");
-      }
+    if (!override) {
+        if (spss.find("ASCII SPSS PORT FILE") == std::string::npos &&
+            spss.find("EBCDIC SPSS PORT FILE") == std::string::npos) {
+            Rcpp::stop("The file header indicates that it is not an SPSS por file. "
+                       "Use 'override = TRUE' to ignore this check.");
+        }
     }
 
     // Controll characters
@@ -129,28 +125,28 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
     digits = readstring(digits, por);
 
     if (debug)
-      Rcout << "digits: " << digits << std::endl;
+      Rcpp::Rcout << "digits: " << digits << std::endl;
 
     // Capitals
     std::string capitals (26, '\0');
     capitals = readstring(capitals, por);
 
     if (debug)
-      Rcout << "capitals: " << capitals << std::endl;
+      Rcpp::Rcout << "capitals: " << capitals << std::endl;
 
     // lowercase
     std::string lower (26, '\0');
     lower = readstring(lower, por);
 
     if (debug)
-      Rcout << "lower: " << lower << std::endl;
+      Rcpp::Rcout << "lower: " << lower << std::endl;
 
     // random
     std::string random (61, '\0');
     random = readstring(random, por);
 
     if (debug)
-      Rcout << "random: " << random << std::endl;
+      Rcpp::Rcout << "random: " << random << std::endl;
 
     // Reserved
     std::string reserved (69, '\0');
@@ -161,10 +157,10 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
     tag = readstring(tag, por);
 
     if (debug)
-      Rcout << "tag: " << tag << std::endl;
+      Rcpp::Rcout << "tag: " << tag << std::endl;
 
     if (debug)
-      Rcout << "Pos: " << por.tellg() << std::endl;
+      Rcpp::Rcout << "Pos: " << por.tellg() << std::endl;
 
     // end of header -----------------------------------------------------------
 
@@ -193,7 +189,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
 
 
     if (debug)
-      Rcout << vers << " " << filedate << " " << filetime << std::endl;
+      Rcpp::Rcout << vers << " " << filedate << " " << filetime << std::endl;
 
 
     std::string varrec (1, '\0');
@@ -213,7 +209,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
 
 
     if (debug)
-      Rcout << prod << std::endl;
+      Rcpp::Rcout << prod << std::endl;
 
     // optional
     // 2 or 3 : author and extra record
@@ -234,7 +230,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
       file_info.push_back(author);
 
       if (debug)
-        Rcout << author << std::endl;
+        Rcpp::Rcout << author << std::endl;
 
       varrec = readstring(varrec, por);
     }
@@ -253,7 +249,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
       file_info.push_back(extra);
 
       if (debug)
-        Rcout << extra << std::endl;
+        Rcpp::Rcout << extra << std::endl;
 
       varrec = readstring(varrec, por);
     }
@@ -284,7 +280,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
       if (varrec.compare("5") == 0) {
 
         if (debug)
-          Rcout << "--- 5 ---" << std::endl;
+          Rcpp::Rcout << "--- 5 ---" << std::endl;
 
         std::string prec;
         prec = readtostring(por);
@@ -298,7 +294,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
       if (varrec.compare("6") == 0) {
 
         if (debug)
-          Rcout << "--- 6 ---" << std::endl;
+          Rcpp::Rcout << "--- 6 ---" << std::endl;
 
         // single string
         std::string len;
@@ -317,7 +313,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
       {
 
         if (debug)
-          Rcout << "--- 7 ---" << std::endl;
+          Rcpp::Rcout << "--- 7 ---" << std::endl;
 
         // 0 or 1-255
         std::string vartyp;
@@ -386,8 +382,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
 
 
         if (debug) {
-          Rcout << varname << std::endl;
-          Rcout << varnamelen << std::endl;
+          Rcpp::Rcout << varname << std::endl;
+          Rcpp::Rcout << varnamelen << std::endl;
         }
       }
 
@@ -396,7 +392,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
       if (varrec.compare("8") == 0) {
 
         if (debug)
-          Rcout << "--- 8 ---" << std::endl;
+          Rcpp::Rcout << "--- 8 ---" << std::endl;
         int vartyp = 0;
 
         std::string misslen;
@@ -491,7 +487,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
       if (varrec.compare("B") == 0) {
 
         if (debug)
-          Rcout << "--- B ---" << std::endl;
+          Rcpp::Rcout << "--- B ---" << std::endl;
         std::string varname;
 
         ptrdiff_t pos = 0;
@@ -526,7 +522,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
       if (varrec.compare("C") == 0) {
 
         if (debug)
-          Rcout << "--- C ---" << std::endl;
+          Rcpp::Rcout << "--- C ---" << std::endl;
 
         std::string labellen;
 
@@ -536,7 +532,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
         label = readstring(label, por);
 
         if (debug)
-          Rcout << label << std::endl;
+          Rcpp::Rcout << label << std::endl;
 
         varlabels.push_back(label);
 
@@ -548,7 +544,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
       if (varrec.compare("D") == 0) {
 
         if (debug)
-          Rcout << "--- D ---" << std::endl;
+          Rcpp::Rcout << "--- D ---" << std::endl;
 
         std::string unk1;
         unk1 = readtostring(por);
@@ -566,7 +562,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
           labelsetnam = readstring(labelsetnam, por);
 
           if (debug)
-            Rcout << labelsetnam << std::endl;
+            Rcpp::Rcout << labelsetnam << std::endl;
 
           labelsetnams.push_back(labelsetnam);
           ++nlabelsetnams;
@@ -577,7 +573,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
         labelnum = readtostring(por);
 
         if (debug)
-          Rcout << labelnum << std::endl;
+          Rcpp::Rcout << labelnum << std::endl;
 
         int labnums = 0;
         labnums = b30int(labelnum);
@@ -603,7 +599,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
             labtxtlen = readtostring(por);
 
             if (debug) {
-              Rcout << "l & t: " << labval << " " << labtxtlen << std::endl;
+              Rcpp::Rcout << "l & t: " << labval << " " << labtxtlen << std::endl;
             }
 
             std::string labtxt ( b30int(labtxtlen), '\0');
@@ -642,8 +638,8 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
         }
 
         if (debug) {
-          Rcout << labtxts << std::endl;
-          Rcout << labvals <<std::endl;
+          Rcpp::Rcout << labtxts << std::endl;
+          Rcpp::Rcout << labvals <<std::endl;
         }
 
         // push it back nolab times so that it matches the labelsetnams
@@ -661,7 +657,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
       if (varrec.compare("E") == 0) {
 
         if (debug)
-          Rcout << "--- E ---" << std::endl;
+          Rcpp::Rcout << "--- E ---" << std::endl;
 
         std::string doclen;
         int doclen_i = 0;
@@ -679,7 +675,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
           docline = readstring(docline, por);
 
           if (debug)
-            Rcout << docline << std::endl;
+            Rcpp::Rcout << docline << std::endl;
 
           doc.push_back(docline);
         }
@@ -696,7 +692,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
 
 
     if (debug)
-      Rcout << "varrec " << varrec << std::endl;
+      Rcpp::Rcout << "varrec " << varrec << std::endl;
 
     int n = 0;
     int nvars = 0;
@@ -712,7 +708,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
     if ( varrec.compare("F") == 0) {
 
       if (debug)
-        Rcout << "--- F ---" << std::endl;
+        Rcpp::Rcout << "--- F ---" << std::endl;
 
       size_t data_begin = por.tellg();
 
@@ -724,7 +720,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
           val = readtostring(por);
 
           if (debug)
-            Rcout << val << std::endl;
+            Rcpp::Rcout << val << std::endl;
 
           // check that eof is really reached and not only a string "Z"
           // if (por.peek() == EOF)
@@ -732,7 +728,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
 
           if (eof) {
             if (debug)
-              Rcout << "End of file found. n is " << n << std::endl;
+              Rcpp::Rcout << "End of file found. n is " << n << std::endl;
             break;
           }
 
@@ -746,7 +742,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
           case 0:
             {
               // if (debug)
-              //   Rcout << "numeric do nothing" << std::endl;
+              //   Rcpp::Rcout << "numeric do nothing" << std::endl;
               break;
             }
 
@@ -772,7 +768,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
 
 
       if (debug)
-        Rcout << "Dry run finished. n is known import beginns" << std::endl;
+        Rcpp::Rcout << "Dry run finished. n is known import beginns" << std::endl;
 
       // back to the data_begin part
       por.seekg(data_begin);
@@ -815,9 +811,9 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
             val_d = dnum(val);
 
             if (debug) {
-              Rcout << varnames[ii] << std::endl;
+              Rcpp::Rcout << varnames[ii] << std::endl;
 
-              Rcout << val << std::endl;
+              Rcpp::Rcout << val << std::endl;
               Rprintf("%f\n", val_d);
             }
 
@@ -848,7 +844,7 @@ List readpor(const char * filePath, const bool debug, std::string encStr,
 
     // 3. Create a data.frame
     R_xlen_t nrows = Rf_length(df[0]);
-    df.attr("row.names") = IntegerVector::create(NA_INTEGER, nrows);
+    df.attr("row.names") = Rcpp::IntegerVector::create(NA_INTEGER, nrows);
     df.attr("names") = varnames;
     df.attr("class") = "data.frame";
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Jan Marvin Garbuszus
+ * Copyright (C) 2018-2025 Jan Marvin Garbuszus
  *
  * zlib header information by Evan Miller
  *

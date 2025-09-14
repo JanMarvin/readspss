@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2019 Jan Marvin Garbuszus
+ * Copyright (C) 2014-2025 Jan Marvin Garbuszus
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -20,8 +20,6 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
-
-using namespace Rcpp;
 
 #include "spss.h"
 
@@ -109,7 +107,7 @@ void write_data(Rcpp::DataFrame dat, int32_t cflag,
           // Rcout << "--- string ---" << std::endl;
 
 
-          std::string val_s = as<std::string>(as<CharacterVector>(dat[j])[i]);
+          std::string val_s = Rcpp::as<std::string>(Rcpp::as<Rcpp::CharacterVector>(dat[j])[i]);
 
           int strlen = type;
           if (strlen == 255) strlen = 256;
@@ -322,13 +320,13 @@ void write_data(Rcpp::DataFrame dat, int32_t cflag,
         default:
         {
 
-          CharacterVector cv_s = NA_STRING;
-          cv_s = as<CharacterVector>(dat[j])[i];
+          Rcpp::CharacterVector cv_s = NA_STRING;
+          cv_s = Rcpp::as<Rcpp::CharacterVector>(dat[j])[i];
 
           std::string val_s = "";
 
           if (cv_s[0] != NA_STRING)
-            val_s = as<std::string>(cv_s);
+            val_s = Rcpp::as<std::string>(cv_s);
 
           int size = type;
           if (size == 255)

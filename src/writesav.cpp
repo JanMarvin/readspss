@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2019 Jan Marvin Garbuszus
+ * Copyright (C) 2014-2025 Jan Marvin Garbuszus
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -20,8 +20,6 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
-
-using namespace Rcpp;
 
 #include "spss.h"
 #include "write_data.h"
@@ -265,7 +263,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
           uint8_t lablen = lab.size();
           if (lablen > 120) {
             lablen = 120;
-            warning("Label longer than 120 characters found. Trimmed to 120.");
+            Rcpp::warning("Label longer than 120 characters found. Trimmed to 120.");
           }
 
           writebin(lablen, sav, swapit);

@@ -49,7 +49,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // readpor
-List readpor(const char * filePath, const bool debug, std::string encStr, bool override);
+Rcpp::List readpor(const char * filePath, const bool debug, std::string encStr, bool override);
 RcppExport SEXP _readspss_readpor(SEXP filePathSEXP, SEXP debugSEXP, SEXP encStrSEXP, SEXP overrideSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -63,7 +63,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // readsav
-List readsav(const char * filePath, const bool debug, std::string encStr, std::string const ownEnc);
+Rcpp::List readsav(const char * filePath, const bool debug, std::string encStr, std::string const ownEnc);
 RcppExport SEXP _readspss_readsav(SEXP filePathSEXP, SEXP debugSEXP, SEXP encStrSEXP, SEXP ownEncSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

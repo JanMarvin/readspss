@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Jan Marvin Garbuszus
+ * Copyright (C) 2018-2025 Jan Marvin Garbuszus
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -18,8 +18,6 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
-
-#include <boost/regex.hpp>
 
 #include "spss.h"
 
@@ -165,8 +163,7 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::fstream& sav,
           if (res_i == res_kk-1) {
 
             // trim additional whitespaces to the right
-            start = boost::regex_replace(start,
-                                         boost::regex(" +$"), "$1");
+            rtrim(start);
 
             Rcpp::as<Rcpp::CharacterVector>(df[kk])[nn] = start;
 
@@ -250,8 +247,7 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::fstream& sav,
           if (res_i == res_kk-1) {
 
             // trim additional whitespaces to the right
-            start = boost::regex_replace(start,
-                                         boost::regex(" +$"), "$1");
+            rtrim(start);
 
             Rcpp::as<Rcpp::CharacterVector>(df[kk])[nn] = start;
 
@@ -294,8 +290,7 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::fstream& sav,
           if (res_i == res_kk-1) {
 
           // trim additional whitespaces to the right
-          start = boost::regex_replace(start,
-                                       boost::regex(" +$"), "$1");
+          rtrim(start);
 
           Rcpp::as<Rcpp::CharacterVector>(df[kk])[nn] = start;
 
@@ -418,8 +413,7 @@ Rcpp::List read_sav_known_n (Rcpp::List& df, std::fstream& sav,
         val_s.erase(type, std::string::npos);
 
         // trim additional whitespaces
-        val_s = boost::regex_replace(val_s,
-                                     boost::regex("^ +| +$"), "$1");
+        trim(val_s);
 
         // Rcpp::Rcout << val_s << std::endl;
         Rcpp::as<Rcpp::CharacterVector>(df[kk])[nn] = val_s;
