@@ -22,8 +22,6 @@
 #include <streambuf>
 #include <locale>
 
-using namespace Rcpp;
-
 #include "spss.h"
 
 //' writes the binary SPSS file
@@ -100,14 +98,14 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
     for (int i = 0; i < k; ++i) {
 
       if (debug)
-        Rcout << "--- 7 ---" << std::endl;
+        Rcpp::Rcout << "--- 7 ---" << std::endl;
 
       file += "7"; //var
 
       int vartypi = vtyp(i);
       int isdate = vartyp(i);
 
-      std::string nvarname = as<std::string>(nvarnames(i));
+      std::string nvarname = Rcpp::as<std::string>(nvarnames(i));
 
       file += pnum1(vartypi);
       file += "/";
@@ -153,11 +151,11 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
       if (!Rf_isNull(label) && (Rf_length(label) == k )) {
 
         if (debug)
-          Rcout << "--- C ---" << std::endl;
+          Rcpp::Rcout << "--- C ---" << std::endl;
 
         file += "C"; //var
 
-        std::string lab = as<std::string>(label(i));
+        std::string lab = Rcpp::as<std::string>(label(i));
 
         file += writestr(lab,0);
       }
@@ -167,7 +165,7 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
     if (!Rf_isNull(labtabs) && (Rf_length(labtabs) > 0)) {
 
       if (debug)
-        Rcout << "--- D ---" << std::endl;
+        Rcpp::Rcout << "--- D ---" << std::endl;
 
       file += "D";
 
@@ -176,7 +174,7 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
       Rcpp::IntegerVector   labtab     = labtabs[nolabtab];
       Rcpp::CharacterVector labtn      = labtab.attr("names");
 
-      const std::string nlabs = as<std::string>(labtabnams[nolabtab]);
+      const std::string nlabs = Rcpp::as<std::string>(labtabnams[nolabtab]);
 
       file += pnum1(1); // nolab
       file += "/";
@@ -190,13 +188,13 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
       for (int j = 0; j < labtab.size(); ++j) {
 
         if (debug) {
-          Rcout << labtab(j) << std::endl; // val
-          Rcout << labtn(j) << std::endl;  // lab
+          Rcpp::Rcout << labtab(j) << std::endl; // val
+          Rcpp::Rcout << labtn(j) << std::endl;  // lab
         }
 
         file += pnum1(labtab(j));
         file += "/";
-        file += writestr(as<std::string>(labtn(j)), 0);
+        file += writestr(Rcpp::as<std::string>(labtn(j)), 0);
 
       }
 
@@ -208,7 +206,7 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
 
 
     if (debug)
-      Rcout << "--- F ---" << std::endl;
+      Rcpp::Rcout << "--- F ---" << std::endl;
 
 
     for (int64_t i = 0; i < n; ++i) {
@@ -243,13 +241,13 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
           default:
           {
 
-            CharacterVector cv_s = NA_STRING;
-            cv_s = as<CharacterVector>(dat[j])[i];
+            Rcpp::CharacterVector cv_s = NA_STRING;
+            cv_s = Rcpp::as<Rcpp::CharacterVector>(dat[j])[i];
 
             std::string val_s = "";
 
             if (cv_s[0] != NA_STRING)
-              val_s = as<std::string>(cv_s);
+              val_s = Rcpp::as<std::string>(cv_s);
 
             file += writestr(val_s, 0);
             break;

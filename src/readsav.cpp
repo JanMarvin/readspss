@@ -21,8 +21,6 @@
 #include <fstream>
 #include <streambuf>
 
-using namespace Rcpp;
-
 #include "spss.h"
 #include "read_sav_known_n.h"
 #include "read_sav_unknown_n.h"
@@ -38,7 +36,7 @@ using namespace Rcpp;
 //' @keywords internal
 //' @noRd
 // [[Rcpp::export]]
-List readsav(const char * filePath, const bool debug, std::string encStr,
+Rcpp::List readsav(const char * filePath, const bool debug, std::string encStr,
              std::string const ownEnc)
 {
 
@@ -91,8 +89,8 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
       fileheader = spss + fileheader;
       if (fileheader.find("ENCRYPTEDSAV") != std::string::npos)
-        stop("The file header indicates that this file is encrypted. "
-               "A password is required to decode this file");
+        Rcpp::stop("The file header indicates that this file is encrypted. "
+                   "A password is required to decode this file");
 
 
       throw std::range_error("Can not read this file. Is it no SPSS sav file?");
@@ -111,7 +109,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     if (doenc) datalabel = Riconv(datalabel, encStr);
 
     if (debug)
-      Rcout << "Datalabel:" << datalabel << std::endl;
+      Rcpp::Rcout << "Datalabel:" << datalabel << std::endl;
 
     // file format? should be 2 or 3
     arch = readbin(arch, sav, swapit);
@@ -302,7 +300,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
 
         if (debug) {
-          Rcout << nvarname << " ";
+          Rcpp::Rcout << nvarname << " ";
           Rprintf("nmistype %d ", nmisstype);
           Rprintf("vflag %d\n", vlflag);
         }
@@ -457,7 +455,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
         Rcpp::CharacterVector Document(nlines);
         std::string document (80, '\0');
 
-        // Rcout << " --- Documentation --- " << std::endl;
+        // Rcpp::Rcout << " --- Documentation --- " << std::endl;
         for (int32_t i = 0; i < nlines; ++i) {
           std::string docline = readstring(document, sav);
 
@@ -642,7 +640,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
             vn = readstringsize(vn, sav, len);
 
             // Rprintf("vn %d \n", len);
-            // Rcout << vn << std::endl;
+            // Rcpp::Rcout << vn << std::endl;
 
             // 8 is the minimal value
             int32_t varw = 0, nvars = 0;
@@ -652,8 +650,8 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
             // Rprintf("varw %d\n", varw);
 
             // set size
-            CharacterVector longv(nvars);
-            CharacterVector longl(nvars);
+            Rcpp::CharacterVector longv(nvars);
+            Rcpp::CharacterVector longl(nvars);
 
             for (int32_t i = 0; i < nvars; ++i) {
 
@@ -670,7 +668,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
               std::string lab (len2, '\0');
               lab = readstringsize(lab, sav, len2);
 
-              // Rcout << val << " : "<< lab << std::endl;
+              // Rcpp::Rcout << val << " : "<< lab << std::endl;
 
               longv(i) = val;
               longl(i) = lab;
@@ -705,7 +703,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
             mv = readbin(mv, sav, swapit);
 
             // set size
-            CharacterVector longmissing(mv);
+            Rcpp::CharacterVector longmissing(mv);
             len = readbin(len, sav, swapit); // should be 8
 
             if (debug)
@@ -744,10 +742,10 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
           // ignore this
           readstring(data, sav);
 
-          Rcout << data << std::endl;
+          Rcpp::Rcout << data << std::endl;
 
-          Rcout << "unknown subtype " << subtyp << " detected." << std::endl;
-          Rcout << "most likely no readson to worry. but if you want\n" <<
+          Rcpp::Rcout << "unknown subtype " << subtyp << " detected." << std::endl;
+          Rcpp::Rcout << "most likely no readson to worry. but if you want\n" <<
             "to help me out and can share a row of this datafile, \n" <<
               "please mail me!" << std::endl;
 
@@ -763,14 +761,14 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
 
     if (debug)
-      Rcout << "-- end of header" << std::endl;
+      Rcpp::Rcout << "-- end of header" << std::endl;
 
     // encStr should not be empty otherwise
     // the iconv call would be useless
     if (doenc && encStr.compare(empty) != 0) {
 
       if (debug)
-        Rcout << "encoding" << std::endl;
+        Rcpp::Rcout << "encoding" << std::endl;
 
       longstring  = Riconv(longstring, encStr);
       longvarname = Riconv(longvarname, encStr);
@@ -793,27 +791,27 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
     unk8 = readbin(unk8, sav, swapit); // 0
 
     // c++ vector to Rcpp Vector
-    IntegerVector Vartype = wrap(vartype);
-    CharacterVector Varnames = wrap(varnames);
+    Rcpp::IntegerVector Vartype = Rcpp::wrap(vartype);
+    Rcpp::CharacterVector Varnames = Rcpp::wrap(varnames);
 
 
     // select only numerics or the beginning of strings. This enables
     // reading into fewer columns and reduces the overhead in the R code
-    CharacterVector vnam = Varnames[Vartype >= 0];
-    IntegerVector vtyp = Vartype[Vartype >= 0];
+    Rcpp::CharacterVector vnam = Varnames[Vartype >= 0];
+    Rcpp::IntegerVector vtyp = Vartype[Vartype >= 0];
 
     // if k is set to be the number of available numerics and string variables
     int32_t kv = vnam.size();
 
 
     // wrangling around to get the length of the strings
-    NumericVector vtyp2 = wrap(vtyp);
-    NumericVector res = ceil(vtyp2 / 8);
+    Rcpp::NumericVector vtyp2 = wrap(vtyp);
+    Rcpp::NumericVector res = ceil(vtyp2 / 8);
 
     if (debug) {
-      Rcout << vnam << std::endl;
-      Rcout << vtyp << std::endl;
-      Rcout << res << std::endl;
+      Rcpp::Rcout << vnam << std::endl;
+      Rcpp::Rcout << vtyp << std::endl;
+      Rcpp::Rcout << res << std::endl;
     }
 
     if (debug)
@@ -877,7 +875,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
           Rcpp::Environment base("package:base");
           Rcpp::Function iconv = base["iconv"];
 
-          CharacterVector tmp = df[i];
+          Rcpp::CharacterVector tmp = df[i];
           tmp = iconv(tmp, Rcpp::Named("from", encStr), Rcpp::Named("to",""));
 
           SET_VECTOR_ELT(df, i, tmp);
@@ -889,7 +887,7 @@ List readsav(const char * filePath, const bool debug, std::string encStr,
 
     // 3. Create a data.frame
     R_xlen_t nrows = Rf_length(df[0]);
-    df.attr("row.names") = IntegerVector::create(NA_INTEGER, nrows);
+    df.attr("row.names") = Rcpp::IntegerVector::create(NA_INTEGER, nrows);
     df.attr("names") = vnam;
     df.attr("class") = "data.frame";
 

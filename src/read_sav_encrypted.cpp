@@ -25,7 +25,6 @@
 #include <openssl/aes.h>
 #include <openssl/cmac.h>
 
-using namespace Rcpp;
 
 #include "spss.h"
 #include "read_sav_encrypted.h"
@@ -51,7 +50,7 @@ int encryptfile (const char * filePath, std::string &outpath, std::string pass)
     fileheader = readstring(fileheader, sav);
 
     if (fileheader.find("ENCRYPTEDSAV") == std::string::npos) {
-        stop("The file header indicates that it is not an SPSS sav file.");
+      Rcpp::stop("The file header indicates that it is not an SPSS sav file.");
     }
 
     /* Read first ciphertext block and use it to verify the password.  Try the
@@ -121,7 +120,7 @@ Rcpp::List readencrypted(const char * filePath, const bool debug,
     // remove encrypted sav-file
     std::remove(outPath.c_str());
   } else {
-    stop("stopping");
+    Rcpp::stop("stopping");
   }
 
   return df;

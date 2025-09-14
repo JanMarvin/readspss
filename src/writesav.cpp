@@ -21,8 +21,6 @@
 #include <fstream>
 #include <streambuf>
 
-using namespace Rcpp;
-
 #include "spss.h"
 #include "write_data.h"
 #include "write_sav_compress.h"
@@ -265,7 +263,7 @@ void writesav(const char * filePath, Rcpp::DataFrame dat, uint8_t compress,
           uint8_t lablen = lab.size();
           if (lablen > 120) {
             lablen = 120;
-            warning("Label longer than 120 characters found. Trimmed to 120.");
+            Rcpp::warning("Label longer than 120 characters found. Trimmed to 120.");
           }
 
           writebin(lablen, sav, swapit);

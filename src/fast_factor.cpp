@@ -1,11 +1,10 @@
 #include <Rcpp.h>
-using namespace Rcpp;
 
 
 template <int RTYPE>
-IntegerVector fast_factor_template( const Vector<RTYPE>& x,
-                                    const Vector<RTYPE>& y) {
-  IntegerVector out = match(x, y);
+Rcpp::IntegerVector fast_factor_template( const Rcpp::Vector<RTYPE>& x,
+                                          const Rcpp::Vector<RTYPE>& y) {
+  Rcpp::IntegerVector out = match(x, y);
 
   out.attr("levels") = y.attr("names");
   out.attr("class") = "factor";
