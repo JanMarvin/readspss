@@ -36,7 +36,7 @@ get.filepath <- function(path = "") {
     return("File does not exist.")
   }
 
-  return(filepath)
+  filepath
 }
 
 #' Check if numeric vector can be expressed as integer vector

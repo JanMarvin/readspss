@@ -382,7 +382,7 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
             nams[p : (p + len)]
         })
 
-      for (i in rev(seq_len(length(replvec)))) {
+      for (i in rev(seq_along(replvec))) {
 
         pat <- replvec[[i]]
 
@@ -536,6 +536,6 @@ read.sav <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   }
 
   # return
-  return(data)
+  data
 
 }

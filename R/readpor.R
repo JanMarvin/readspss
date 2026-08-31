@@ -307,6 +307,6 @@ read.por <- function(file, convert.factors = TRUE, generate.factors = TRUE,
   }
 
   # return
-  return(data)
+  data
 
 }
