@@ -272,3 +272,11 @@ test_that("zsav", {
 })
 
 unlink("data", recursive = TRUE)
+
+test_that("write por works with negative values", {
+  tmp <- tempfile(fileext = ".por")
+  d <- data.frame(NUM = c(-1, 1, 2))
+  write.por(d, tmp)
+  got <- read.por(tmp)
+  expect_true(all.equal(got, d, check.attributes = FALSE))
+})

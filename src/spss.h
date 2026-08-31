@@ -370,13 +370,18 @@ inline std::string pfnum(double x)
   if (x == 0)
     return ("0");
 
+  if (x < 0) {
+    val_s += "-";
+    x = -x;
+  }
+
   e = floor(log(x) / log(30.0));
   b = x / pow(30.0, e);
   c = floor(b);
   if (c < 0.0 || c >= 30.0)
     Rcpp::stop("74"); // no clue what this supposed be
 
-  val_s = DIG30[(int32_t)c];
+  val_s += DIG30[(int32_t)c];
   b -= c;
   if (b > EPSI) {
     val_s += ".";
