@@ -251,7 +251,13 @@ inline int getdigit(char *p, int *err)
 // Copyright (C) 1989,1991-97 Goetz Rohwer. GPL-2
 inline double dnum(std::string strng)
 {
-  double x = 0.0, man = 0.0, mex = 0.0; /* result, mantissa and exponent */
+  double x = 0.0, mex = 0.0;            /* result and exponent */
+  /* The mantissa is accumulated as an exact integer. A double holds
+   integers exactly only to 2^53 = 9.0e15, and thirteen base-30 digits
+   reach 30^13 = 1.6e19, so accumulating into a double lost the low
+   bits before the rescale below could run. uint64_t covers 1.8e19,
+   which is exactly the thirteen digits the k > 13 check allows. */
+  uint64_t man = 0;
   int32_t err,  neg = 0, pnt = 0, ex  = 0, k = 0,  n = 0;
   char *p = &strng[0], *q;
 
@@ -282,8 +288,8 @@ inline double dnum(std::string strng)
       ex = -1;
     else {
       if (!ex) {
-        man *= 30.0;
-        man += (double) getdigit(p, &err);
+        man *= 30;
+        man += (uint64_t) getdigit(p, &err);
 
         if (err) {
           Rcpp::stop("Unk0: %d\n", q);
@@ -291,7 +297,7 @@ inline double dnum(std::string strng)
         }
         k++;
         if (k > 13)
-          Rcpp::stop("Warning: found entry with %2d (base-30) digits.\n",k);
+          Rcpp::warning("Warning: found entry with %2d (base-30) digits.\n",k);
       }
       else {
         mex *= 30.0;
@@ -305,19 +311,22 @@ inline double dnum(std::string strng)
     }
     p++;
   }
+
+  /* one conversion, then one division: three roundings in total rather
+   than one per digit */
+  x = (double) man;
+
   if (neg)
-    man = -man;
+    x = -x;
 
   if (pnt) {
     k -= n;
-    while (k--)
-      man /= 30.0;
+    x /= pow(30.0, (double) k);
   }
   if (ex == 1)
-    man *= pow(30.0, mex);
+    x *= pow(30.0, mex);
   else if (ex == -1)
-    man /= pow(30.0, mex);
-  x = man;
+    x /= pow(30.0, mex);
 
   return(x);
 }
@@ -362,7 +371,7 @@ inline std::string pnum1(int32_t n)
 inline std::string pfnum(double x)
 {
   int32_t i;
-  double a, b, c, d, e;
+  double b, c, d, e;
   double EPSI = std::numeric_limits<double>::epsilon();
 
   std::string val_s;
@@ -385,15 +394,18 @@ inline std::string pfnum(double x)
   b -= c;
   if (b > EPSI) {
     val_s += ".";
-    c = 30.0;
-    for (i = 0; i < 10 ; ++i) {
-      a = b * c;
-      d = floor(a);
+
+    /* Rescale b each step instead of growing c to 30^12 and doing
+     b -= d/c: with the growing form both b*c and the subtraction
+     shed low bits, and the loop can break early on a b that is
+     small only because of accumulated rounding. */
+    for (i = 0; i < 12 ; ++i) {
+      b *= 30.0;
+      d = floor(b);
       val_s += DIG30[(int32_t)d];
-      b -= d / c;
+      b -= d;
       if (b <= EPSI)
         break;
-      c *= 30;
     }
   }
   i = (int32_t)e;
