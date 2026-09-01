@@ -272,3 +272,56 @@ test_that("zsav", {
 })
 
 unlink("data", recursive = TRUE)
+
+test_that("write por works with negative values", {
+  tmp <- tempfile(fileext = ".por")
+  d <- data.frame(NUM = c(-1, 1, 2))
+  write.por(d, tmp)
+  got <- read.por(tmp)
+  expect_true(all.equal(got, d, check.attributes = FALSE))
+})
+
+test_that("write.por keeps the magnitude exactly", {
+  tmp <- tempfile(fileext = ".por")
+  d <- data.frame(NUM = c(1e6, 1e9, 1e-5, -1e6, 123456.789))
+  write.por(d, tmp)
+  got <- read.por(tmp)$NUM
+
+  expect_equal(sign(got), sign(d$NUM))
+  expect_true(all(abs(got - d$NUM) / pmax(abs(d$NUM), 1) < 1e-12))
+})
+
+test_that("the error is a few ulp, not a wrong number", {
+  set.seed(1)
+  tmp <- tempfile(fileext = ".por")
+  d <- data.frame(NUM = c(runif(500, -1e9, 1e9), 1e6, 123456.789, 1 / 3))
+  write.por(d, tmp)
+  got <- read.por(tmp)$NUM
+
+  rel <- abs(got - d$NUM) / abs(d$NUM)
+  rel <- rel[is.finite(rel)]
+  expect_lt(max(rel), 1e-14)
+})
+
+test_that("round-trip is within one ulp", {
+  # NOT exact, and cannot be: the digit loop stops on `b <= EPSI` with
+  # EPSI an absolute threshold on the remaining fraction, so it leaves
+  # up to ~2.2e-16 of the mantissa unwritten -- about 1 ulp of the
+  # value. Raising the digit count does not change that; the
+  # termination rule is the floor, not the digit count.
+  #
+  # Before the reader fix, 1e6 was 2.33e-10 low, which is ~1000 ulp.
+  # That was the accumulate-then-divide overflow, and it is what this
+  # test guards against coming back.
+  set.seed(1)
+  tmp <- tempfile(fileext = ".por")
+  d <- data.frame(NUM = c(1e6, 123456.789, -26574736.40935, 1 / 3, 2 / 3,
+                          runif(500, -1e9, 1e9)))
+  write.por(d, tmp)
+  got <- read.por(tmp)$NUM
+
+  rel <- abs(got - d$NUM) / abs(d$NUM)
+  expect_lt(max(rel[is.finite(rel)]), 4 * .Machine$double.eps)
+
+  expect_identical(got[1], 1e6)
+})

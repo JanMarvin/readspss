@@ -8,6 +8,8 @@ export(write.sav)
 import(Rcpp)
 importFrom(stats,na.omit)
 importFrom(tools,file_ext)
-importFrom(utils,download.file)
-importFrom(utils,localeToCharset)
+importFrom(utils,
+  download.file,
+  localeToCharset
+)
 useDynLib(readspss, .registration=TRUE)

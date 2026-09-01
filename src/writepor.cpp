@@ -57,6 +57,7 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
 
     Rcpp::IntegerVector haslabel = dat.attr("haslabel");
     Rcpp::List labtabs = dat.attr("labtab");
+    Rcpp::List missings = dat.attr("missings");
 
     int nolabtab = 0;
 
@@ -147,6 +148,20 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
       file += pnum1(wfmt3);
       file += "/";
 
+      if (!Rf_isNull(missings) &&
+          missings.containsElementNamed(nvarname.c_str())) {
+
+        file += "8";
+
+        if (vartypi == 0) {
+          file += pfnum(Rcpp::as<double>(missings[nvarname]));
+          file += "/";
+        } else {
+          file += writestr(Rcpp::as<std::string>(missings[nvarname]), 0);
+        }
+
+      }
+
 
       if (!Rf_isNull(label) && (Rf_length(label) == k )) {
 
@@ -171,7 +186,8 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
 
       // labtabnam
       Rcpp::CharacterVector labtabnams = labtabs.attr("names");
-      Rcpp::IntegerVector   labtab     = labtabs[nolabtab];
+      Rcpp::NumericVector   labtab     =
+        Rcpp::as<Rcpp::NumericVector>(labtabs[nolabtab]);
       Rcpp::CharacterVector labtn      = labtab.attr("names");
 
       const std::string nlabs = Rcpp::as<std::string>(labtabnams[nolabtab]);
@@ -192,7 +208,7 @@ void writepor(const char * filePath, Rcpp::DataFrame dat)
           Rcpp::Rcout << labtn(j) << std::endl;  // lab
         }
 
-        file += pnum1(labtab(j));
+        file += pfnum(labtab(j));
         file += "/";
         file += writestr(Rcpp::as<std::string>(labtn(j)), 0);
 
